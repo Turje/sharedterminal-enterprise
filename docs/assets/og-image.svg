@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#12121a"/>
+    </linearGradient>
+    <linearGradient id="accentGlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#da7756" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#da7756" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#da7756" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.03" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="0" x2="0" y2="640"/><line x1="40" y1="0" x2="40" y2="640"/>
+    <line x1="80" y1="0" x2="80" y2="640"/><line x1="120" y1="0" x2="120" y2="640"/>
+    <line x1="160" y1="0" x2="160" y2="640"/><line x1="200" y1="0" x2="200" y2="640"/>
+    <line x1="240" y1="0" x2="240" y2="640"/><line x1="280" y1="0" x2="280" y2="640"/>
+    <line x1="320" y1="0" x2="320" y2="640"/><line x1="360" y1="0" x2="360" y2="640"/>
+    <line x1="400" y1="0" x2="400" y2="640"/><line x1="440" y1="0" x2="440" y2="640"/>
+    <line x1="480" y1="0" x2="480" y2="640"/><line x1="520" y1="0" x2="520" y2="640"/>
+    <line x1="560" y1="0" x2="560" y2="640"/><line x1="600" y1="0" x2="600" y2="640"/>
+    <line x1="640" y1="0" x2="640" y2="640"/><line x1="680" y1="0" x2="680" y2="640"/>
+    <line x1="720" y1="0" x2="720" y2="640"/><line x1="760" y1="0" x2="760" y2="640"/>
+    <line x1="800" y1="0" x2="800" y2="640"/><line x1="840" y1="0" x2="840" y2="640"/>
+    <line x1="880" y1="0" x2="880" y2="640"/><line x1="920" y1="0" x2="920" y2="640"/>
+    <line x1="960" y1="0" x2="960" y2="640"/><line x1="1000" y1="0" x2="1000" y2="640"/>
+    <line x1="1040" y1="0" x2="1040" y2="640"/><line x1="1080" y1="0" x2="1080" y2="640"/>
+    <line x1="1120" y1="0" x2="1120" y2="640"/><line x1="1160" y1="0" x2="1160" y2="640"/>
+    <line x1="1200" y1="0" x2="1200" y2="640"/><line x1="1240" y1="0" x2="1240" y2="640"/>
+    <line x1="1280" y1="0" x2="1280" y2="640"/>
+    <line x1="0" y1="40" x2="1280" y2="40"/><line x1="0" y1="80" x2="1280" y2="80"/>
+    <line x1="0" y1="120" x2="1280" y2="120"/><line x1="0" y1="160" x2="1280" y2="160"/>
+    <line x1="0" y1="200" x2="1280" y2="200"/><line x1="0" y1="240" x2="1280" y2="240"/>
+    <line x1="0" y1="280" x2="1280" y2="280"/><line x1="0" y1="320" x2="1280" y2="320"/>
+    <line x1="0" y1="360" x2="1280" y2="360"/><line x1="0" y1="400" x2="1280" y2="400"/>
+    <line x1="0" y1="440" x2="1280" y2="440"/><line x1="0" y1="480" x2="1280" y2="480"/>
+    <line x1="0" y1="520" x2="1280" y2="520"/><line x1="0" y1="560" x2="1280" y2="560"/>
+    <line x1="0" y1="600" x2="1280" y2="600"/>
+  </g>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1280" height="3" fill="url(#accentGlow)"/>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="637" width="1280" height="3" fill="url(#accentGlow)"/>
+
+  <!-- Corner decorations -->
+  <path d="M40 60 L40 40 L60 40" fill="none" stroke="#da7756" stroke-width="2" opacity="0.5"/>
+  <path d="M1240 60 L1240 40 L1220 40" fill="none" stroke="#da7756" stroke-width="2" opacity="0.5"/>
+  <path d="M40 580 L40 600 L60 600" fill="none" stroke="#da7756" stroke-width="2" opacity="0.5"/>
+  <path d="M1240 580 L1240 600 L1220 600" fill="none" stroke="#da7756" stroke-width="2" opacity="0.5"/>
+
+  <!-- Logo icon (centered) -->
+  <g transform="translate(600, 180)">
+    <rect x="0" y="0" width="80" height="66" rx="10" ry="10" fill="#da7756"/>
+    <rect x="0" y="0" width="80" height="16" rx="10" ry="10" fill="#c4654a"/>
+    <rect x="0" y="10" width="80" height="6" fill="#c4654a"/>
+    <circle cx="14" cy="8" r="3" fill="#0a0a0f" opacity="0.4"/>
+    <circle cx="24" cy="8" r="3" fill="#0a0a0f" opacity="0.4"/>
+    <circle cx="34" cy="8" r="3" fill="#0a0a0f" opacity="0.4"/>
+    <text x="17" y="52" font-family="-apple-system, 'SF Mono', 'Fira Code', monospace" font-size="30" font-weight="700" fill="#ffffff" letter-spacing="-1">
+      &gt;_
+    </text>
+  </g>
+
+  <!-- Main title -->
+  <text x="640" y="320" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff" letter-spacing="-1">
+    SharedTerminal Enterprise
+  </text>
+
+  <!-- Subtitle -->
+  <text x="640" y="370" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" font-weight="400" fill="#8888a0" letter-spacing="0.5">
+    Collaborative Terminal Sharing for Enterprise
+  </text>
+
+  <!-- Feature pills -->
+  <g transform="translate(640, 420)" text-anchor="middle">
+    <g transform="translate(-300, 0)">
+      <rect x="-60" y="-14" width="120" height="28" rx="14" fill="#da7756" opacity="0.12" stroke="#da7756" stroke-width="1" stroke-opacity="0.3"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#da7756" font-weight="500">Docker Sandbox</text>
+    </g>
+    <g transform="translate(-150, 0)">
+      <rect x="-60" y="-14" width="120" height="28" rx="14" fill="#da7756" opacity="0.12" stroke="#da7756" stroke-width="1" stroke-opacity="0.3"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#da7756" font-weight="500">Audit Logging</text>
+    </g>
+    <g transform="translate(0, 0)">
+      <rect x="-60" y="-14" width="120" height="28" rx="14" fill="#da7756" opacity="0.12" stroke="#da7756" stroke-width="1" stroke-opacity="0.3"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#da7756" font-weight="500">DLP Scanning</text>
+    </g>
+    <g transform="translate(150, 0)">
+      <rect x="-60" y="-14" width="120" height="28" rx="14" fill="#da7756" opacity="0.12" stroke="#da7756" stroke-width="1" stroke-opacity="0.3"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#da7756" font-weight="500">Session Replay</text>
+    </g>
+    <g transform="translate(300, 0)">
+      <rect x="-60" y="-14" width="120" height="28" rx="14" fill="#da7756" opacity="0.12" stroke="#da7756" stroke-width="1" stroke-opacity="0.3"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#da7756" font-weight="500">Self-Hosted</text>
+    </g>
+  </g>
+
+  <!-- URL at bottom -->
+  <text x="640" y="560" text-anchor="middle" font-family="-apple-system, 'SF Mono', 'Fira Code', monospace" font-size="14" fill="#8888a0" opacity="0.6">
+    github.com/sharedterminal
+  </text>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" width="600" height="100">
+  <!-- 1. Shield (Docker Isolation) -->
+  <g transform="translate(10, 10)">
+    <path d="M40 8 L16 20 L16 42 C16 56 28 66 40 72 C52 66 64 56 64 42 L64 20 Z" fill="none" stroke="#da7756" stroke-width="2" stroke-linejoin="round"/>
+    <polyline points="28 40 36 48 54 30" fill="none" stroke="#da7756" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 2. Document/Log (Audit Logging) -->
+  <g transform="translate(110, 10)">
+    <path d="M22 8 L22 72 C22 74 24 76 26 76 L56 76 C58 76 60 74 60 72 L60 24 L46 8 Z" fill="none" stroke="#da7756" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M46 8 L46 24 L60 24" fill="none" stroke="#da7756" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="30" y1="38" x2="52" y2="38" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="30" y1="48" x2="52" y2="48" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="30" y1="58" x2="44" y2="58" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- 3. Play Circle (Session Recording) -->
+  <g transform="translate(210, 10)">
+    <circle cx="40" cy="40" r="30" fill="none" stroke="#da7756" stroke-width="2"/>
+    <polygon points="34,26 34,54 58,40" fill="none" stroke="#da7756" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 4. Eye with Slash (DLP) -->
+  <g transform="translate(310, 10)">
+    <path d="M12 40 C20 24 30 18 40 18 C50 18 60 24 68 40 C60 56 50 62 40 62 C30 62 20 56 12 40 Z" fill="none" stroke="#da7756" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="40" cy="40" r="10" fill="none" stroke="#da7756" stroke-width="2"/>
+    <line x1="18" y1="64" x2="62" y2="16" stroke="#da7756" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 5. Key (SSO) -->
+  <g transform="translate(410, 10)">
+    <circle cx="32" cy="32" r="12" fill="none" stroke="#da7756" stroke-width="2"/>
+    <line x1="42" y1="38" x2="64" y2="60" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="56" y1="52" x2="64" y2="44" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="50" y1="46" x2="58" y2="38" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- 6. Server (Self-Hosted) -->
+  <g transform="translate(510, 10)">
+    <rect x="18" y="10" width="44" height="16" rx="3" fill="none" stroke="#da7756" stroke-width="2"/>
+    <rect x="18" y="32" width="44" height="16" rx="3" fill="none" stroke="#da7756" stroke-width="2"/>
+    <rect x="18" y="54" width="44" height="16" rx="3" fill="none" stroke="#da7756" stroke-width="2"/>
+    <circle cx="52" cy="18" r="2.5" fill="#da7756"/>
+    <circle cx="52" cy="40" r="2.5" fill="#da7756"/>
+    <circle cx="52" cy="62" r="2.5" fill="#da7756"/>
+    <line x1="26" y1="18" x2="38" y2="18" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="26" y1="40" x2="38" y2="40" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+    <line x1="26" y1="62" x2="38" y2="62" stroke="#da7756" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

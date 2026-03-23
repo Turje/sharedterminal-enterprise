@@ -9,7 +9,8 @@
   <meta property="og:description" content="Secure, shared terminal environment for incident response, pair debugging, and onboarding. Self-hosted, Docker-sandboxed, enterprise-ready.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://turje.github.io/sharedterminal-enterprise/">
-  <meta property="og:image" content="https://turje.github.io/sharedterminal-enterprise/og-image.png">
+  <meta property="og:image" content="https://turje.github.io/sharedterminal-enterprise/assets/og-image.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SharedTerminal Enterprise — Collaborative Terminal Sharing">
   <meta name="twitter:description" content="Secure, shared terminal environment for incident response, pair debugging, and onboarding.">
@@ -693,7 +694,7 @@
   <!-- ─── NAVIGATION ─── -->
   <nav>
     <div class="nav-inner">
-      <a href="#" class="wordmark">Shared<span>Terminal</span></a>
+      <a href="#" class="wordmark"><img src="assets/logo.svg" alt="" width="28" height="28" style="vertical-align:middle;margin-right:8px;">Shared<span>Terminal</span></a>
       <div class="nav-links">
         <a href="#features" class="nav-text-link">Documentation</a>
         <a href="https://github.com/Turje/sharedterminal-enterprise" class="nav-text-link">GitHub</a>
@@ -779,34 +780,83 @@
       <h2 class="section-heading reveal">Enterprise-Grade by Design</h2>
       <div class="features-grid">
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9638;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 3L4 10v12c0 7.7 6 13.3 14 16 8-2.7 14-8.3 14-16V10L18 3z" stroke="#da7756" stroke-width="2" fill="none"/><path d="M12 18l4 4 8-8" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h3>Docker Isolation</h3>
           <p>Every session runs in a sandboxed container. Read-only root filesystem, no capabilities, isolated network. Users never touch the host.</p>
         </div>
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9654;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="26" height="28" rx="3" stroke="#da7756" stroke-width="2"/><line x1="11" y1="12" x2="25" y2="12" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="18" x2="22" y2="18" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="24" x2="19" y2="24" stroke="#da7756" stroke-width="2" stroke-linecap="round"/></svg></div>
           <h3>Audit Logging</h3>
           <p>Every command, every connection, every chat message. NDJSON format pipes directly into Splunk, Datadog, or your SIEM of choice.</p>
         </div>
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9210;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="14" stroke="#da7756" stroke-width="2"/><polygon points="15,11 15,25 27,18" fill="#da7756"/></svg></div>
           <h3>Session Recording</h3>
           <p>Full terminal replay in asciicast v2 format. Review any session frame-by-frame in the browser &mdash; no downloads needed.</p>
         </div>
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9670;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="18" rx="14" ry="8" stroke="#da7756" stroke-width="2"/><circle cx="18" cy="18" r="4" stroke="#da7756" stroke-width="2"/><line x1="6" y1="30" x2="30" y2="6" stroke="#da7756" stroke-width="2.5" stroke-linecap="round"/></svg></div>
           <h3>DLP / Secret Scanning</h3>
           <p>Real-time regex scanning redacts AWS keys, GitHub tokens, private keys, and passwords before they reach other users' screens.</p>
         </div>
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9671;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="16" width="16" height="14" rx="3" stroke="#da7756" stroke-width="2"/><path d="M14 16V11a4 4 0 018 0v5" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="24" r="2" fill="#da7756"/></svg></div>
           <h3>SSO / OIDC</h3>
           <p>Okta, Microsoft Entra, Google Workspace, Auth0, Keycloak. One-click login for your team, domain-restricted access.</p>
         </div>
         <div class="feature-card reveal">
-          <div class="feature-icon">&#9644;</div>
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="4" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><rect x="6" y="14" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><rect x="6" y="24" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><circle cx="11" cy="8" r="1.5" fill="#da7756"/><circle cx="11" cy="18" r="1.5" fill="#da7756"/><circle cx="11" cy="28" r="1.5" fill="#da7756"/></svg></div>
           <h3>Self-Hosted</h3>
           <p>Deploy inside your VPC with docker-compose. Zero data leaves your network. No telemetry, no phone-home, no cloud dependency.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── INTEGRATIONS ─── -->
+  <section style="padding:48px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container" style="text-align:center;">
+      <p style="color:var(--muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:32px;">Integrates With Your Stack</p>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:40px;opacity:0.7;">
+        <!-- Docker -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="44" height="32" viewBox="0 0 256 185" xmlns="http://www.w3.org/2000/svg"><g fill="#e0e0e8"><path d="M250.7 78.8c-5-3.3-16.4-4.5-25.2-2.8-1.2-8.7-6.2-16.3-15.1-23.1l-5.1-3.4-3.4 5.1c-6.8 10.2-6.5 27 .6 36.1-4.3 2.3-12.7 5.5-23.8 5.3H.6c-1.8 10.5-1.8 43.3 25 68.4 20.9 19.5 52.2 29.5 92.6 29.5 88 0 153.2-40.5 183.8-114.1 12 .2 37.8.1 51-25.3l2.6-5.3-4.9-3.3zm-223-24.4h23.8c1.2 0 2.1-.9 2.1-2.1V30.5c0-1.2-.9-2.1-2.1-2.1H27.7c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm30.1 0h23.8c1.2 0 2.1-.9 2.1-2.1V30.5c0-1.2-.9-2.1-2.1-2.1H57.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm30.5 0H112c1.2 0 2.1-.9 2.1-2.1V30.5c0-1.2-.9-2.1-2.1-2.1H88.3c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm30.3 0h23.8c1.2 0 2.1-.9 2.1-2.1V30.5c0-1.2-.9-2.1-2.1-2.1h-23.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zM57.8 28h23.8c1.2 0 2.1-.9 2.1-2.1V4.1c0-1.2-.9-2.1-2.1-2.1H57.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm30.5 0H112c1.2 0 2.1-.9 2.1-2.1V4.1c0-1.2-.9-2.1-2.1-2.1H88.3c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm30.3 0h23.8c1.2 0 2.1-.9 2.1-2.1V4.1c0-1.2-.9-2.1-2.1-2.1h-23.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zM88.3 80.8H112c1.2 0 2.1-.9 2.1-2.1V56.9c0-1.2-.9-2.1-2.1-2.1H88.3c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm-30.5 0h23.8c1.2 0 2.1-.9 2.1-2.1V56.9c0-1.2-.9-2.1-2.1-2.1H57.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm-30.1 0h23.8c1.2 0 2.1-.9 2.1-2.1V56.9c0-1.2-.9-2.1-2.1-2.1H27.7c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1zm90.9 0h23.8c1.2 0 2.1-.9 2.1-2.1V56.9c0-1.2-.9-2.1-2.1-2.1h-23.8c-1.2 0-2.1.9-2.1 2.1v21.8c0 1.2.9 2.1 2.1 2.1z"/></g></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Docker</span>
+        </div>
+        <!-- Okta -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" stroke="#e0e0e8" stroke-width="2" fill="none"/><circle cx="20" cy="20" r="7" stroke="#e0e0e8" stroke-width="2" fill="none"/></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Okta</span>
+        </div>
+        <!-- Splunk -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><text x="4" y="28" font-family="Inter,sans-serif" font-weight="700" font-size="14" fill="#e0e0e8">S&gt;</text></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Splunk</span>
+        </div>
+        <!-- Datadog -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 4C11.2 4 4 11.2 4 20s7.2 16 16 16 16-7.2 16-16S28.8 4 20 4zm-2 24l-1-3-4 1 2-5-3-2 5-1 1-5 3 4 4-2-2 5 3 3-5-1-3 6z" fill="#e0e0e8"/></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Datadog</span>
+        </div>
+        <!-- AWS -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="28" viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg"><text x="0" y="22" font-family="Inter,sans-serif" font-weight="700" font-size="16" fill="#e0e0e8">AWS</text></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">AWS / GCP</span>
+        </div>
+        <!-- Google Workspace -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="15" stroke="#e0e0e8" stroke-width="2" fill="none"/><path d="M20 5v15l10 6" stroke="#e0e0e8" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Google SSO</span>
+        </div>
+        <!-- Microsoft -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="14" height="14" fill="#e0e0e8" opacity="0.8"/><rect x="20" y="2" width="14" height="14" fill="#e0e0e8" opacity="0.6"/><rect x="2" y="20" width="14" height="14" fill="#e0e0e8" opacity="0.6"/><rect x="20" y="20" width="14" height="14" fill="#e0e0e8" opacity="0.4"/></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">Entra ID</span>
+        </div>
+        <!-- Asciinema -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="16" stroke="#e0e0e8" stroke-width="2" fill="none"/><polygon points="16,12 16,28 30,20" fill="#e0e0e8"/></svg>
+          <span style="color:var(--muted);font-size:0.75rem;">asciinema</span>
         </div>
       </div>
     </div>
@@ -816,33 +866,10 @@
   <section id="architecture">
     <div class="container" style="text-align:center;">
       <h2 class="section-heading center reveal">How It Works</h2>
-      <div class="arch-block reveal">
-        <div class="arch-diagram">
-<pre style="margin:0;font:inherit;white-space:pre;">  <span class="hl">Developer A (Host)</span>              <span class="hl">Developer B (Browser)</span>
-       |                                |
-       v                                v
-  +-----------+                  +-------------+
-  |  CLI Tool |                  |  Web Client |
-  +-----------+                  +-------------+
-       |                                |
-       +---------- <span class="gr">Your Network</span> --------+
-                      |
-               +------+------+
-               |   Express   |
-               |   Server    |
-               +------+------+
-                      |
-               +------+------+
-               |   <span class="hl">Docker</span>    |
-               |  <span class="hl">Container</span>  |
-               |  <span class="hl">(Sandbox)</span>  |
-               +------+------+
-               |  /workspace |
-               |  (shared)   |
-               +--------------+</pre>
-        </div>
-        <p class="arch-description">SharedTerminal runs entirely inside your infrastructure. The host developer starts a session from their CLI. Teammates join via browser on the internal network. All terminal I/O flows through an Express server into an isolated Docker container. No data ever leaves your firewall.</p>
+      <div class="arch-block reveal" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px 24px;margin-top:32px;overflow-x:auto;">
+        <img src="assets/architecture.svg" alt="SharedTerminal Architecture Diagram" style="max-width:100%;height:auto;display:block;margin:0 auto;">
       </div>
+      <p class="arch-description" style="max-width:700px;margin:24px auto 0;color:var(--muted);font-size:0.95rem;line-height:1.7;">SharedTerminal runs entirely inside your infrastructure. The host developer starts a session from their CLI. Teammates join via browser on the internal network. All terminal I/O flows through an Express server into an isolated Docker container. No data ever leaves your firewall.</p>
     </div>
   </section>
 

@@ -1,12 +1,27 @@
-# SharedTerminal Enterprise
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="SharedTerminal" width="64" height="64">
+</p>
 
-Self-hosted collaborative terminal sharing for engineering teams.
-Docker-sandboxed. Audit-logged. Session-recorded. SSO-ready.
+<h1 align="center">SharedTerminal Enterprise</h1>
 
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Node 20+](https://img.shields.io/badge/Node-20%2B-green.svg)
-![Docker Required](https://img.shields.io/badge/Docker-Required-blue.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)
+<p align="center">
+  Self-hosted collaborative terminal sharing for engineering teams.<br>
+  Docker-sandboxed. Audit-logged. Session-recorded. SSO-ready.
+</p>
+
+<p align="center">
+  <a href="https://turje.github.io/sharedterminal-enterprise/">Website</a> &nbsp;|&nbsp;
+  <a href="#quick-start">Quick Start</a> &nbsp;|&nbsp;
+  <a href="#enterprise-deployment">Deploy</a> &nbsp;|&nbsp;
+  <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request">Request Demo</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+  <img src="https://img.shields.io/badge/Node-20%2B-green.svg" alt="Node 20+">
+  <img src="https://img.shields.io/badge/Docker-Required-blue.svg" alt="Docker Required">
+  <img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript">
+</p>
 
 ---
 
@@ -42,35 +57,9 @@ SharedTerminal Enterprise lets engineering teams instantly share a terminal envi
 
 ## Architecture
 
-```
-                         +-------------------------------+
-                         |        Express Server         |
-                         |                               |
-  Host CLI ------------>|   +-- Audit Logger            |
-                         |   |   (NDJSON, per-session)   |
-                         |   |                           |
-  Browser Client ------>|   +-- DLP Scanner             |
-                         |   |   (real-time redaction)   |
-                         |   |                           |
-                         |   +-- Session Recorder        |
-                         |   |   (asciicast v2 capture)  |
-                         |   |                           |
-                         |   +-- SSO / OIDC              |
-                         |       (pluggable IdP)         |
-                         +----------|--------------------+
-                                    |
-                                    v
-                         +-------------------------------+
-                         |     Docker Container          |
-                         |         (Sandbox)             |
-                         |                               |
-                         |   /workspace (shared volume)  |
-                         |                               |
-                         |   Shell 1  (user A, PTY)      |
-                         |   Shell 2  (user B, PTY)      |
-                         |   Shell N  (user N, PTY)      |
-                         +-------------------------------+
-```
+<p align="center">
+  <img src="docs/assets/architecture.svg" alt="SharedTerminal Architecture" width="800">
+</p>
 
 All components run inside your network. Zero external dependencies in self-hosted mode.
 
