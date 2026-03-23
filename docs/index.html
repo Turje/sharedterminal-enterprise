@@ -1422,7 +1422,7 @@
     <div class="container">
       <p style="display:inline-block;font-size:13px;font-weight:500;color:var(--accent);background:rgba(218,119,86,0.1);padding:6px 16px;border-radius:20px;margin-bottom:20px;letter-spacing:0.02em;">Open source &middot; Self-hosted &middot; Browser-native</p>
       <h1>Your Team. One Project.<br>Working in Parallel.</h1>
-      <p class="subtitle">Drop your team into the same project. Everyone gets a shell. Delegate, collaborate, ship &mdash; all from the browser.</p>
+      <p class="subtitle">Drop your team into the same project. Everyone gets a shell. Delegate tasks, call AI when you need it, ship together &mdash; all from the browser.</p>
       <div style="display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;margin-top:8px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
           <span style="color:var(--green);font-size:18px;">&#9679;</span> Parallel shells, one project
@@ -1431,7 +1431,7 @@
           <span style="color:var(--green);font-size:18px;">&#9679;</span> Task delegation &amp; live activity
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
-          <span style="color:var(--green);font-size:18px;">&#9679;</span> AI session summaries
+          <span style="color:var(--green);font-size:18px;">&#9679;</span> AI assist on demand
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
           <span style="color:var(--green);font-size:18px;">&#9679;</span> Hosted on your cloud
@@ -1450,7 +1450,7 @@
             <div class="terminal-dot"></div>
             <div class="terminal-dot"></div>
             <div class="terminal-dot"></div>
-            <span class="terminal-title">Saar@acme &mdash; host</span>
+            <span class="terminal-title">Saar@acme-api &mdash; host</span>
           </div>
           <div class="terminal-body" id="demo-left-body"></div>
         </div>
@@ -1460,7 +1460,7 @@
             <div class="terminal-dot"></div>
             <div class="terminal-dot"></div>
             <div class="terminal-dot"></div>
-            <span class="terminal-title">Alex@acme &mdash; teammate</span>
+            <span class="terminal-title">Alex@acme-api &mdash; teammate</span>
           </div>
           <div class="terminal-body" id="demo-right-body"></div>
         </div>
@@ -1995,52 +1995,65 @@
     var leftLines = [
       // Saar starts session and assigns tasks
       { text: '<span class="t-accent">$ sharedterminal --path ./acme-api</span>', mode: 'type', typeText: '$ sharedterminal --path ./acme-api' },
-      { text: '', mode: 'instant' },
       { text: '<span class="t-green">\u25CF</span> <span class="t-accent t-bold">SharedTerminal</span> <span class="t-dim">session started</span>', mode: 'instant' },
       { text: '<span class="t-dim">Online:</span> <span class="t-white">Saar (owner)</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Create tasks
+      // Create tasks and team joins
       { text: '<span class="t-accent">saar@acme-api$ /tasks create</span>', mode: 'type', typeText: 'saar@acme-api$ /tasks create' },
-      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Fix rate limiter bug</span>        <span class="t-dim">\u2192 Alex</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Write integration tests</span>    <span class="t-dim">\u2192 Maya</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Review PR #142</span>             <span class="t-dim">\u2192 Saar</span>', mode: 'instant' },
-      { text: '<span class="t-green">\u2713 3 tasks assigned</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Fix memory leak in redis pool</span>  <span class="t-dim">\u2192 Alex</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Add rate limiter to /api/upload</span> <span class="t-dim">\u2192 Saar</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2713 2 tasks assigned</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2713</span> <span class="t-white">Alex joined</span>', mode: 'instant', trigger: 'showRight' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-green">\u2713</span> <span class="t-white">Alex joined</span>  <span class="t-green">\u2713</span> <span class="t-white">Maya joined</span>', mode: 'instant', trigger: 'showRight' },
+      // Saar works on his own task
+      { text: '<span class="t-accent">saar@acme-api$ vim src/middleware/rate-limit.ts</span>', mode: 'type', typeText: 'saar@acme-api$ vim src/middleware/rate-limit.ts' },
+      { text: '<span class="t-dim">  1 |</span> <span class="t-white">import { RateLimiter } from \'./limiter\';</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  2 |</span> <span class="t-white">export const uploadLimit = new RateLimiter({</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  3 |</span> <span class="t-green">  max: 10, windowMs: 60_000</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  4 |</span> <span class="t-white">});</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Saar reviews code, uses AI agent
-      { text: '<span class="t-accent">saar@acme-api$ git diff src/rate-limiter.ts</span>', mode: 'type', typeText: 'saar@acme-api$ git diff src/rate-limiter.ts' },
-      { text: '<span class="t-red">-  const ttl = 60;</span>           <span class="t-dim">// seconds</span>', mode: 'instant' },
-      { text: '<span class="t-green">+  const ttl = 60 * 1000;</span>    <span class="t-dim">// milliseconds</span>', mode: 'instant' },
+      // Saar sees Alex's AI session output in real time
+      { text: '<span class="t-dim">[activity]</span> <span class="t-white">Alex activated Claude Code on his task</span>', mode: 'instant' },
+      { text: '<span class="t-dim">[activity]</span> <span class="t-white">Alex\u2019s AI editing src/cache/redis-pool.ts</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">saar@acme-api$ @agent summarize this session</span>', mode: 'type', typeText: 'saar@acme-api$ @agent summarize this session' },
+      // DLP catches a secret from AI output
+      { text: '<span class="t-red t-bold">\u26A0 DLP:</span> <span class="t-red">Secret redacted in AI output (password)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2192 REDIS_URL=redis://admin:</span><span class="t-red t-bold">***REDACTED***</span><span class="t-dim">@prod-cluster</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2192 Logged to audit trail</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-dim">\u2728 AI:</span> <span class="t-white">3 engineers, 23min. Fixed rate limiter</span>', mode: 'instant' },
-      { text: '<span class="t-white">   TTL bug (60s\u219260000ms). 14 tests added.</span>', mode: 'instant' },
-      { text: '<span class="t-white">   All tasks complete. PR #142 approved.</span>', mode: 'instant' }
+      { text: '<span class="t-accent">saar@acme-api$ /tasks status</span>', mode: 'type', typeText: 'saar@acme-api$ /tasks status' },
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix memory leak</span> <span class="t-green">done</span> <span class="t-dim">(Alex + AI)</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Add rate limiter</span> <span class="t-green">done</span> <span class="t-dim">(Saar)</span>', mode: 'instant' }
     ];
 
     var rightLines = [
-      // Alex picks up task, writes actual code
-      { text: '<span class="t-dim">Your tasks:</span> <span class="t-white">Fix rate limiter bug</span> <span class="t-red">\u25CF urgent</span>', mode: 'instant' },
+      // Alex picks up task
+      { text: '<span class="t-dim">Your task:</span> <span class="t-white">Fix memory leak in redis pool</span> <span class="t-red">\u25CF urgent</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">alex@acme-api$ vim src/rate-limiter.ts</span>', mode: 'type', typeText: 'alex@acme-api$ vim src/rate-limiter.ts' },
-      { text: '<span class="t-dim">  12 |</span> <span class="t-white">export function checkRate(key: string) {</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  13 |</span> <span class="t-white">  const window = redis.get(key);</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  14 |</span> <span class="t-green">  const ttl = 60 * 1000; // fixed!</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  15 |</span> <span class="t-white">  return window.count < MAX_REQ;</span>', mode: 'instant' },
+      // Alex investigates first
+      { text: '<span class="t-accent">alex@acme-api$ grep -r ".release" src/</span>', mode: 'type', typeText: 'alex@acme-api$ grep -r ".release" src/' },
+      { text: '<span class="t-dim">(no results)</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">alex@acme-api$ @agent write tests for rate-limiter</span>', mode: 'type', typeText: 'alex@acme-api$ @agent write tests for rate-limiter' },
-      { text: '<span class="t-dim">\u2728 AI:</span> <span class="t-white">Generated 6 tests in rate-limiter.test.ts</span>', mode: 'instant' },
+      // Alex calls AI to help with the fix
+      { text: '<span class="t-accent">alex@acme-api$ claude "Fix the pool leak in redis-pool.ts"</span>', mode: 'type', typeText: 'alex@acme-api$ claude "Fix the pool leak in redis-pool.ts"' },
+      { text: '<span class="t-dim">\u2728 Claude Code</span> <span class="t-white">Analyzing redis-pool.ts...</span>', mode: 'instant' },
+      { text: '<span class="t-dim">[Claude]</span> <span class="t-white">Pool.acquire() called but never released</span>', mode: 'instant' },
+      { text: '<span class="t-dim">[Claude]</span> <span class="t-white">Patching with try/finally pattern:</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
+      { text: '<span class="t-red">-    const conn = pool.acquire();</span>', mode: 'instant' },
+      { text: '<span class="t-red">-    return conn.exec(cmd);</span>', mode: 'instant' },
+      { text: '<span class="t-green">+    const conn = pool.acquire();</span>', mode: 'instant' },
+      { text: '<span class="t-green">+    try { return conn.exec(cmd); }</span>', mode: 'instant' },
+      { text: '<span class="t-green">+    finally { pool.release(conn); }</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-dim">\u2728 Claude Code</span> <span class="t-white">Writing tests...</span>', mode: 'instant' },
       { text: '<span class="t-accent">alex@acme-api$ npm test</span>', mode: 'type', typeText: 'alex@acme-api$ npm test' },
-      { text: '  <span class="t-green">\u2713</span> <span class="t-white">rate-limiter.test.ts (6 passed)</span>', mode: 'instant' },
-      { text: '  <span class="t-green">\u2713</span> <span class="t-white">api.test.ts (8 passed)</span>', mode: 'instant' },
-      { text: '<span class="t-green">Tests: 14 passed, 0 failed</span>', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">redis-pool.test.ts (4 passed)</span>', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">handlers.test.ts (8 passed)</span>', mode: 'instant' },
+      { text: '<span class="t-green">All 12 tests passing</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">alex@acme-api$ /tasks done "Fix rate limiter bug"</span>', mode: 'type', typeText: 'alex@acme-api$ /tasks done "Fix rate limiter bug"' },
-      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix rate limiter bug</span> <span class="t-green">completed</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Remaining: 2 tasks (Maya: 1, Saar: 1)</span>', mode: 'instant' }
+      { text: '<span class="t-accent">alex@acme-api$ /tasks done "Fix memory leak"</span>', mode: 'type', typeText: 'alex@acme-api$ /tasks done "Fix memory leak"' },
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix memory leak</span> <span class="t-green">completed</span>', mode: 'instant' }
     ];
 
     var leftBody = document.getElementById('demo-left-body');
