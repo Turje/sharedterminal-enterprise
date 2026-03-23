@@ -1,0 +1,72 @@
+{
+  "name": "sharedterminal-enterprise",
+  "version": "2.0.0",
+  "description": "Enterprise-grade collaborative terminal sharing via Docker — persistent sessions, audit logging, session recording, DLP, and self-hosted deployment",
+  "main": "dist/server/index.js",
+  "bin": {
+    "sharedterminal-enterprise": "dist/cli/index.js",
+    "sharedfolder": "dist/cli/index.js",
+    "sharedterm": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/",
+    "docker/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && npm run build:client && npm run copy:client",
+    "build:client": "esbuild src/client/js/main.ts --bundle --outfile=src/client/js/bundle.js --platform=browser --format=iife",
+    "copy:client": "mkdir -p dist/client && cp -r src/client/index.html src/client/admin.html src/client/player.html src/client/css src/client/js dist/client/",
+    "dev": "npm run build:client && npx tsc && npm run copy:client && node dist/server/index.js",
+    "start": "node dist/server/index.js",
+    "docker:build": "bash scripts/docker-build.sh",
+    "prepublishOnly": "npm run build && npm test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "terminal",
+    "collaboration",
+    "docker",
+    "shared",
+    "pair-programming",
+    "remote",
+    "real-time",
+    "devtools"
+  ],
+  "author": "Saar Turjeman",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saartur/sharedterminal.git"
+  },
+  "homepage": "https://github.com/saartur/sharedterminal#readme",
+  "bugs": {
+    "url": "https://github.com/saartur/sharedterminal/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "dockerode": "^4.0.10",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "uuid": "^13.0.0",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^4.0.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",
+    "esbuild": "^0.27.4",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

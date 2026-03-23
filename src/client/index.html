@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SharedTerminal Enterprise</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
+  <link rel="stylesheet" href="css/terminal.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Auth screen -->
+    <div id="auth-screen" class="screen">
+      <div class="auth-container">
+        <div class="auth-card">
+          <div class="auth-logo">
+            <svg viewBox="0 0 256 256" fill="none" class="auth-logo-icon">
+              <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+            </svg>
+            <h1>SharedTerminal <span>Enterprise</span></h1>
+          </div>
+          <p class="auth-subtitle">Secure collaborative terminal environment</p>
+          <div id="session-label" class="hidden"></div>
+          <div id="auth-form">
+            <input type="text" id="session-input" placeholder="Session ID" autocomplete="off" spellcheck="false" />
+            <input type="password" id="password-input" placeholder="Session PIN" />
+            <input type="text" id="name-input" placeholder="Your name" autocomplete="off" />
+            <button id="join-btn">Join Session</button>
+            <div id="sso-divider" class="hidden">
+              <span class="divider-line"></span>
+              <span class="divider-text">or</span>
+              <span class="divider-line"></span>
+            </div>
+            <button id="sso-btn" class="hidden">Login with SSO</button>
+          </div>
+          <div id="auth-error" class="error hidden"></div>
+          <p class="auth-footer">Secure sandbox environment. All sessions are audited and recorded.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terminal screen -->
+    <div id="terminal-screen" class="screen hidden">
+      <!-- Security banner -->
+      <div id="security-banner">
+        <span class="security-banner-icon">&#x1F512;</span>
+        <span class="security-banner-text">Enterprise Sandbox Mode &mdash; Session is audited and recorded</span>
+        <span id="security-banner-session" class="security-banner-session"></span>
+      </div>
+
+      <div id="header">
+        <div id="header-left">
+          <svg viewBox="0 0 256 256" fill="none">
+            <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+          </svg>
+          <span id="session-name"><span class="accent">SharedTerminal</span> <span class="header-separator">&mdash;</span> <span id="session-display-name">Enterprise Session</span></span>
+        </div>
+        <div id="header-right">
+          <span id="session-timer" class="header-meta">0:00</span>
+          <span id="user-count" class="header-meta">0 online</span>
+          <button id="sidebar-toggle-btn" class="header-btn" title="Toggle sidebar">&#9776;</button>
+          <button id="mute-btn" class="header-btn" title="Toggle notifications">
+            <span id="mute-icon">&#128264;</span>
+          </button>
+          <span id="connection-dot" class="dot-green" title="Connected"></span>
+        </div>
+      </div>
+
+      <!-- Reconnecting banner -->
+      <div id="reconnecting-banner" class="hidden">
+        <span class="reconnect-dot"></span>
+        <span>Reconnecting...</span>
+      </div>
+
+      <!-- Terminal tabs bar -->
+      <div id="terminal-tabs">
+        <div id="tab-list"></div>
+        <button id="new-tab-btn" title="New terminal (Ctrl+T)">+</button>
+      </div>
+
+      <div id="workspace">
+        <div id="terminal-main">
+          <div id="terminal-row">
+            <div id="terminal-area">
+              <div id="terminal-container"></div>
+            </div>
+
+            <!-- Follow panel (split view) -->
+            <div id="follow-panel" class="hidden">
+              <div id="follow-header">
+                <span id="follow-label">Following: <span id="follow-name"></span></span>
+                <button id="follow-stop-btn">Stop</button>
+              </div>
+              <div id="follow-terminal"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="sidebar-resize-handle"></div>
+        <div id="sidebar">
+          <div id="sidebar-header">
+            <span class="sidebar-header-title">Session Panel</span>
+          </div>
+
+          <!-- Who's Online section -->
+          <div class="sidebar-section" id="sidebar-online-section">
+            <div class="sidebar-section-header">
+              <span class="sidebar-section-title">Who's Online</span>
+              <span id="sidebar-user-count" class="sidebar-section-badge">0</span>
+            </div>
+            <div id="users-list"></div>
+          </div>
+
+          <!-- Activity Feed section -->
+          <div class="sidebar-section" id="sidebar-activity-section">
+            <div class="sidebar-section-header sidebar-section-toggle" data-section="activity">
+              <span class="sidebar-section-title">Activity Feed</span>
+              <span class="sidebar-section-chevron">&#9660;</span>
+            </div>
+            <div id="activity-panel-content" class="sidebar-section-body">
+              <div id="activity-list"></div>
+            </div>
+          </div>
+
+          <!-- Team Chat section -->
+          <div class="sidebar-section sidebar-section-chat" id="sidebar-chat-section">
+            <div class="sidebar-section-header sidebar-section-toggle" data-section="chat">
+              <span class="sidebar-section-title">Team Chat</span>
+              <span id="chat-unread" class="unread-badge hidden">0</span>
+              <span class="sidebar-section-chevron">&#9660;</span>
+            </div>
+            <div id="chat-panel-content" class="sidebar-section-body">
+              <div id="chat-messages"></div>
+              <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" maxlength="500" />
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Summary (collapsed by default, accessible via tab) -->
+          <div class="sidebar-section" id="sidebar-ai-section">
+            <div class="sidebar-section-header sidebar-section-toggle" data-section="ai">
+              <span class="sidebar-section-title">AI Summary</span>
+              <span id="claude-unread" class="unread-badge hidden">0</span>
+              <span class="sidebar-section-chevron collapsed-chevron">&#9654;</span>
+            </div>
+            <div id="claude-panel-content" class="sidebar-section-body collapsed">
+              <div id="claude-messages"></div>
+              <div id="claude-input-container">
+                <button id="summary-ai-btn">Generate Session Summary</button>
+                <input type="text" id="claude-input" placeholder="Ask about this session..." autocomplete="off" maxlength="2000" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div id="status-bar">
+        <span id="status-role"></span>
+        <span id="status-size"></span>
+        <span id="status-connection">Connected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Shortcuts overlay -->
+  <div id="shortcuts-overlay" class="hidden">
+    <div class="shortcuts-modal">
+      <div class="shortcuts-header">
+        <span>Keyboard Shortcuts</span>
+        <button id="shortcuts-close">&times;</button>
+      </div>
+      <div class="shortcuts-list">
+        <div class="shortcut-item"><kbd>Ctrl+T</kbd><span>New terminal tab</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+W</kbd><span>Close current tab</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+Tab</kbd><span>Next tab</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+Shift+Tab</kbd><span>Previous tab</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+1-9</kbd><span>Jump to tab N</span></div>
+        <div class="shortcut-item"><kbd>Escape</kbd><span>Exit follow mode / close overlay</span></div>
+        <div class="shortcut-item"><kbd>?</kbd><span>Toggle this overlay</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script src="js/bundle.js"></script>
+</body>
+</html>

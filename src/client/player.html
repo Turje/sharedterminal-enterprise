@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SharedTerminal Enterprise — Session Player</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.8.0/dist/bundle/asciinema-player.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --surface2: #1f2b47;
+      --border: #2a3a5c;
+      --text: #e0e0e0;
+      --text-dim: #8892a4;
+      --accent: #da7756;
+      --accent-hover: #e8956e;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    #header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    #header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #header-left svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    #header-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    #header-title .accent {
+      color: var(--accent);
+    }
+
+    #header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    #header-meta .label {
+      color: var(--text-dim);
+    }
+
+    #header-meta .value {
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+    }
+
+    /* Main content */
+    #content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px;
+    }
+
+    /* Recording list */
+    #recording-list {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    #recording-list h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    #recording-list .empty {
+      color: var(--text-dim);
+      font-size: 14px;
+      padding: 24px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .recording-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .recording-item:hover {
+      border-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .recording-item .rec-name {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .recording-item .rec-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .recording-item .play-icon {
+      color: var(--accent);
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    /* Player area */
+    #player-area {
+      width: 100%;
+      max-width: 960px;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #player-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #back-btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    #back-btn:hover {
+      border-color: var(--accent);
+    }
+
+    #player-label {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    #player-label .value {
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    #player-container {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #0d1117;
+    }
+
+    /* Override asciinema-player theme */
+    #player-container .ap-wrapper {
+      background: #0d1117 !important;
+    }
+
+    /* Loading / Error states */
+    #loading, #error {
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    #loading {
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #error {
+      color: #e06c75;
+      font-size: 14px;
+    }
+
+    #error .error-detail {
+      margin-top: 8px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    /* Status bar */
+    #status-bar {
+      padding: 6px 24px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #status-bar .accent {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <div id="header-left">
+      <svg viewBox="0 0 256 256" fill="none">
+        <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+      </svg>
+      <div id="header-title"><span class="accent">SharedTerminal Enterprise</span> — Session Recording Player</div>
+    </div>
+    <div id="header-meta">
+      <span><span class="label">Session:</span> <span class="value" id="meta-session">--</span></span>
+      <span><span class="label">Terminal:</span> <span class="value" id="meta-terminal">--</span></span>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="loading">
+      <div class="spinner"></div>
+      <div>Loading recordings...</div>
+    </div>
+
+    <div id="error" style="display:none;"></div>
+
+    <div id="recording-list" style="display:none;"></div>
+
+    <div id="player-area">
+      <div id="player-toolbar">
+        <button id="back-btn" onclick="showRecordingList()">Back to list</button>
+        <span id="player-label">Playing: <span class="value" id="playing-terminal"></span></span>
+      </div>
+      <div id="player-container"></div>
+    </div>
+  </div>
+
+  <div id="status-bar">
+    <span><span class="accent">SharedTerminal Enterprise</span> v2.0</span>
+    <span>Session Recording Player</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/asciinema-player@3.8.0/dist/bundle/asciinema-player.min.js"></script>
+  <script>
+    (function() {
+      'use strict';
+
+      // Parse query params
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      const sessionId = params.get('session');
+      const terminalId = params.get('terminal');
+
+      const $loading = document.getElementById('loading');
+      const $error = document.getElementById('error');
+      const $recordingList = document.getElementById('recording-list');
+      const $playerArea = document.getElementById('player-area');
+      const $playerContainer = document.getElementById('player-container');
+      const $metaSession = document.getElementById('meta-session');
+      const $metaTerminal = document.getElementById('meta-terminal');
+      const $playingTerminal = document.getElementById('playing-terminal');
+
+      let currentPlayer = null;
+      let recordings = [];
+
+      // Update header metadata
+      $metaSession.textContent = sessionId || '--';
+      $metaTerminal.textContent = terminalId || 'all';
+
+      // Validate params
+      if (!token || !sessionId) {
+        showError('Missing required parameters', 'URL must include ?token=xxx&session=xxx and optionally &terminal=xxx');
+        return;
+      }
+
+      // Auth headers
+      function authHeaders() {
+        return { 'Authorization': 'Bearer ' + token };
+      }
+
+      function showError(title, detail) {
+        $loading.style.display = 'none';
+        $recordingList.style.display = 'none';
+        $playerArea.style.display = 'none';
+        $error.style.display = 'block';
+        $error.innerHTML = '<div>' + escapeHtml(title) + '</div>' +
+          (detail ? '<div class="error-detail">' + escapeHtml(detail) + '</div>' : '');
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Fetch recordings list
+      async function fetchRecordings() {
+        try {
+          const resp = await fetch('/api/admin/recordings/' + encodeURIComponent(sessionId), {
+            headers: authHeaders()
+          });
+          if (!resp.ok) {
+            var body = await resp.json().catch(function() { return {}; });
+            throw new Error(body.error || 'HTTP ' + resp.status);
+          }
+          var data = await resp.json();
+          recordings = data.recordings || [];
+          return recordings;
+        } catch (err) {
+          throw err;
+        }
+      }
+
+      // Show list of recordings
+      function showRecordingList() {
+        $loading.style.display = 'none';
+        $error.style.display = 'none';
+        $playerArea.style.display = 'none';
+        $recordingList.style.display = 'block';
+        $metaTerminal.textContent = 'all';
+
+        // Destroy existing player
+        if (currentPlayer) {
+          currentPlayer.dispose();
+          currentPlayer = null;
+          $playerContainer.innerHTML = '';
+        }
+
+        if (recordings.length === 0) {
+          $recordingList.innerHTML = '<h2>Session Recordings</h2>' +
+            '<div class="empty">No recordings found for this session.</div>';
+          return;
+        }
+
+        var html = '<h2>Session Recordings (' + recordings.length + ')</h2>';
+        recordings.forEach(function(rec) {
+          var name = rec.terminalId || rec.name || rec;
+          var displayName = typeof name === 'string' ? name : String(name);
+          html += '<div class="recording-item" onclick="playRecording(\'' + escapeHtml(displayName) + '\')">' +
+            '<div>' +
+              '<div class="rec-name">' + escapeHtml(displayName) + '</div>' +
+              (rec.size ? '<div class="rec-meta">' + formatBytes(rec.size) + '</div>' : '') +
+            '</div>' +
+            '<div class="play-icon">&#9654;</div>' +
+          '</div>';
+        });
+
+        $recordingList.innerHTML = html;
+      }
+      // Expose to global scope for onclick handlers
+      window.showRecordingList = showRecordingList;
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      }
+
+      // Play a specific recording
+      function playRecording(tid) {
+        $loading.style.display = 'none';
+        $error.style.display = 'none';
+        $recordingList.style.display = 'none';
+        $playerArea.style.display = 'flex';
+        $metaTerminal.textContent = tid;
+        $playingTerminal.textContent = tid;
+
+        // Destroy existing player
+        if (currentPlayer) {
+          currentPlayer.dispose();
+          currentPlayer = null;
+        }
+        $playerContainer.innerHTML = '';
+
+        var url = '/api/admin/recordings/' + encodeURIComponent(sessionId) + '/' + encodeURIComponent(tid);
+
+        // Use asciinema-player to create player with fetch auth
+        // We fetch the cast file ourselves and pass it as a string source
+        fetch(url, { headers: authHeaders() })
+          .then(function(resp) {
+            if (!resp.ok) throw new Error('Failed to fetch recording: HTTP ' + resp.status);
+            return resp.text();
+          })
+          .then(function(castData) {
+            currentPlayer = AsciinemaPlayer.create(
+              { data: castData },
+              $playerContainer,
+              {
+                fit: 'width',
+                autoPlay: true,
+                theme: 'monokai',
+                terminalFontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', 'Menlo', monospace",
+                terminalFontSize: 'small',
+                idleTimeLimit: 3
+              }
+            );
+          })
+          .catch(function(err) {
+            showError('Failed to play recording', err.message);
+          });
+      }
+      // Expose to global scope for onclick handlers
+      window.playRecording = playRecording;
+
+      // Init
+      async function init() {
+        try {
+          await fetchRecordings();
+
+          if (terminalId) {
+            // Directly play the specified terminal recording
+            playRecording(terminalId);
+          } else {
+            // Show the list
+            showRecordingList();
+          }
+        } catch (err) {
+          showError('Failed to load recordings', err.message);
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

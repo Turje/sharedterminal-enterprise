@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SharedTerminal Enterprise — Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #1c2129;
+      --border: #30363d;
+      --border-subtle: #21262d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --accent: #da7756;
+      --accent-dim: rgba(218, 119, 86, 0.15);
+      --green: #3fb950;
+      --green-dim: rgba(63, 185, 80, 0.15);
+      --yellow: #d29922;
+      --yellow-dim: rgba(210, 153, 34, 0.15);
+      --red: #f85149;
+      --red-dim: rgba(248, 81, 73, 0.15);
+      --blue: #58a6ff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-logo {
+      width: 28px;
+      height: 28px;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .topbar-title span {
+      color: var(--accent);
+    }
+
+    .topbar-sep {
+      color: var(--border);
+      font-weight: 300;
+      margin: 0 4px;
+    }
+
+    .topbar-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .refresh-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Main layout */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Stats cards row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .panel-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+      padding: 10px 20px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 12px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .mono {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    .status-running {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .status-stopped {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    .status-creating {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Users list */
+    .users-grid {
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .user-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .user-name { color: var(--text-primary); }
+
+    .user-role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .user-session {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+    }
+
+    .btn-accent {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-color: transparent;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Empty state */
+    .empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    /* Auth gate */
+    .auth-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+      color: var(--text-secondary);
+    }
+
+    .auth-gate h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .auth-gate p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth gate (shown if no token) -->
+<div id="auth-gate" class="auth-gate" style="display:none;">
+  <svg width="48" height="48" viewBox="0 0 256 256" fill="none">
+    <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+  </svg>
+  <h2>Admin Access Required</h2>
+  <p>Append <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:4px;">?token=YOUR_TOKEN</code> to the URL to authenticate.</p>
+</div>
+
+<!-- Dashboard (shown if token present) -->
+<div id="dashboard" style="display:none;">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <svg class="topbar-logo" viewBox="0 0 256 256" fill="none">
+        <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+      </svg>
+      <span class="topbar-title"><span>SharedTerminal</span> Enterprise</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-subtitle">Admin Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-status">
+        <span class="pulse-dot"></span>
+        <span>Live</span>
+      </div>
+      <span class="refresh-label" id="refresh-label">Refreshing in 10s</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Stats cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Active Sessions</div>
+        <div class="stat-value" id="stat-active">--</div>
+        <div class="stat-sub" id="stat-active-sub">loading...</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Connected Users</div>
+        <div class="stat-value" id="stat-users">--</div>
+        <div class="stat-sub" id="stat-users-sub">across all sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Uptime</div>
+        <div class="stat-value" id="stat-uptime">--</div>
+        <div class="stat-sub" id="stat-uptime-sub">server process</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Platform</div>
+        <div class="stat-value" id="stat-platform">--</div>
+        <div class="stat-sub" id="stat-platform-sub">loading...</div>
+      </div>
+    </div>
+
+    <!-- Active Sessions table -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Active Sessions</span>
+        <span class="panel-badge" id="session-count-badge">0</span>
+      </div>
+      <div id="sessions-table-wrap" class="table-wrap">
+        <div class="empty" id="sessions-empty">
+          <div class="empty-icon">&#9605;</div>
+          No active sessions
+        </div>
+        <table id="sessions-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Session Name</th>
+              <th>ID</th>
+              <th>Users</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Persistent Sessions -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Persistent Sessions</span>
+        <span class="panel-badge" id="persistent-count-badge">0</span>
+      </div>
+      <div id="persistent-table-wrap" class="table-wrap">
+        <div class="empty" id="persistent-empty">
+          <div class="empty-icon">&#128451;</div>
+          No persistent sessions
+        </div>
+        <table id="persistent-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Session ID</th>
+              <th>Project Path</th>
+              <th>Created</th>
+              <th>Last Accessed</th>
+            </tr>
+          </thead>
+          <tbody id="persistent-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Connected Users -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Connected Users</span>
+        <span class="panel-badge" id="user-count-badge">0</span>
+      </div>
+      <div id="users-grid" class="users-grid">
+        <div class="empty" id="users-empty" style="width:100%;">
+          <div class="empty-icon">&#128100;</div>
+          No users connected
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // Extract token from query params
+  const params = new URLSearchParams(window.location.search);
+  const TOKEN = params.get('token');
+
+  if (!TOKEN) {
+    document.getElementById('auth-gate').style.display = 'flex';
+    return;
+  }
+
+  document.getElementById('dashboard').style.display = 'block';
+
+  // Color palette for user avatars
+  const AVATAR_COLORS = [
+    '#da7756', '#58a6ff', '#3fb950', '#d29922',
+    '#bc8cff', '#f778ba', '#79c0ff', '#7ee787'
+  ];
+
+  function avatarColor(name) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  }
+
+  function truncateId(id) {
+    if (!id) return '--';
+    return id.substring(0, 8) + '...';
+  }
+
+  function formatUptime(seconds) {
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (d > 0) return d + 'd ' + h + 'h';
+    if (h > 0) return h + 'h ' + m + 'm';
+    return m + 'm ' + Math.floor(seconds % 60) + 's';
+  }
+
+  function formatTime(isoStr) {
+    if (!isoStr) return '--';
+    const d = new Date(isoStr);
+    return d.toLocaleString(undefined, {
+      month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function statusBadge(status) {
+    const cls = status === 'running' ? 'status-running'
+      : status === 'stopped' ? 'status-stopped'
+      : 'status-creating';
+    return '<span class="status-badge ' + cls + '"><span class="status-dot"></span>' + status + '</span>';
+  }
+
+  // Fetch data
+  async function fetchStats() {
+    try {
+      const res = await fetch('/api/admin/stats', {
+        headers: { 'Authorization': 'Bearer ' + TOKEN }
+      });
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          document.getElementById('dashboard').style.display = 'none';
+          document.getElementById('auth-gate').style.display = 'flex';
+          document.querySelector('#auth-gate p').textContent = 'Invalid or expired token. Please use a valid owner token.';
+          return null;
+        }
+        throw new Error('HTTP ' + res.status);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error('Failed to fetch admin stats:', err);
+      return null;
+    }
+  }
+
+  function renderDashboard(data) {
+    if (!data) return;
+
+    const activeSessions = data.activeSessions || [];
+    const persistentSessions = data.persistentSessions || [];
+
+    // Collect all users
+    let allUsers = [];
+    activeSessions.forEach(function(s) {
+      (s.users || []).forEach(function(u) {
+        allUsers.push({ name: u.name, role: u.role, sessionName: s.name, sessionId: s.id });
+      });
+    });
+
+    // Stats cards
+    document.getElementById('stat-active').textContent = activeSessions.length;
+    document.getElementById('stat-active-sub').textContent =
+      persistentSessions.length + ' persistent session' + (persistentSessions.length !== 1 ? 's' : '') + ' stored';
+
+    document.getElementById('stat-users').textContent = allUsers.length;
+    document.getElementById('stat-users-sub').textContent =
+      'across ' + activeSessions.length + ' session' + (activeSessions.length !== 1 ? 's' : '');
+
+    document.getElementById('stat-uptime').textContent = formatUptime(data.uptime || 0);
+    document.getElementById('stat-uptime-sub').textContent = 'Node ' + (data.nodeVersion || '--');
+
+    document.getElementById('stat-platform').textContent = (data.platform || '--');
+    document.getElementById('stat-platform-sub').textContent = 'Node ' + (data.nodeVersion || '--');
+
+    // Active Sessions table
+    var sessionCountBadge = document.getElementById('session-count-badge');
+    sessionCountBadge.textContent = activeSessions.length;
+
+    var sessionsEmpty = document.getElementById('sessions-empty');
+    var sessionsTable = document.getElementById('sessions-table');
+    var sessionsBody = document.getElementById('sessions-body');
+
+    if (activeSessions.length === 0) {
+      sessionsEmpty.style.display = 'block';
+      sessionsTable.style.display = 'none';
+    } else {
+      sessionsEmpty.style.display = 'none';
+      sessionsTable.style.display = 'table';
+      sessionsBody.innerHTML = activeSessions.map(function(s) {
+        return '<tr>' +
+          '<td><strong>' + escHtml(s.name) + '</strong></td>' +
+          '<td><span class="mono">' + truncateId(s.id) + '</span></td>' +
+          '<td>' + (s.userCount || 0) + '</td>' +
+          '<td>' + statusBadge(s.status) + '</td>' +
+          '<td>' + formatTime(s.createdAt) + '</td>' +
+          '<td><button class="btn btn-accent" onclick="downloadAudit(\'' + s.id + '\')">Audit Log</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // Persistent Sessions table
+    var persistentCountBadge = document.getElementById('persistent-count-badge');
+    persistentCountBadge.textContent = persistentSessions.length;
+
+    var persistentEmpty = document.getElementById('persistent-empty');
+    var persistentTable = document.getElementById('persistent-table');
+    var persistentBody = document.getElementById('persistent-body');
+
+    if (persistentSessions.length === 0) {
+      persistentEmpty.style.display = 'block';
+      persistentTable.style.display = 'none';
+    } else {
+      persistentEmpty.style.display = 'none';
+      persistentTable.style.display = 'table';
+      persistentBody.innerHTML = persistentSessions.map(function(s) {
+        return '<tr>' +
+          '<td><span class="mono">' + truncateId(s.sessionId) + '</span></td>' +
+          '<td><span class="mono">' + escHtml(s.projectPath || '--') + '</span></td>' +
+          '<td>' + formatTime(s.createdAt) + '</td>' +
+          '<td>' + formatTime(s.lastAccessedAt) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // Connected Users
+    var userCountBadge = document.getElementById('user-count-badge');
+    userCountBadge.textContent = allUsers.length;
+
+    var usersGrid = document.getElementById('users-grid');
+    var usersEmpty = document.getElementById('users-empty');
+
+    if (allUsers.length === 0) {
+      usersEmpty.style.display = 'block';
+      usersGrid.querySelectorAll('.user-chip').forEach(function(el) { el.remove(); });
+    } else {
+      usersEmpty.style.display = 'none';
+      // Clear old chips
+      usersGrid.querySelectorAll('.user-chip').forEach(function(el) { el.remove(); });
+      allUsers.forEach(function(u) {
+        var chip = document.createElement('div');
+        chip.className = 'user-chip';
+        var initials = (u.name || '?').substring(0, 2).toUpperCase();
+        var color = avatarColor(u.name || '');
+        chip.innerHTML =
+          '<span class="user-avatar" style="background:' + color + ';">' + initials + '</span>' +
+          '<span class="user-name">' + escHtml(u.name) + '</span>' +
+          '<span class="user-role">' + u.role + '</span>' +
+          '<span class="user-session">' + escHtml(u.sessionName) + '</span>';
+        usersGrid.appendChild(chip);
+      });
+    }
+  }
+
+  function escHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // Audit log download
+  window.downloadAudit = function(sessionId) {
+    var a = document.createElement('a');
+    a.href = '/api/admin/audit/' + sessionId + '?token=' + encodeURIComponent(TOKEN);
+    a.download = sessionId + '.ndjson';
+    // We'll add the token as a header via fetch instead for security
+    fetch('/api/admin/audit/' + sessionId, {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    }).then(function(res) {
+      if (!res.ok) {
+        alert('Audit log not found for this session.');
+        return;
+      }
+      return res.blob();
+    }).then(function(blob) {
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = sessionId + '.ndjson';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }).catch(function(err) {
+      console.error('Download failed:', err);
+      alert('Failed to download audit log.');
+    });
+  };
+
+  // Refresh countdown
+  var countdown = 10;
+  var refreshLabel = document.getElementById('refresh-label');
+
+  function tick() {
+    countdown--;
+    if (countdown <= 0) {
+      refreshLabel.textContent = 'Refreshing...';
+      refresh();
+      countdown = 10;
+    } else {
+      refreshLabel.textContent = 'Refreshing in ' + countdown + 's';
+    }
+  }
+
+  async function refresh() {
+    var data = await fetchStats();
+    renderDashboard(data);
+  }
+
+  // Initial load
+  refresh();
+  setInterval(tick, 1000);
+
+})();
+</script>
+
+</body>
+</html>

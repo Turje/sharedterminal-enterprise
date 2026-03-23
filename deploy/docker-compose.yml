@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  sharedterminal:
+    image: sharedterminal-server:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.server
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - sharedterminal-data:/data
+      - ./certs:/certs:ro
+    environment:
+      NODE_ENV: production
+      TUNNEL_ENABLED: "false"
+      SERVER_URL: "${SERVER_URL:-http://localhost:3000}"
+      DATA_DIR: /data
+      PORT: "3000"
+      HOST: "0.0.0.0"
+      DOCKER_IMAGE: "${DOCKER_IMAGE:-sharedterminal:latest}"
+      CONTAINER_MEMORY_LIMIT: "${CONTAINER_MEMORY_LIMIT:-536870912}"
+      CONTAINER_PID_LIMIT: "${CONTAINER_PID_LIMIT:-256}"
+      SESSION_IDLE_TIMEOUT_MS: "${SESSION_IDLE_TIMEOUT_MS:-3600000}"
+      RECORDING_ENABLED: "${RECORDING_ENABLED:-true}"
+      DLP_ENABLED: "${DLP_ENABLED:-true}"
+      TLS_CERT_PATH: /certs/cert.pem
+      TLS_KEY_PATH: /certs/key.pem
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  sharedterminal-data:
