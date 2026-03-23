@@ -687,6 +687,97 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    /* ─── DEMO TERMINALS (inside hero) ─── */
+    .demo-terminals {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .demo-terminal {
+      flex: 1;
+      min-width: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #0d0d14;
+      text-align: left;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    .demo-terminal .terminal-body {
+      min-height: 480px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.65;
+      overflow-x: auto;
+      color: var(--muted);
+      white-space: pre;
+    }
+
+    .demo-terminal .terminal-body .t-green { color: var(--green); }
+    .demo-terminal .terminal-body .t-accent { color: var(--accent); font-weight: 500; }
+    .demo-terminal .terminal-body .t-dim { color: #555570; }
+    .demo-terminal .terminal-body .t-bold { color: var(--text); font-weight: 600; }
+    .demo-terminal .terminal-body .t-yellow { color: var(--yellow); }
+    .demo-terminal .terminal-body .t-red { color: #f87171; }
+    .demo-terminal .terminal-body .t-white { color: #e0e0e8; }
+
+    .cursor-blink {
+      display: inline;
+      animation: cursorBlink 1s step-end infinite;
+      color: var(--accent);
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .demo-replay-wrap {
+      margin-top: 32px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .demo-replay-wrap.visible {
+      opacity: 1;
+    }
+
+    .demo-replay-btn {
+      display: inline-block;
+      padding: 10px 28px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .demo-replay-btn:hover {
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    @media (max-width: 768px) {
+      .demo-terminals {
+        flex-direction: column;
+      }
+
+      .demo-terminal .terminal-body {
+        min-height: 320px;
+        font-size: 11px;
+        padding: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -698,7 +789,7 @@
       <div class="nav-links">
         <a href="#features" class="nav-text-link">Documentation</a>
         <a href="https://github.com/Turje/sharedterminal-enterprise" class="nav-text-link">GitHub</a>
-        <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent btn-nav">Request Demo</a>
+        <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent btn-nav">Request Demo</a>
       </div>
     </div>
   </nav>
@@ -710,42 +801,34 @@
       <p class="subtitle">Give your engineering team a secure, shared terminal environment for incident response, pair debugging, and onboarding &mdash; without screen sharing, without leaving your firewall.</p>
       <div class="hero-buttons">
         <a href="https://github.com/Turje/sharedterminal-enterprise" class="btn btn-outline">View on GitHub</a>
-        <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent">Request Demo</a>
+        <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent">Request Demo</a>
       </div>
 
-      <div class="terminal-window reveal">
-        <div class="terminal-titlebar">
-          <div class="terminal-dot"></div>
-          <div class="terminal-dot"></div>
-          <div class="terminal-dot"></div>
-          <span class="terminal-title">sharedterminal &mdash; ~/acme-api</span>
+      <p class="section-label" style="margin-bottom:24px;">See It In Action</p>
+      <div class="demo-terminals" id="demo-terminals-wrap">
+        <!-- left terminal -->
+        <div class="demo-terminal" id="demo-left">
+          <div class="terminal-titlebar">
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <span class="terminal-title">saar@acme &mdash; host</span>
+          </div>
+          <div class="terminal-body" id="demo-left-body"></div>
         </div>
-        <div class="terminal-body">
-<pre style="margin:0;font:inherit;white-space:pre;">
-  <span class="t-green">&#9679;</span> <span class="t-accent t-bold">SharedTerminal Enterprise</span> <span class="t-dim">[Self-Hosted Mode]</span>
-  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
-
-  <span class="t-dim">Secure Sandbox:</span>  <span class="t-green">&#9679;</span> Active <span class="t-dim">(Isolated Network, Read-Only RootFS)</span>
-  <span class="t-dim">Audit Logging:</span>   <span class="t-green">&#9679;</span> Active <span class="t-dim">(Writing to ./data/audit/)</span>
-  <span class="t-dim">DLP Scanner:</span>     <span class="t-green">&#9679;</span> Active <span class="t-dim">(Redacting secrets)</span>
-  <span class="t-dim">Recording:</span>       <span class="t-green">&#9679;</span> Active <span class="t-dim">(asciicast v2)</span>
-
-  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
-
-  <span class="t-dim">Invite Link:</span>  <span class="t-link">https://your-server:3000/?session=a1b2c3</span>
-  <span class="t-dim">Session PIN:</span>  <span class="t-bold">8472</span>
-
-  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
-
-  <span class="t-dim">Project</span>   ~/acme-api
-  <span class="t-dim">Mode</span>      read-write
-
-  <span class="t-dim">Waiting for teammates to join...</span>
-  <span class="t-dim">Type a message below to chat, or Ctrl+C to stop.</span>
-
-  <span class="t-accent">&#9656;</span> <span class="t-dim">_</span>
-</pre>
+        <!-- right terminal -->
+        <div class="demo-terminal" id="demo-right" style="opacity:0;transition:opacity 0.5s ease;">
+          <div class="terminal-titlebar">
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <span class="terminal-title">alex@acme &mdash; teammate</span>
+          </div>
+          <div class="terminal-body" id="demo-right-body"></div>
         </div>
+      </div>
+      <div class="demo-replay-wrap" id="demo-replay-wrap">
+        <button class="demo-replay-btn" id="demo-replay-btn">Replay Demo</button>
       </div>
     </div>
   </section>
@@ -808,6 +891,35 @@
           <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="4" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><rect x="6" y="14" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><rect x="6" y="24" width="24" height="8" rx="2" stroke="#da7756" stroke-width="2"/><circle cx="11" cy="8" r="1.5" fill="#da7756"/><circle cx="11" cy="18" r="1.5" fill="#da7756"/><circle cx="11" cy="28" r="1.5" fill="#da7756"/></svg></div>
           <h3>Self-Hosted</h3>
           <p>Deploy inside your VPC with docker-compose. Zero data leaves your network. No telemetry, no phone-home, no cloud dependency.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── COLLABORATION FEATURES ─── -->
+  <section id="collaboration">
+    <div class="container">
+      <h2 class="section-heading reveal">Collaboration &amp; Productivity</h2>
+      <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 8a3 3 0 013-3h14a3 3 0 013 3v10a3 3 0 01-3 3H13l-4 4v-4H9a3 3 0 01-3-3V8z" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 24v2a3 3 0 003 3h10l4 4v-4h1a3 3 0 003-3V16a3 3 0 00-3-3h-3" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Built-In Team Chat</h3>
+          <p>Real-time messaging alongside the terminal. Discuss code, share context, and coordinate without switching to Slack. Every message is audit-logged.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="4" width="18" height="24" rx="3" stroke="#da7756" stroke-width="2"/><path d="M14 14l2 2 4-4" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="21" x2="22" y2="21" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><path d="M26 16l5-5M31 11l-3 1 2 2" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Task Delegation</h3>
+          <p>Assign tasks to teammates directly from the session. Track who's working on what with live status updates. Keep incident response organized.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="16" rx="10" ry="6" stroke="#da7756" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="#da7756" stroke-width="2"/><path d="M14 26l2 2 4-4" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Manager Review</h3>
+          <p>Engineering managers can review completed tasks, audit command history, and approve changes &mdash; all from the admin dashboard without joining the terminal.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="5" width="16" height="22" rx="2" stroke="#da7756" stroke-width="2"/><line x1="12" y1="11" x2="20" y2="11" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="18" y2="16" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="16" y2="21" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><path d="M26 8l2-3 2 3M28 5v0" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 14l2-3 2 3M32 11v0" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="27" cy="12" r="1" fill="#da7756"/></svg></div>
+          <h3>AI Session Summary</h3>
+          <p>Get an automatic AI-generated summary of every session: key commands run, decisions made, issues found, and action items &mdash; delivered to the team lead when the session ends.</p>
         </div>
       </div>
     </div>
@@ -980,6 +1092,34 @@
               <td class="cross">No</td>
               <td class="check">Yes</td>
             </tr>
+            <tr>
+              <td>Built-in team chat</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Task delegation</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Manager review</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>AI session summary</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -991,7 +1131,7 @@
     <div class="container">
       <h2 class="reveal">Ready to See It In Action?</h2>
       <p class="subtitle reveal">We offer a free 30-day Proof of Concept for qualifying engineering teams.</p>
-      <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent reveal">Request Demo</a>
+      <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent reveal">Request Demo</a>
       <p class="cta-link reveal">Or explore the source on <a href="https://github.com/Turje/sharedterminal-enterprise">GitHub</a></p>
     </div>
   </section>
@@ -1035,6 +1175,222 @@
         });
       }
     });
+  </script>
+
+  <!-- ─── TERMINAL DEMO ANIMATION ─── -->
+  <script>
+  (function () {
+    var CHAR_DELAY = 30;
+    var LINE_PAUSE = 500;
+    var RESTART_PAUSE = 3000;
+
+    // Line types: 'type' = typewriter, 'instant' = appear at once
+    // Each line is { text: '...', mode: 'type'|'instant' }
+    // HTML spans are embedded directly; only plain-text portions get typed.
+
+    var leftLines = [
+      { text: '<span class="t-accent">$ sharedterminal --path ./acme-api --server-url http://internal:3000</span>', mode: 'type', typeText: '$ sharedterminal --path ./acme-api --server-url http://internal:3000' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-green">\u25CF</span> <span class="t-accent t-bold">SharedTerminal Enterprise</span> <span class="t-dim">[Self-Hosted Mode]</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Secure Sandbox:</span>  <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Audit Logging:</span>   <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
+      { text: '<span class="t-dim">DLP Scanner:</span>     <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Recording:</span>       <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Invite Link:</span>  <span class="t-accent">https://internal:3000/?session=a1b2c3</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Session PIN:</span>  <span class="t-bold">8472</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-green">\u2713</span> <span class="t-white">alex joined the session</span>', mode: 'instant', trigger: 'showRight' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-accent">saar@sandbox:~/acme-api$ cat .env</span>', mode: 'type', typeText: 'saar@sandbox:~/acme-api$ cat .env' },
+      { text: '<span class="t-white">DATABASE_URL=postgres://localhost:5432/acme</span>', mode: 'instant' },
+      { text: '<span class="t-white">AWS_SECRET_ACCESS_KEY=</span><span class="t-yellow">[***REDACTED BY DLP***]</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-red">\u26A0 DLP: 1 secret redacted (AWS Secret Key)</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-accent">saar@sandbox:~/acme-api$</span> <span class="cursor-blink">\u258C</span>', mode: 'instant' }
+    ];
+
+    var rightLines = [
+      { text: '<span class="t-white">Joined session: acme-api</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Online:</span> <span class="t-white">saar (owner), alex</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-accent">alex@sandbox:~/acme-api$ npm test</span>', mode: 'type', typeText: 'alex@sandbox:~/acme-api$ npm test' },
+      { text: '', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">auth.test.ts (3 passed)</span>', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">api.test.ts (12 passed)</span>', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">db.test.ts (8 passed)</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-green">Tests: 23 passed, 0 failed</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-accent">alex@sandbox:~/acme-api$ git log --oneline -3</span>', mode: 'type', typeText: 'alex@sandbox:~/acme-api$ git log --oneline -3' },
+      { text: '<span class="t-yellow">a1b2c3d</span> <span class="t-white">fix: rate limiter edge case</span>', mode: 'instant' },
+      { text: '<span class="t-yellow">b2c3d4e</span> <span class="t-white">feat: add webhook retry</span>', mode: 'instant' },
+      { text: '<span class="t-yellow">c3d4e5f</span> <span class="t-white">chore: update deps</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500 Team Chat \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-accent">saar:</span> <span class="t-white">alex can you check the rate limiter?</span>', mode: 'instant' },
+      { text: '<span class="t-accent">alex:</span> <span class="t-white">on it, running load test now</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500 Tasks \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix rate limiter edge case</span>     <span class="t-dim">(saar \u2192 alex)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-dim">Review load test results</span>       <span class="t-dim">(alex \u2192 saar)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-dim">Update deployment config</span>       <span class="t-dim">(unassigned)</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-dim">\u2500\u2500 AI Summary \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
+      { text: '<span class="t-accent">Session:</span> <span class="t-white">2 engineers, 47min</span>', mode: 'instant' },
+      { text: '<span class="t-white">Key actions: debugged rate limiter,</span>', mode: 'instant' },
+      { text: '<span class="t-white">ran test suite (23 passed), reviewed</span>', mode: 'instant' },
+      { text: '<span class="t-white">3 recent commits. 1 secret redacted.</span>', mode: 'instant' }
+    ];
+
+    var leftBody = document.getElementById('demo-left-body');
+    var rightBody = document.getElementById('demo-right-body');
+    var rightTerminal = document.getElementById('demo-right');
+    var replayWrap = document.getElementById('demo-replay-wrap');
+    var replayBtn = document.getElementById('demo-replay-btn');
+    var animationTimer = null;
+    var animationRunning = false;
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function clearTimers() {
+      if (animationTimer) {
+        clearTimeout(animationTimer);
+        animationTimer = null;
+      }
+    }
+
+    // Type a line character by character into the container, then call cb
+    function typeLine(container, lineObj, existingContent, cb) {
+      var plainText = lineObj.typeText;
+      var charIndex = 0;
+
+      function typeNext() {
+        if (!animationRunning) return;
+        if (charIndex <= plainText.length) {
+          var partial = escapeHtml(plainText.substring(0, charIndex));
+          container.innerHTML = existingContent + partial + '<span class="cursor-blink">\u258C</span>';
+          charIndex++;
+          animationTimer = setTimeout(typeNext, CHAR_DELAY);
+        } else {
+          // Done typing this line - replace with styled version
+          container.innerHTML = existingContent + lineObj.text;
+          cb();
+        }
+      }
+      typeNext();
+    }
+
+    // Render lines one by one in a terminal
+    function renderLines(container, lines, startIndex, onTrigger, onDone) {
+      var content = '';
+      var i = startIndex;
+
+      function nextLine() {
+        if (!animationRunning) return;
+        if (i >= lines.length) {
+          // Remove cursor
+          container.innerHTML = content;
+          if (onDone) onDone();
+          return;
+        }
+
+        var line = lines[i];
+        i++;
+
+        if (line.mode === 'instant') {
+          content += line.text + '\n';
+          container.innerHTML = content + '<span class="cursor-blink">\u258C</span>';
+
+          if (line.trigger && onTrigger) {
+            onTrigger(line.trigger);
+          }
+
+          animationTimer = setTimeout(nextLine, LINE_PAUSE);
+        } else {
+          // Typewriter mode
+          typeLine(container, line, content, function () {
+            content += line.text + '\n';
+
+            if (line.trigger && onTrigger) {
+              onTrigger(line.trigger);
+            }
+
+            animationTimer = setTimeout(nextLine, LINE_PAUSE);
+          });
+        }
+      }
+      nextLine();
+    }
+
+    var rightStarted = false;
+    var leftDone = false;
+    var rightDone = false;
+
+    function checkAllDone() {
+      if (leftDone && rightDone) {
+        animationTimer = setTimeout(function () {
+          // Show replay button
+          replayWrap.classList.add('visible');
+          // Fade out terminals
+          leftBody.style.transition = 'opacity 0.6s ease';
+          rightBody.style.transition = 'opacity 0.6s ease';
+          leftBody.style.opacity = '0.3';
+          rightBody.style.opacity = '0.3';
+
+          // Auto-restart after pause
+          animationTimer = setTimeout(function () {
+            if (animationRunning) {
+              startDemo();
+            }
+          }, RESTART_PAUSE);
+        }, RESTART_PAUSE);
+      }
+    }
+
+    function startDemo() {
+      clearTimers();
+      animationRunning = true;
+      rightStarted = false;
+      leftDone = false;
+      rightDone = false;
+
+      leftBody.innerHTML = '';
+      rightBody.innerHTML = '';
+      leftBody.style.opacity = '1';
+      rightBody.style.opacity = '1';
+      leftBody.style.transition = '';
+      rightBody.style.transition = '';
+      rightTerminal.style.opacity = '0';
+      replayWrap.classList.remove('visible');
+
+      renderLines(leftBody, leftLines, 0, function (trigger) {
+        if (trigger === 'showRight' && !rightStarted) {
+          rightStarted = true;
+          rightTerminal.style.opacity = '1';
+          renderLines(rightBody, rightLines, 0, null, function () {
+            rightDone = true;
+            checkAllDone();
+          });
+        }
+      }, function () {
+        leftDone = true;
+        checkAllDone();
+      });
+    }
+
+    replayBtn.addEventListener('click', function () {
+      startDemo();
+    });
+
+    // Demo is now in the hero (always visible), start immediately
+    startDemo();
+  })();
   </script>
 
 </body>

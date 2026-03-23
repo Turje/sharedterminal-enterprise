@@ -13,7 +13,7 @@
   <a href="https://turje.github.io/sharedterminal-enterprise/">Website</a> &nbsp;|&nbsp;
   <a href="#quick-start">Quick Start</a> &nbsp;|&nbsp;
   <a href="#enterprise-deployment">Deploy</a> &nbsp;|&nbsp;
-  <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request">Request Demo</a>
+  <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request">Request Demo</a>
 </p>
 
 <p align="center">
