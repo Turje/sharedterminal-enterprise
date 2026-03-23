@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SharedTerminal — Your Team, One Project, Working in Parallel</title>
+  <title>SharedTerminal — Stop Screensharing Your Terminal</title>
   <meta name="description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries. Self-hosted on your cloud.">
-  <meta property="og:title" content="SharedTerminal — Your Team, One Project, Working in Parallel">
+  <meta property="og:title" content="SharedTerminal — Stop Screensharing Your Terminal">
   <meta property="og:description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://turje.github.io/sharedterminal-enterprise/">
   <meta property="og:image" content="https://turje.github.io/sharedterminal-enterprise/assets/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SharedTerminal — Your Team, One Project, Working in Parallel">
+  <meta name="twitter:title" content="SharedTerminal — Stop Screensharing Your Terminal">
   <meta name="twitter:description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1421,7 +1421,8 @@
   <section class="hero">
     <div class="container">
       <p style="display:inline-block;font-size:13px;font-weight:500;color:var(--accent);background:rgba(218,119,86,0.1);padding:6px 16px;border-radius:20px;margin-bottom:20px;letter-spacing:0.02em;">Open source &middot; Self-hosted &middot; Browser-native</p>
-      <h1>Your Team. One Project.<br>Working in Parallel.</h1>
+      <h1>Stop Screensharing Your Terminal.</h1>
+      <p style="font-size:22px;color:var(--text);margin:-8px 0 8px;font-weight:500;opacity:0.9;">One terminal. Full team. In sync.</p>
       <p class="subtitle">Drop your team into the same project. Everyone gets a shell. Delegate tasks, call AI when you need it, ship together &mdash; all from the browser.</p>
       <div style="display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;margin-top:8px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
@@ -1892,7 +1893,7 @@
     <div class="container" style="text-align:center;">
       <span class="section-label">Zero Friction</span>
       <h2 class="section-heading center reveal">Try It</h2>
-      <p class="subtitle reveal" style="margin:0 auto 48px;max-width:580px;">No signup. No cloud account. No Docker Hub login. Just clone, build, and run.</p>
+      <p class="subtitle reveal" style="margin:0 auto 48px;max-width:580px;">No signup. No cloud account. No Docker Hub login. Clone and run.</p>
 
       <div class="terminal-window reveal" style="max-width:680px;margin:0 auto;text-align:left;">
         <div class="terminal-titlebar">
@@ -1904,16 +1905,14 @@
         <div class="terminal-body" style="padding:24px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;">
 <span class="t-dim"># Clone and build (one time)</span>
 <span class="t-accent">git clone</span> https://github.com/Turje/sharedterminal-enterprise.git
-<span class="t-accent">cd</span> sharedterminal-enterprise <span class="t-accent">&amp;&amp;</span> npm install <span class="t-accent">&amp;&amp;</span> npm run build
-
-<span class="t-dim"># Build the sandbox container (one time)</span>
-<span class="t-accent">npm run</span> docker:build
+<span class="t-accent">cd</span> sharedterminal-enterprise <span class="t-accent">&amp;&amp;</span> npm install <span class="t-accent">&amp;&amp;</span> npm run build <span class="t-accent">&amp;&amp;</span> npm run docker:build
 
 <span class="t-dim"># Start a session — share the URL + PIN with your team</span>
-<span class="t-accent">node</span> dist/cli/index.js <span class="t-accent">--path</span> /your/project
+<span class="t-accent">npx</span> sharedterminal <span class="t-accent">--path</span> ./your-project
 
-<span class="t-dim"># Or self-hosted mode (no Cloudflare tunnel)</span>
-<span class="t-accent">node</span> dist/cli/index.js <span class="t-accent">--path</span> /your/project <span class="t-accent">--server-url</span> http://your-server:3000
+<span class="t-dim"># Or deploy self-hosted with docker compose</span>
+<span class="t-accent">cd</span> deploy <span class="t-accent">&amp;&amp;</span> cp .env.example .env
+<span class="t-accent">docker compose</span> up -d
         </div>
       </div>
 

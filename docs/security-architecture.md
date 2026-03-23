@@ -151,7 +151,7 @@ The DLP scanner operates **inline** — secrets are redacted before they are emi
 
 ## 5. Audit Logging (Enterprise)
 
-Every significant event is logged to append-only audit files stored in the data directory (`~/.sharedterminal/data/audit/`).
+Every terminal command, chat message, AI request, session join, kick, and ban is logged per-user to append-only audit files stored in the data directory (`~/.sharedterminal/data/audit/`).
 
 ### Logged Events
 
@@ -162,7 +162,7 @@ Every significant event is logged to append-only audit files stored in the data 
 | `session.left` | User ID, user name |
 | `terminal.created` | User, tab ID |
 | `terminal.closed` | User, tab ID |
-| `terminal.input` | User, command text |
+| `terminal.input` | User, full command text |
 | `chat.message` | User, message text |
 | `ai.request` | User, prompt text |
 | `ai.response` | User, message ID |
@@ -170,26 +170,52 @@ Every significant event is logged to append-only audit files stored in the data 
 | `user.banned` | Initiator, target user |
 | `security.dlp_detected` | User, pattern types |
 
+### Tamper-Evident Hash Chain
+
+Every audit entry is linked to its predecessor via SHA-256 hash chaining. Each entry contains:
+
+- `prevHash` — the hash of the previous entry (first entry chains from a known seed)
+- `hash` — SHA-256 of `(prevHash + JSON(event))`, forming a cryptographic chain
+
+If any entry is modified, inserted, or deleted after the fact, the chain breaks and verification fails. Admins can verify integrity at any time:
+
+```bash
+sharedterminal admin audit-verify
+# or verify a specific file:
+sharedterminal admin audit-verify ./audit/session-abc123.ndjson
+```
+
+Output:
+
+```
+  ✓ abc123.ndjson — 847 entries, chain intact
+  ✗ def456.ndjson — chain broken at entry 312 of 520
+```
+
 ### Log Format
 
 Audit logs are stored as newline-delimited JSON (NDJSON). Each entry includes:
 
 ```json
 {
-  "timestamp": "2026-03-23T14:30:00.000Z",
-  "event": "terminal.input",
+  "ts": "2026-03-23T14:30:00.000Z",
+  "type": "terminal.input",
   "sessionId": "abc123",
   "userId": "user456",
   "userName": "alice",
-  "data": { "command": "git push origin main" }
+  "data": { "command": "git push origin main" },
+  "prevHash": "a1b2c3...previous hash...",
+  "hash": "d4e5f6...sha256 of prevHash + this entry..."
 }
 ```
 
-### Retention
+### Retention & Export
 
-- Maximum file size: 50 MB per session (configurable)
+- Maximum file size: 50 MB per session (auto-rotated)
 - Rotation: Up to 5 rotated files per session
 - Files are stored on the host filesystem, never inside containers
+- Format is standard NDJSON — ingestible by Splunk, Elasticsearch, Datadog, or any log aggregator
+- Files can be exported directly from the data directory for compliance archival
 
 ---
 
@@ -226,39 +252,100 @@ The Socket.IO server validates the `Host` header on incoming connections against
 
 ---
 
-## 8. Data Flow Diagram
+## 8. Architecture & Trust Boundaries
 
-Each session is a parallel workspace — multiple developers work on the same project folder inside a single isolated container. Each developer gets their own terminal(s), but all terminals share the same filesystem, enabling real-time code collaboration, AI tool usage, and coordinated shipping.
+Each session is a parallel workspace — multiple developers work on the same project folder inside a single isolated container. Each developer gets their own terminal(s), but all terminals share the same filesystem.
+
+The system has three distinct trust boundaries:
 
 ```
-Developer A (Browser)          Developer B (Browser)
-  Terminal 1 + Chat + AI        Terminal 1 + Terminal 2
-       │                              │
-       │  WSS (encrypted)             │  WSS (encrypted)
-       ▼                              ▼
-┌──────────────────────────────────────────┐
-│         SharedTerminal Server            │
-│  ┌─────────┐  ┌─────┐  ┌────────────┐   │
-│  │ Auth    │  │ DLP │  │ Audit Log  │   │
-│  │ Tokens  │  │     │  │ (on disk)  │   │
-│  └─────────┘  └─────┘  └────────────┘   │
-│                  │                        │
-│            ┌─────┴─────┐                  │
-│            │  Docker    │                  │
-│            │  Exec API  │                  │
-│            └─────┬─────┘                  │
-└──────────────────┼───────────────────────┘
-                   │
-     ┌─────────────┼──────────────┐
-     ▼             ▼              ▼
-┌─────────┐  ┌─────────┐   ┌─────────┐
-│Container│  │Container│   │Container│
-│Project A│  │Project B│   │Project C│
-│ /workspace │ /workspace │  │ /workspace │
-│(isolated)│ │(isolated)│  │(isolated)│
-└─────────┘  └─────────┘   └─────────┘
-     ╳ No inter-container communication ╳
+╔══════════════════════════════════════════════════════════════════╗
+║  TRUST BOUNDARY 1: Your Network (firewall / VPC)               ║
+║                                                                  ║
+║  ┌─────────────┐      ┌──────────────┐                          ║
+║  │ Host (CLI)  │      │ Teammate     │                          ║
+║  │ Terminal    │      │ Browser/CLI  │                          ║
+║  └──────┬──────┘      └──────┬───────┘                          ║
+║         │ localhost           │ WSS (TLS)                        ║
+║  ╔══════╧════════════════════╧══════════════════════════╗       ║
+║  ║  TRUST BOUNDARY 2: SharedTerminal Server Process     ║       ║
+║  ║                                                      ║       ║
+║  ║  ┌──────────┐  ┌──────────┐  ┌───────────────────┐  ║       ║
+║  ║  │ Auth     │  │ DLP      │  │ Audit Logger      │  ║       ║
+║  ║  │ (bcrypt, │  │ (inline  │  │ (NDJSON, SHA-256  │  ║       ║
+║  ║  │  tokens) │  │  redact) │  │  hash chain)      │  ║       ║
+║  ║  └──────────┘  └──────────┘  └───────────────────┘  ║       ║
+║  ║                      │                               ║       ║
+║  ║              Docker Exec API                         ║       ║
+║  ║                      │ (unix socket)                 ║       ║
+║  ╚══════════════════════╧═══════════════════════════════╝       ║
+║                         │                                        ║
+║  ╔══════════════════════╧═══════════════════════════════╗       ║
+║  ║  TRUST BOUNDARY 3: Sandboxed Container               ║       ║
+║  ║  (per session — isolated from other containers)      ║       ║
+║  ║                                                      ║       ║
+║  ║  ┌──────────────────────────────────────────────┐    ║       ║
+║  ║  │  /workspace (project files)                  │    ║       ║
+║  ║  │  /home/developer (ephemeral tmpfs)           │    ║       ║
+║  ║  │                                              │    ║       ║
+║  ║  │  UID 1000 · no capabilities · read-only root │    ║       ║
+║  ║  │  512MB mem · 256 PIDs · no inter-container   │    ║       ║
+║  ║  └──────────────────────────────────────────────┘    ║       ║
+║  ║          │                                           ║       ║
+║  ║  AI tool calls (if Claude Code installed):           ║       ║
+║  ║          │ HTTPS ──────────────────────────────────── ╫ ──── ║
+║  ╚══════════════════════════════════════════════════════╝       ║
+║                                                                  ║
+╚════════════════════════════════╦═════════════════════════════════╝
+                                 ║ (outbound only)
+                                 ▼
+                    ┌─────────────────────────┐
+                    │  External Services       │
+                    │  • api.anthropic.com     │
+                    │    (AI tool calls)       │
+                    │  • api.sharedterminal.com│
+                    │    (license validation)  │
+                    │  • github.com, npm, etc. │
+                    │    (git push, packages)  │
+                    └─────────────────────────┘
 ```
+
+### Trust Boundary 1 — Your Network
+
+Everything runs inside your firewall. No inbound ports need to be opened unless you choose to expose the server externally. The optional Cloudflare tunnel provides public access without opening ports.
+
+### Trust Boundary 2 — Server Process
+
+The Node.js server handles authentication, DLP scanning, and audit logging. It communicates with containers only via the Docker/Podman unix socket. All terminal output passes through the DLP scanner before reaching any client. Audit logs are written to the host filesystem, never inside containers.
+
+### Trust Boundary 3 — Sandboxed Container
+
+Each session runs in an isolated container with all Linux capabilities dropped. The container has no access to the host filesystem beyond the mounted project directory. If AI tools (like Claude Code) are installed inside the container, they make **outbound HTTPS calls** to external APIs — see section 8.1.
+
+### 8.1 AI Feature — Data Flow & External Calls
+
+SharedTerminal's AI features (`@agent` commands, session summaries) work by running **Claude Code** inside the sandboxed container. This is important for security-conscious teams to understand:
+
+**How it works:**
+1. User sends an AI request via the chat panel
+2. SharedTerminal server gathers session context (online users, recent commands, chat history, git activity)
+3. Server executes `claude -p "<prompt>"` inside the container via Docker exec
+4. Claude Code (running inside the container) makes HTTPS calls to `api.anthropic.com`
+5. Response streams back through the server to the user
+
+**What leaves your network:**
+- The AI prompt (session context + user message) is sent to `api.anthropic.com` over HTTPS
+- Claude Code's authentication credentials are stored **inside the container** (not managed by SharedTerminal)
+- SharedTerminal itself never stores or transmits API keys
+
+**What stays on your infrastructure:**
+- All terminal I/O, chat messages, and file contents
+- Audit logs and session recordings
+- Authentication tokens and passwords
+
+**To disable AI entirely:** Simply don't install Claude Code in the container image. The AI features gracefully degrade — users see an error message explaining that Claude Code is not available. No external API calls will be made.
+
+**To use AI without external calls:** You can configure Claude Code inside the container to point to a self-hosted LLM endpoint instead of `api.anthropic.com`. SharedTerminal does not control this — it runs whatever `claude` binary is available in the container.
 
 ---
 

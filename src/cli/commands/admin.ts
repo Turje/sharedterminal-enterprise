@@ -6,6 +6,7 @@ import path from 'path';
 import os from 'os';
 import { loadConfig } from '../../server/config';
 import { LicenseValidator, TIER_LABELS } from '../../server/license';
+import { AuditLogger } from '../../server/audit/audit-logger';
 
 const ACCENT = '\x1b[38;2;218;119;86m';
 const GREEN = '\x1b[32m';
@@ -137,6 +138,63 @@ adminCommand
       for (const feature of license.features) {
         console.log(`    ${GREEN}✓${RESET} ${feature}`);
       }
+    }
+    console.log('');
+  });
+
+adminCommand
+  .command('audit-verify')
+  .description('Verify tamper-evidence of audit log files')
+  .argument('[file]', 'Specific audit file to verify (or verifies all in data dir)')
+  .action((file?: string) => {
+    console.log('');
+    console.log(`  ${ACCENT}${BOLD}SharedTerminal Enterprise${RESET} — Audit Chain Verification`);
+    console.log(`  ${DIM}${'─'.repeat(48)}${RESET}`);
+    console.log('');
+
+    const files: string[] = [];
+    if (file) {
+      files.push(path.resolve(file));
+    } else {
+      const config = loadConfig();
+      const auditDir = path.join(config.dataDir, 'audit');
+      if (fs.existsSync(auditDir)) {
+        for (const f of fs.readdirSync(auditDir)) {
+          if (f.endsWith('.ndjson')) {
+            files.push(path.join(auditDir, f));
+          }
+        }
+      }
+    }
+
+    if (files.length === 0) {
+      console.log(`  ${DIM}No audit files found.${RESET}`);
+      console.log('');
+      return;
+    }
+
+    let allValid = true;
+    for (const f of files) {
+      const name = path.basename(f);
+      try {
+        const result = AuditLogger.verifyChain(f);
+        if (result.valid) {
+          console.log(`  ${GREEN}✓${RESET} ${name} — ${result.entries} entries, chain intact`);
+        } else {
+          console.log(`  ${RED}✗${RESET} ${name} — chain broken at entry ${result.brokenAt} of ${result.entries}`);
+          allValid = false;
+        }
+      } catch (err) {
+        console.log(`  ${RED}✗${RESET} ${name} — ${(err as Error).message}`);
+        allValid = false;
+      }
+    }
+
+    console.log('');
+    if (allValid) {
+      console.log(`  ${GREEN}All audit logs verified — no tampering detected.${RESET}`);
+    } else {
+      console.log(`  ${RED}${BOLD}WARNING: One or more audit logs show signs of tampering.${RESET}`);
     }
     console.log('');
   });

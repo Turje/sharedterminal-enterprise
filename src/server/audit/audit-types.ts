@@ -24,4 +24,8 @@ export interface AuditEvent {
   userName?: string;
   ip?: string;
   data?: Record<string, unknown>;
+  /** SHA-256 hash of (previousHash + this event), forming a tamper-evident chain */
+  hash?: string;
+  /** Hash of the previous entry in the chain */
+  prevHash?: string;
 }

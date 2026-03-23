@@ -25,6 +25,9 @@ services:
       SESSION_IDLE_TIMEOUT_MS: "${SESSION_IDLE_TIMEOUT_MS:-3600000}"
       RECORDING_ENABLED: "${RECORDING_ENABLED:-true}"
       DLP_ENABLED: "${DLP_ENABLED:-true}"
+      AUDIT_ENABLED: "${AUDIT_ENABLED:-true}"
+      LICENSE_KEY: "${LICENSE_KEY:-}"
+      LICENSE_SERVER_URL: "${LICENSE_SERVER_URL:-https://api.sharedterminal.com/v1/license/validate}"
       TLS_CERT_PATH: /certs/cert.pem
       TLS_KEY_PATH: /certs/key.pem
     healthcheck:
