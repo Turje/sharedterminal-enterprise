@@ -253,6 +253,15 @@ export class SessionManager {
     return Array.from(this.sessions.values()).map((s) => s.toInfo());
   }
 
+  findPublicSession(): SessionState | null {
+    for (const session of this.sessions.values()) {
+      if (session.isPublic && session.status === 'running') {
+        return session;
+      }
+    }
+    return null;
+  }
+
   listPersistentSessions(): PersistentSessionRecord[] {
     return this.persistentStore.listSessions();
   }

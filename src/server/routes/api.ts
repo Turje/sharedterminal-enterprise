@@ -84,6 +84,24 @@ export function createApiRouter(
     }
   });
 
+  // Auto-discover public demo session (no session ID needed)
+  router.get('/api/session/demo', (_req: Request, res: Response) => {
+    try {
+      const session = sessionManager.findPublicSession();
+      if (session) {
+        res.json({
+          sessionId: session.id,
+          sessionName: session.name,
+          isPublic: true,
+        });
+      } else {
+        res.status(404).json({ error: 'No public demo session available' });
+      }
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
   // Join session (no auth — password is verified in body, brute-force protected)
   router.post('/api/session/join', async (req: Request, res: Response) => {
     try {

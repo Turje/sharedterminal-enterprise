@@ -219,12 +219,28 @@ const urlSession = urlParams.get('session');
 const urlName = urlParams.get('name');
 let isPublicSession = false;
 
+function setupPublicSession(sid: string, sName?: string) {
+  sessionInput.value = sid;
+  sessionInput.type = 'hidden';
+  if (sName) {
+    const sessionLabel = document.getElementById('session-label')!;
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'label-dim';
+    labelSpan.textContent = 'Project:';
+    sessionLabel.appendChild(labelSpan);
+    sessionLabel.appendChild(document.createTextNode(' ' + sName));
+    sessionLabel.classList.remove('hidden');
+  }
+  isPublicSession = true;
+  passwordInput.style.display = 'none';
+  nameInput.focus();
+}
+
 if (urlSession) {
   sessionInput.value = urlSession;
   // If we have a project name, show it and hide the raw UUID
   if (urlName) {
     const sessionLabel = document.getElementById('session-label')!;
-    // Use DOM methods instead of innerHTML to prevent XSS via URL params
     const labelSpan = document.createElement('span');
     labelSpan.className = 'label-dim';
     labelSpan.textContent = 'Project:';
@@ -241,8 +257,17 @@ if (urlSession) {
       if (data?.isPublic) {
         isPublicSession = true;
         passwordInput.style.display = 'none';
-        // Auto-focus the name field
         nameInput.focus();
+      }
+    })
+    .catch(() => {});
+} else {
+  // No session in URL — auto-discover a public demo session
+  fetch('/api/session/demo')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data?.isPublic && data?.sessionId) {
+        setupPublicSession(data.sessionId, data.sessionName);
       }
     })
     .catch(() => {});

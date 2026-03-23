@@ -162,6 +162,23 @@
   var urlParams = new URLSearchParams(window.location.search);
   var urlSession = urlParams.get("session");
   var urlName = urlParams.get("name");
+  var isPublicSession = false;
+  function setupPublicSession(sid, sName) {
+    sessionInput.value = sid;
+    sessionInput.type = "hidden";
+    if (sName) {
+      const sessionLabel = document.getElementById("session-label");
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "label-dim";
+      labelSpan.textContent = "Project:";
+      sessionLabel.appendChild(labelSpan);
+      sessionLabel.appendChild(document.createTextNode(" " + sName));
+      sessionLabel.classList.remove("hidden");
+    }
+    isPublicSession = true;
+    passwordInput.style.display = "none";
+    nameInput.focus();
+  }
   if (urlSession) {
     sessionInput.value = urlSession;
     if (urlName) {
@@ -174,6 +191,21 @@
       sessionLabel.classList.remove("hidden");
       sessionInput.type = "hidden";
     }
+    fetch(`/api/session/public-info?sessionId=${encodeURIComponent(urlSession)}`).then((r) => r.ok ? r.json() : null).then((data) => {
+      if (data?.isPublic) {
+        isPublicSession = true;
+        passwordInput.style.display = "none";
+        nameInput.focus();
+      }
+    }).catch(() => {
+    });
+  } else {
+    fetch("/api/session/demo").then((r) => r.ok ? r.json() : null).then((data) => {
+      if (data?.isPublic && data?.sessionId) {
+        setupPublicSession(data.sessionId, data.sessionName);
+      }
+    }).catch(() => {
+    });
   }
   joinBtn.addEventListener("click", connect);
   passwordInput.addEventListener("keydown", (e) => {
@@ -206,7 +238,7 @@
       showError("Please enter a Session ID");
       return;
     }
-    if (!password) {
+    if (!isPublicSession && !password) {
       showError("Please enter the Session PIN");
       return;
     }
