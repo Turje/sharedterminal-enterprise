@@ -1422,7 +1422,7 @@
     <div class="container">
       <p style="display:inline-block;font-size:13px;font-weight:500;color:var(--accent);background:rgba(218,119,86,0.1);padding:6px 16px;border-radius:20px;margin-bottom:20px;letter-spacing:0.02em;">Open source &middot; Self-hosted &middot; Browser-native</p>
       <h1>Your Team. One Project.<br>Working in Parallel.</h1>
-      <p class="subtitle">A shared terminal workspace where your entire team works on the same project at the same time &mdash; each with their own shell. Delegate tasks, see what teammates are doing, and get AI summaries when the session ends. The project lives on your cloud, your rules.</p>
+      <p class="subtitle">Drop your team into the same project. Everyone gets a shell. Delegate, collaborate, ship &mdash; all from the browser.</p>
       <div style="display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;margin-top:8px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
           <span style="color:var(--green);font-size:18px;">&#9679;</span> Parallel shells, one project
@@ -1993,61 +1993,54 @@
     // HTML spans are embedded directly; only plain-text portions get typed.
 
     var leftLines = [
-      { text: '<span class="t-accent">$ sharedterminal --path ./acme-api --server-url http://internal:3000</span>', mode: 'type', typeText: '$ sharedterminal --path ./acme-api --server-url http://internal:3000' },
+      // Saar starts session and assigns tasks
+      { text: '<span class="t-accent">$ sharedterminal --path ./acme-api</span>', mode: 'type', typeText: '$ sharedterminal --path ./acme-api' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-green">\u25CF</span> <span class="t-accent t-bold">SharedTerminal Enterprise</span> <span class="t-dim">[Self-Hosted Mode]</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Secure Sandbox:</span>  <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Audit Logging:</span>   <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
-      { text: '<span class="t-dim">DLP Scanner:</span>     <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Recording:</span>       <span class="t-green">\u25CF</span> <span class="t-white">Active</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Invite Link:</span>  <span class="t-accent">https://internal:3000/?session=a1b2c3</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Session PIN:</span>  <span class="t-bold">8472</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u25CF</span> <span class="t-accent t-bold">SharedTerminal</span> <span class="t-dim">session started</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Online:</span> <span class="t-white">Saar (owner)</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-green">\u2713</span> <span class="t-white">Alex joined the session</span>', mode: 'instant', trigger: 'showRight' },
+      // Create tasks
+      { text: '<span class="t-accent">saar@acme-api$ /tasks create</span>', mode: 'type', typeText: 'saar@acme-api$ /tasks create' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Fix rate limiter bug</span>        <span class="t-dim">\u2192 Alex</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Write integration tests</span>    <span class="t-dim">\u2192 Maya</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2610</span> <span class="t-white">Review PR #142</span>             <span class="t-dim">\u2192 Saar</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2713 3 tasks assigned</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">saar@sandbox:~/acme-api$ cat .env</span>', mode: 'type', typeText: 'saar@sandbox:~/acme-api$ cat .env' },
-      { text: '<span class="t-white">DATABASE_URL=postgres://localhost:5432/acme</span>', mode: 'instant' },
-      { text: '<span class="t-white">AWS_SECRET_ACCESS_KEY=</span><span class="t-yellow">[***REDACTED BY DLP***]</span>', mode: 'instant' },
+      { text: '<span class="t-green">\u2713</span> <span class="t-white">Alex joined</span>  <span class="t-green">\u2713</span> <span class="t-white">Maya joined</span>', mode: 'instant', trigger: 'showRight' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-red">\u26A0 DLP: 1 secret redacted (AWS Secret Key)</span>', mode: 'instant' },
+      // Saar reviews code, uses AI agent
+      { text: '<span class="t-accent">saar@acme-api$ git diff src/rate-limiter.ts</span>', mode: 'type', typeText: 'saar@acme-api$ git diff src/rate-limiter.ts' },
+      { text: '<span class="t-red">-  const ttl = 60;</span>           <span class="t-dim">// seconds</span>', mode: 'instant' },
+      { text: '<span class="t-green">+  const ttl = 60 * 1000;</span>    <span class="t-dim">// milliseconds</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">saar@sandbox:~/acme-api$</span> <span class="cursor-blink">\u258C</span>', mode: 'instant' }
+      { text: '<span class="t-accent">saar@acme-api$ @agent summarize this session</span>', mode: 'type', typeText: 'saar@acme-api$ @agent summarize this session' },
+      { text: '', mode: 'instant' },
+      { text: '<span class="t-dim">\u2728 AI:</span> <span class="t-white">3 engineers, 23min. Fixed rate limiter</span>', mode: 'instant' },
+      { text: '<span class="t-white">   TTL bug (60s\u219260000ms). 14 tests added.</span>', mode: 'instant' },
+      { text: '<span class="t-white">   All tasks complete. PR #142 approved.</span>', mode: 'instant' }
     ];
 
     var rightLines = [
-      { text: '<span class="t-white">Joined session: acme-api</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-dim">Online:</span> <span class="t-white">Saar (owner), Alex</span>', mode: 'instant' },
+      // Alex picks up task, writes actual code
+      { text: '<span class="t-dim">Your tasks:</span> <span class="t-white">Fix rate limiter bug</span> <span class="t-red">\u25CF urgent</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">alex@sandbox:~/acme-api$ npm test</span>', mode: 'type', typeText: 'alex@sandbox:~/acme-api$ npm test' },
+      { text: '<span class="t-accent">alex@acme-api$ vim src/rate-limiter.ts</span>', mode: 'type', typeText: 'alex@acme-api$ vim src/rate-limiter.ts' },
+      { text: '<span class="t-dim">  12 |</span> <span class="t-white">export function checkRate(key: string) {</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  13 |</span> <span class="t-white">  const window = redis.get(key);</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  14 |</span> <span class="t-green">  const ttl = 60 * 1000; // fixed!</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  15 |</span> <span class="t-white">  return window.count < MAX_REQ;</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '  <span class="t-green">\u2713</span> <span class="t-white">auth.test.ts (3 passed)</span>', mode: 'instant' },
-      { text: '  <span class="t-green">\u2713</span> <span class="t-white">api.test.ts (12 passed)</span>', mode: 'instant' },
-      { text: '  <span class="t-green">\u2713</span> <span class="t-white">db.test.ts (8 passed)</span>', mode: 'instant' },
+      { text: '<span class="t-accent">alex@acme-api$ @agent write tests for rate-limiter</span>', mode: 'type', typeText: 'alex@acme-api$ @agent write tests for rate-limiter' },
+      { text: '<span class="t-dim">\u2728 AI:</span> <span class="t-white">Generated 6 tests in rate-limiter.test.ts</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-green">Tests: 23 passed, 0 failed</span>', mode: 'instant' },
+      { text: '<span class="t-accent">alex@acme-api$ npm test</span>', mode: 'type', typeText: 'alex@acme-api$ npm test' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">rate-limiter.test.ts (6 passed)</span>', mode: 'instant' },
+      { text: '  <span class="t-green">\u2713</span> <span class="t-white">api.test.ts (8 passed)</span>', mode: 'instant' },
+      { text: '<span class="t-green">Tests: 14 passed, 0 failed</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-accent">alex@sandbox:~/acme-api$ git log --oneline -3</span>', mode: 'type', typeText: 'alex@sandbox:~/acme-api$ git log --oneline -3' },
-      { text: '<span class="t-yellow">a1b2c3d</span> <span class="t-white">fix: rate limiter edge case</span>', mode: 'instant' },
-      { text: '<span class="t-yellow">b2c3d4e</span> <span class="t-white">feat: add webhook retry</span>', mode: 'instant' },
-      { text: '<span class="t-yellow">c3d4e5f</span> <span class="t-white">chore: update deps</span>', mode: 'instant' },
-      { text: '', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500 Team Chat \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-accent">Saar:</span> <span class="t-white">Alex can you check the rate limiter?</span>', mode: 'instant' },
-      { text: '<span class="t-accent">Alex:</span> <span class="t-white">on it, running load test now</span>', mode: 'instant' },
-      { text: '', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500 Tasks \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix rate limiter edge case</span>     <span class="t-dim">(Saar \u2192 Alex)</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2610</span> <span class="t-dim">Review load test results</span>       <span class="t-dim">(Alex \u2192 Saar)</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2610</span> <span class="t-dim">Update deployment config</span>       <span class="t-dim">(unassigned)</span>', mode: 'instant' },
-      { text: '', mode: 'instant' },
-      { text: '<span class="t-dim">\u2500\u2500 AI Summary \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>', mode: 'instant' },
-      { text: '<span class="t-accent">Session:</span> <span class="t-white">2 engineers, 47min</span>', mode: 'instant' },
-      { text: '<span class="t-white">Key actions: debugged rate limiter,</span>', mode: 'instant' },
-      { text: '<span class="t-white">ran test suite (23 passed), reviewed</span>', mode: 'instant' },
-      { text: '<span class="t-white">3 recent commits. 1 secret redacted.</span>', mode: 'instant' }
+      { text: '<span class="t-accent">alex@acme-api$ /tasks done "Fix rate limiter bug"</span>', mode: 'type', typeText: 'alex@acme-api$ /tasks done "Fix rate limiter bug"' },
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix rate limiter bug</span> <span class="t-green">completed</span>', mode: 'instant' },
+      { text: '<span class="t-dim">Remaining: 2 tasks (Maya: 1, Saar: 1)</span>', mode: 'instant' }
     ];
 
     var leftBody = document.getElementById('demo-left-body');
