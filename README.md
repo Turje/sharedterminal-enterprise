@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+  <img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="License: AGPL-3.0">
   <img src="https://img.shields.io/badge/Node-20%2B-green.svg" alt="Node 20+">
   <img src="https://img.shields.io/badge/Docker-Required-blue.svg" alt="Docker Required">
   <img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript">
@@ -174,7 +174,7 @@ npm test
 
 ## License
 
-MIT
+AGPL-3.0 — free for internal use. [Commercial licenses](COMMERCIAL-LICENSE.md) available for SaaS and proprietary distribution.
 
 ---
 
