@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Stop Screensharing Your Terminal</title>
-  <meta name="description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries. Self-hosted on your cloud.">
+  <meta name="description" content="A parallel workspace where your team drops into one project, works on the code side by side, delegates tasks, calls AI, and ships together. Self-hosted on your cloud.">
   <meta property="og:title" content="SharedTerminal — Stop Screensharing Your Terminal">
-  <meta property="og:description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries.">
+  <meta property="og:description" content="A parallel workspace where your team drops into one project, works on the code side by side, delegates tasks, calls AI, and ships together.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://turje.github.io/sharedterminal-enterprise/">
   <meta property="og:image" content="https://turje.github.io/sharedterminal-enterprise/assets/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SharedTerminal — Stop Screensharing Your Terminal">
-  <meta name="twitter:description" content="A shared terminal workspace where your entire team works on the same project at the same time. Delegate tasks, see what teammates are doing, get AI summaries.">
+  <meta name="twitter:description" content="A parallel workspace where your team drops into one project, works on the code side by side, delegates tasks, calls AI, and ships together.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1424,19 +1424,19 @@
     <div class="container">
       <p style="display:inline-block;font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:-0.02em;"><img src="assets/logo.svg" alt="" width="24" height="24" style="vertical-align:middle;margin-right:8px;">Shared<span style="color:var(--accent);">Terminal</span></p>
       <h1>Stop Screensharing Your Terminal.<br>One terminal. Full team. In sync.</h1>
-      <p class="subtitle">Drop your team into the same project. Everyone gets a shell. Delegate tasks, call AI when you need it, ship together.</p>
+      <p class="subtitle">Your whole team drops into one project folder. Everyone gets their own shell, works on the code in parallel, delegates tasks, calls AI &mdash; and ships the fix together.</p>
       <div style="display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;margin-top:8px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
-          <span style="color:var(--green);font-size:18px;">&#9679;</span> Parallel shells, one project
+          <span style="color:var(--green);font-size:18px;">&#9679;</span> Everyone works in parallel, same codebase
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
-          <span style="color:var(--green);font-size:18px;">&#9679;</span> Task delegation &amp; live activity
+          <span style="color:var(--green);font-size:18px;">&#9679;</span> Chat, delegate tasks, track activity
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
-          <span style="color:var(--green);font-size:18px;">&#9679;</span> AI assist on demand
+          <span style="color:var(--green);font-size:18px;">&#9679;</span> AI coding tools inside the workspace
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);">
-          <span style="color:var(--green);font-size:18px;">&#9679;</span> Hosted on your cloud
+          <span style="color:var(--green);font-size:18px;">&#9679;</span> Self-hosted, sandboxed, audit-logged
         </div>
       </div>
       <div class="hero-buttons">
@@ -1477,42 +1477,42 @@
   <section id="why" style="border-bottom: 1px solid var(--border);">
     <div class="container">
       <div style="text-align:center;margin-bottom:48px;">
-        <span class="section-label">Why This Exists</span>
-        <h2 class="section-heading center reveal">What tmux + SSH Can't Do</h2>
-        <p class="subtitle reveal" style="margin:0 auto;max-width:640px;">tmux is great for sharing a single session. SharedTerminal is what you need when the whole team needs to work together with real permissions, audit trails, and persistence.</p>
+        <span class="section-label">Not a Terminal Multiplexer</span>
+        <h2 class="section-heading center reveal">A Parallel Workspace for Your Team</h2>
+        <p class="subtitle reveal" style="margin:0 auto;max-width:640px;">This isn't tmux. It's not screensharing. Your team opens one project, everyone gets their own shell, and you ship code together in real time.</p>
       </div>
       <div class="problem-grid reveal">
-        <div class="problem-card" style="border-left:3px solid var(--accent);">
-          <h3 style="color:var(--accent);font-size:14px;margin-bottom:12px;">tmux / tmate</h3>
-          <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--muted);line-height:2;">
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> One shared cursor for everyone</li>
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> No access control or roles</li>
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> No audit log of who did what</li>
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Requires SSH access + client install</li>
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Session dies when host disconnects</li>
-            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Secrets visible to all participants</li>
+        <div class="problem-card" style="border-left:3px solid var(--green);background:rgba(74,222,128,0.03);">
+          <h3 style="color:var(--green);font-size:14px;margin-bottom:12px;">How It Works</h3>
+          <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--text);line-height:2;">
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Host shares a project folder from their terminal</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Teammates join via browser &mdash; zero install</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Everyone gets independent shell tabs</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Same codebase, parallel work, real-time sync</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Chat, delegate tasks, call AI for help</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Ship the fix together &mdash; all in one session</li>
           </ul>
         </div>
-        <div class="problem-card" style="border-left:3px solid var(--green);background:rgba(74,222,128,0.03);">
-          <h3 style="color:var(--green);font-size:14px;margin-bottom:12px;">SharedTerminal</h3>
+        <div class="problem-card" style="border-left:3px solid var(--accent);">
+          <h3 style="color:var(--accent);font-size:14px;margin-bottom:12px;">Enterprise Guardrails</h3>
           <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--text);line-height:2;">
-            <li><span class="check" style="margin-right:8px;">&#10003;</span> Each user gets their own independent shell</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Docker-sandboxed (read-only rootfs, no capabilities)</li>
             <li><span class="check" style="margin-right:8px;">&#10003;</span> Owner / editor / viewer roles with SSO</li>
-            <li><span class="check" style="margin-right:8px;">&#10003;</span> Every keystroke audit-logged per user</li>
-            <li><span class="check" style="margin-right:8px;">&#10003;</span> Browser-native — zero install for guests</li>
-            <li><span class="check" style="margin-right:8px;">&#10003;</span> Persistent sessions survive disconnects</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Every command audit-logged per user</li>
             <li><span class="check" style="margin-right:8px;">&#10003;</span> DLP auto-redacts secrets in real-time</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Full session recording with browser replay</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Persistent sessions survive disconnects</li>
           </ul>
         </div>
         <div class="problem-card" style="border-left:3px solid #60a5fa;">
-          <h3 style="color:#60a5fa;font-size:14px;margin-bottom:12px;">Plus enterprise features</h3>
+          <h3 style="color:#60a5fa;font-size:14px;margin-bottom:12px;">Built-In Collaboration</h3>
           <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--text);line-height:2;">
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Full session recording with browser replay</li>
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Admin dashboard for managers</li>
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> AI-generated session summaries</li>
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Built-in team chat + task board</li>
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Docker-sandboxed (read-only rootfs)</li>
-            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Self-hosted via docker-compose</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Team chat alongside the terminal</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Task board &mdash; assign work during sessions</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Live activity feed &mdash; see who ran what</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> AI assistant for code questions &amp; summaries</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Follow mode &mdash; watch a teammate's terminal</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Self-hosted via docker compose</li>
           </ul>
         </div>
       </div>
@@ -1522,8 +1522,8 @@
   <!-- ─── FEATURES ─── -->
   <section id="features">
     <div class="container">
-      <h2 class="section-heading reveal">What's Actually Built</h2>
-      <p class="subtitle reveal" style="max-width:640px;">These aren't roadmap items. Every feature below is implemented, tested, and in the source code.</p>
+      <h2 class="section-heading reveal">Enterprise-Grade by Default</h2>
+      <p class="subtitle reveal" style="max-width:640px;">These aren't roadmap items. Every feature is implemented, tested, and in the source code.</p>
       <div class="features-grid">
         <div class="feature-card reveal">
           <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 3L4 10v12c0 7.7 6 13.3 14 16 8-2.7 14-8.3 14-16V10L18 3z" stroke="#da7756" stroke-width="2" fill="none"/><path d="M12 18l4 4 8-8" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1563,9 +1563,9 @@
   <section id="collaboration" style="padding: 96px 24px;">
     <div class="container">
       <div style="text-align:center;margin-bottom:64px;">
-        <span class="section-label">Beyond the Terminal</span>
-        <h2 class="section-heading center reveal">Built-In Collaboration Tools</h2>
-        <p class="subtitle reveal" style="margin:0 auto;">Your team doesn't just need a shared terminal &mdash; they need to communicate, delegate, track, and learn from every session.</p>
+        <span class="section-label">Built Into Every Session</span>
+        <h2 class="section-heading center reveal">Collaboration, Not Just Shells</h2>
+        <p class="subtitle reveal" style="margin:0 auto;">A workspace isn't just terminals. Your team needs to communicate, delegate, track progress, and learn from every session.</p>
       </div>
 
       <div class="showcase-panels">
