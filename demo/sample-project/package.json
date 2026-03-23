@@ -1,0 +1,10 @@
+{
+  "name": "acme-api",
+  "version": "1.0.0",
+  "description": "Sample project for SharedTerminal demo",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/test.js"
+  }
+}
