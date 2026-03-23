@@ -778,6 +778,629 @@
         padding: 16px;
       }
     }
+
+    /* ─── SHOWCASE PANELS ─── */
+    .showcase-panels {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    .showcase-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .showcase-panel.reverse {
+      direction: rtl;
+    }
+
+    .showcase-panel.reverse > * {
+      direction: ltr;
+    }
+
+    .showcase-text {
+      padding: 16px 0;
+    }
+
+    .showcase-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      background: rgba(218, 119, 86, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .showcase-text h3 {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .showcase-text p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .showcase-bullets {
+      list-style: none;
+      padding: 0;
+    }
+
+    .showcase-bullets li {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .showcase-bullets li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* Mockup windows */
+    .mockup-window {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #0d0d14;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    .mockup-titlebar {
+      background: #16161e;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .mockup-dot.red { background: #ff5f57; }
+    .mockup-dot.yellow { background: #febc2e; }
+    .mockup-dot.green { background: #28c840; }
+
+    .mockup-title {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .mockup-body {
+      padding: 16px;
+    }
+
+    /* Chat mockup */
+    .chat-mockup {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-msg {
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .showcase-panel.visible .chat-msg {
+      animation: chatFadeIn 0.4s ease forwards;
+    }
+
+    .showcase-panel.visible .chat-msg-1 { animation-delay: 0.5s; }
+    .showcase-panel.visible .chat-msg-2 { animation-delay: 1.5s; }
+    .showcase-panel.visible .chat-msg-3 { animation-delay: 2.5s; }
+    .showcase-panel.visible .chat-msg-4 { animation-delay: 3.5s; }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .chat-content {
+      flex: 1;
+    }
+
+    .chat-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .chat-time {
+      font-size: 10px;
+      color: #555570;
+      margin-left: 8px;
+    }
+
+    .chat-content p {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 2px 0 0;
+      line-height: 1.5;
+    }
+
+    .chat-typing {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      opacity: 0;
+    }
+
+    .showcase-panel.visible .chat-typing {
+      animation: chatFadeIn 0.4s ease forwards;
+      animation-delay: 4.5s;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 3px;
+      padding: 8px 12px;
+      background: var(--surface);
+      border-radius: 12px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes chatFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* Activity mockup */
+    .activity-mockup {
+      padding: 0;
+    }
+
+    .activity-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-users {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .activity-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .activity-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .presence-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .presence-indicator.online {
+      background: #4ade80;
+      box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+    }
+
+    .showcase-panel.visible .presence-indicator.online {
+      animation: presencePulse 2s infinite;
+    }
+
+    .presence-indicator.offline {
+      background: #555570;
+    }
+
+    @keyframes presencePulse {
+      0%, 100% { box-shadow: 0 0 6px rgba(74, 222, 128, 0.5); }
+      50% { box-shadow: 0 0 12px rgba(74, 222, 128, 0.8); }
+    }
+
+    .activity-role {
+      font-size: 10px;
+      color: var(--accent);
+      background: rgba(218, 119, 86, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .activity-tag {
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .activity-user.offline {
+      opacity: 0.5;
+    }
+
+    .activity-feed {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .showcase-panel.visible .activity-item {
+      animation: chatFadeIn 0.4s ease forwards;
+    }
+
+    .showcase-panel.visible .activity-item-1 { animation-delay: 0.3s; }
+    .showcase-panel.visible .activity-item-2 { animation-delay: 0.8s; }
+    .showcase-panel.visible .activity-item-3 { animation-delay: 1.3s; }
+    .showcase-panel.visible .activity-item-4 { animation-delay: 1.8s; }
+    .showcase-panel.visible .activity-item-5 { animation-delay: 2.3s; }
+
+    .activity-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #555570;
+      min-width: 32px;
+    }
+
+    .activity-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .activity-item strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .activity-item code {
+      background: rgba(218, 119, 86, 0.1);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* Task mockup */
+    .task-mockup {
+      padding: 12px;
+    }
+
+    .task-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .task-column {
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .task-column-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 0 4px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .task-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .task-count {
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: auto;
+    }
+
+    .task-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 6px;
+      transition: transform 0.2s, border-color 0.2s;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .showcase-panel.visible .task-card {
+      animation: chatFadeIn 0.4s ease forwards;
+    }
+
+    .showcase-panel.visible .task-card-1 { animation-delay: 0.3s; }
+    .showcase-panel.visible .task-card-2 { animation-delay: 0.6s; }
+    .showcase-panel.visible .task-card-3 { animation-delay: 0.9s; }
+    .showcase-panel.visible .task-card-4 { animation-delay: 1.2s; }
+    .showcase-panel.visible .task-card-5 { animation-delay: 1.5s; }
+
+    .task-card:hover {
+      transform: translateY(-1px);
+      border-color: #2a2a3e;
+    }
+
+    .task-card-active {
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+
+    .task-card-done .task-card-title {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .task-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .task-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .task-card-tag {
+      background: rgba(218, 119, 86, 0.1);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+    }
+
+    .task-card-tag.priority {
+      background: rgba(248, 113, 113, 0.15);
+      color: #f87171;
+    }
+
+    .task-assignee {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mini-avatar {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .task-card-progress {
+      margin-top: 8px;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .task-progress-bar {
+      height: 100%;
+      background: #60a5fa;
+      border-radius: 2px;
+      width: 0;
+    }
+
+    .showcase-panel.visible .task-progress-bar {
+      animation: progressGrow 2s ease forwards;
+      animation-delay: 1.2s;
+    }
+
+    @keyframes progressGrow {
+      to { width: 70%; }
+    }
+
+    /* AI Summary mockup */
+    .ai-mockup {
+      padding: 20px;
+    }
+
+    .ai-header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ai-sparkle {
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .showcase-panel.visible .ai-sparkle {
+      animation: sparkleRotate 3s ease infinite;
+    }
+
+    @keyframes sparkleRotate {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(15deg) scale(1.1); }
+    }
+
+    .ai-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .ai-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .ai-section {
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .showcase-panel.visible .ai-section {
+      animation: chatFadeIn 0.5s ease forwards;
+    }
+
+    .showcase-panel.visible .ai-section:nth-child(2) { animation-delay: 0.5s; }
+    .showcase-panel.visible .ai-section:nth-child(3) { animation-delay: 1.2s; }
+    .showcase-panel.visible .ai-section:nth-child(4) { animation-delay: 1.9s; }
+
+    .ai-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .ai-section p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .ai-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ai-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .ai-check {
+      color: #4ade80;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .ai-todo {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ai-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ai-tag {
+      font-size: 10px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    /* Showcase responsive */
+    @media (max-width: 900px) {
+      .showcase-panel,
+      .showcase-panel.reverse {
+        grid-template-columns: 1fr;
+        direction: ltr;
+      }
+
+      .showcase-panel.reverse > * {
+        direction: ltr;
+      }
+
+      .task-columns {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -896,31 +1519,272 @@
     </div>
   </section>
 
-  <!-- ─── COLLABORATION FEATURES ─── -->
-  <section id="collaboration">
+  <!-- ─── COLLABORATION SHOWCASE ─── -->
+  <section id="collaboration" style="padding: 96px 24px;">
     <div class="container">
-      <h2 class="section-heading reveal">Collaboration &amp; Productivity</h2>
-      <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
-        <div class="feature-card reveal">
-          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 8a3 3 0 013-3h14a3 3 0 013 3v10a3 3 0 01-3 3H13l-4 4v-4H9a3 3 0 01-3-3V8z" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 24v2a3 3 0 003 3h10l4 4v-4h1a3 3 0 003-3V16a3 3 0 00-3-3h-3" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Built-In Team Chat</h3>
-          <p>Real-time messaging alongside the terminal. Discuss code, share context, and coordinate without switching to Slack. Every message is audit-logged.</p>
+      <div style="text-align:center;margin-bottom:64px;">
+        <span class="section-label">Beyond the Terminal</span>
+        <h2 class="section-heading center reveal">Built-In Collaboration Tools</h2>
+        <p class="subtitle reveal" style="margin:0 auto;">Your team doesn't just need a shared terminal &mdash; they need to communicate, delegate, track, and learn from every session.</p>
+      </div>
+
+      <div class="showcase-panels">
+
+        <!-- Panel 1: Team Chat (text left, mockup right) -->
+        <div class="showcase-panel reveal">
+          <div class="showcase-text">
+            <span class="showcase-badge">Team Chat</span>
+            <h3>Discuss Code Without Leaving the Terminal</h3>
+            <p>Real-time messaging built right into the session sidebar. Share context, ask questions, and coordinate &mdash; all audit-logged and searchable after the session ends.</p>
+            <ul class="showcase-bullets">
+              <li>Threaded conversations alongside terminal output</li>
+              <li>Every message logged with timestamp and user</li>
+              <li>No context switching to Slack or Teams</li>
+            </ul>
+          </div>
+          <div class="showcase-mockup">
+            <div class="mockup-window">
+              <div class="mockup-titlebar">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title">Team Chat &mdash; acme-api session</span>
+              </div>
+              <div class="mockup-body chat-mockup" id="chat-mockup">
+                <div class="chat-msg chat-msg-1">
+                  <div class="chat-avatar" style="background:#da7756;">S</div>
+                  <div class="chat-content">
+                    <span class="chat-name">saar</span> <span class="chat-time">2:34 PM</span>
+                    <p>alex can you check why the rate limiter is failing on burst requests?</p>
+                  </div>
+                </div>
+                <div class="chat-msg chat-msg-2">
+                  <div class="chat-avatar" style="background:#4ade80;">A</div>
+                  <div class="chat-content">
+                    <span class="chat-name">alex</span> <span class="chat-time">2:35 PM</span>
+                    <p>on it &mdash; looks like the sliding window isn't resetting properly. running load test now</p>
+                  </div>
+                </div>
+                <div class="chat-msg chat-msg-3">
+                  <div class="chat-avatar" style="background:#60a5fa;">M</div>
+                  <div class="chat-content">
+                    <span class="chat-name">maya</span> <span class="chat-time">2:36 PM</span>
+                    <p>I saw that same issue in staging last week. Check the Redis TTL config</p>
+                  </div>
+                </div>
+                <div class="chat-msg chat-msg-4">
+                  <div class="chat-avatar" style="background:#4ade80;">A</div>
+                  <div class="chat-content">
+                    <span class="chat-name">alex</span> <span class="chat-time">2:38 PM</span>
+                    <p>found it! TTL was set to 60s instead of 60000ms. fixing now</p>
+                  </div>
+                </div>
+                <div class="chat-typing">
+                  <div class="chat-avatar" style="background:#da7756;">S</div>
+                  <div class="typing-dots"><span></span><span></span><span></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="4" width="18" height="24" rx="3" stroke="#da7756" stroke-width="2"/><path d="M14 14l2 2 4-4" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="21" x2="22" y2="21" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><path d="M26 16l5-5M31 11l-3 1 2 2" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Task Delegation</h3>
-          <p>Assign tasks to teammates directly from the session. Track who's working on what with live status updates. Keep incident response organized.</p>
+
+        <!-- Panel 2: Activity & Presence (mockup left, text right) -->
+        <div class="showcase-panel reverse reveal">
+          <div class="showcase-text">
+            <span class="showcase-badge">Live Activity</span>
+            <h3>See Who's Online and What They're Doing</h3>
+            <p>Real-time presence indicators show who's connected, who's typing, and who's idle. The activity feed captures every meaningful action in the session.</p>
+            <ul class="showcase-bullets">
+              <li>Green/yellow/gray presence dots for each user</li>
+              <li>Live activity feed with command tracking</li>
+              <li>DLP alerts highlighted in real-time</li>
+            </ul>
+          </div>
+          <div class="showcase-mockup">
+            <div class="mockup-window">
+              <div class="mockup-titlebar">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title">Activity Feed</span>
+              </div>
+              <div class="mockup-body activity-mockup">
+                <div class="activity-header">
+                  <div class="activity-users">
+                    <div class="activity-user online">
+                      <div class="activity-avatar" style="background:#da7756;">S</div>
+                      <span class="presence-indicator online"></span>
+                      <span>saar</span>
+                      <span class="activity-role">owner</span>
+                    </div>
+                    <div class="activity-user online">
+                      <div class="activity-avatar" style="background:#4ade80;">A</div>
+                      <span class="presence-indicator online"></span>
+                      <span>alex</span>
+                      <span class="activity-tag">typing...</span>
+                    </div>
+                    <div class="activity-user online">
+                      <div class="activity-avatar" style="background:#60a5fa;">M</div>
+                      <span class="presence-indicator online"></span>
+                      <span>maya</span>
+                      <span class="activity-tag">idle 2m</span>
+                    </div>
+                    <div class="activity-user offline">
+                      <div class="activity-avatar" style="background:#888;">J</div>
+                      <span class="presence-indicator offline"></span>
+                      <span>jordan</span>
+                      <span class="activity-tag">offline</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="activity-feed">
+                  <div class="activity-item activity-item-1">
+                    <span class="activity-time">2:38</span>
+                    <span class="activity-dot" style="background:#4ade80;"></span>
+                    <span><strong>alex</strong> ran <code>npm test</code> &mdash; 23 passed</span>
+                  </div>
+                  <div class="activity-item activity-item-2">
+                    <span class="activity-time">2:36</span>
+                    <span class="activity-dot" style="background:#f87171;"></span>
+                    <span><strong>DLP</strong> redacted 1 secret (AWS key)</span>
+                  </div>
+                  <div class="activity-item activity-item-3">
+                    <span class="activity-time">2:35</span>
+                    <span class="activity-dot" style="background:#da7756;"></span>
+                    <span><strong>saar</strong> ran <code>cat .env</code></span>
+                  </div>
+                  <div class="activity-item activity-item-4">
+                    <span class="activity-time">2:34</span>
+                    <span class="activity-dot" style="background:#4ade80;"></span>
+                    <span><strong>alex</strong> joined the session</span>
+                  </div>
+                  <div class="activity-item activity-item-5">
+                    <span class="activity-time">2:30</span>
+                    <span class="activity-dot" style="background:#60a5fa;"></span>
+                    <span><strong>maya</strong> joined the session</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="16" rx="10" ry="6" stroke="#da7756" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="#da7756" stroke-width="2"/><path d="M14 26l2 2 4-4" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Manager Review</h3>
-          <p>Engineering managers can review completed tasks, audit command history, and approve changes &mdash; all from the admin dashboard without joining the terminal.</p>
+
+        <!-- Panel 3: Task Board (text left, mockup right) -->
+        <div class="showcase-panel reveal">
+          <div class="showcase-text">
+            <span class="showcase-badge">Task Board</span>
+            <h3>Assign, Track, and Complete &mdash; All in One Place</h3>
+            <p>Create and delegate tasks during an incident or pairing session. Track progress with a kanban board that lives right next to the terminal.</p>
+            <ul class="showcase-bullets">
+              <li>Drag-and-drop task management</li>
+              <li>Assign to any session participant</li>
+              <li>Priority tags and progress tracking</li>
+            </ul>
+          </div>
+          <div class="showcase-mockup">
+            <div class="mockup-window">
+              <div class="mockup-titlebar">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title">Session Tasks</span>
+              </div>
+              <div class="mockup-body task-mockup">
+                <div class="task-columns">
+                  <div class="task-column">
+                    <div class="task-column-header"><span class="task-status-dot" style="background:#facc15;"></span> To Do <span class="task-count">2</span></div>
+                    <div class="task-card task-card-1">
+                      <div class="task-card-title">Update deployment config</div>
+                      <div class="task-card-meta"><span class="task-card-tag">ops</span> unassigned</div>
+                    </div>
+                    <div class="task-card task-card-2">
+                      <div class="task-card-title">Write postmortem doc</div>
+                      <div class="task-card-meta"><span class="task-card-tag">docs</span> <span class="task-assignee"><span class="mini-avatar" style="background:#60a5fa;">M</span> maya</span></div>
+                    </div>
+                  </div>
+                  <div class="task-column">
+                    <div class="task-column-header"><span class="task-status-dot" style="background:#60a5fa;"></span> In Progress <span class="task-count">1</span></div>
+                    <div class="task-card task-card-active task-card-3">
+                      <div class="task-card-title">Fix rate limiter edge case</div>
+                      <div class="task-card-meta"><span class="task-card-tag priority">urgent</span> <span class="task-assignee"><span class="mini-avatar" style="background:#4ade80;">A</span> alex</span></div>
+                      <div class="task-card-progress"><div class="task-progress-bar" style="width:70%;"></div></div>
+                    </div>
+                  </div>
+                  <div class="task-column">
+                    <div class="task-column-header"><span class="task-status-dot" style="background:#4ade80;"></span> Done <span class="task-count">2</span></div>
+                    <div class="task-card task-card-done task-card-4">
+                      <div class="task-card-title">Identify root cause</div>
+                      <div class="task-card-meta"><span class="task-assignee"><span class="mini-avatar" style="background:#da7756;">S</span> saar</span></div>
+                    </div>
+                    <div class="task-card task-card-done task-card-5">
+                      <div class="task-card-title">Run regression tests</div>
+                      <div class="task-card-meta"><span class="task-assignee"><span class="mini-avatar" style="background:#4ade80;">A</span> alex</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="5" width="16" height="22" rx="2" stroke="#da7756" stroke-width="2"/><line x1="12" y1="11" x2="20" y2="11" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="18" y2="16" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="16" y2="21" stroke="#da7756" stroke-width="2" stroke-linecap="round"/><path d="M26 8l2-3 2 3M28 5v0" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 14l2-3 2 3M32 11v0" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="27" cy="12" r="1" fill="#da7756"/></svg></div>
-          <h3>AI Session Summary</h3>
-          <p>Get an automatic AI-generated summary of every session: key commands run, decisions made, issues found, and action items &mdash; delivered to the team lead when the session ends.</p>
+
+        <!-- Panel 4: AI Summary (mockup left, text right) -->
+        <div class="showcase-panel reverse reveal">
+          <div class="showcase-text">
+            <span class="showcase-badge">AI Summary</span>
+            <h3>Every Session Generates a Shareable Report</h3>
+            <p>When the session ends, AI automatically summarizes what happened: key commands, decisions made, secrets caught, and follow-up items. Sent to Slack or saved to your wiki.</p>
+            <ul class="showcase-bullets">
+              <li>Auto-generated session recap with key actions</li>
+              <li>Follow-up items extracted automatically</li>
+              <li>Post to Slack, email, or save to audit trail</li>
+            </ul>
+          </div>
+          <div class="showcase-mockup">
+            <div class="mockup-window">
+              <div class="mockup-titlebar">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title">AI Session Summary</span>
+              </div>
+              <div class="mockup-body ai-mockup">
+                <div class="ai-header">
+                  <div class="ai-sparkle">&#10022;</div>
+                  <div>
+                    <div class="ai-title">Session Summary &mdash; acme-api incident</div>
+                    <div class="ai-meta">Generated at 3:15 PM &middot; Duration: 47 minutes &middot; 3 participants</div>
+                  </div>
+                </div>
+                <div class="ai-section">
+                  <div class="ai-section-title">What happened</div>
+                  <p>Rate limiter was failing on burst requests due to Redis TTL misconfiguration (60s instead of 60000ms). Alex identified the root cause with Maya's help pointing to staging logs.</p>
+                </div>
+                <div class="ai-section">
+                  <div class="ai-section-title">Key actions</div>
+                  <div class="ai-list">
+                    <div class="ai-list-item"><span class="ai-check">&#10003;</span> Diagnosed rate limiter failure</div>
+                    <div class="ai-list-item"><span class="ai-check">&#10003;</span> Fixed Redis TTL config</div>
+                    <div class="ai-list-item"><span class="ai-check">&#10003;</span> Ran test suite &mdash; 23/23 passed</div>
+                    <div class="ai-list-item"><span class="ai-check">&#10003;</span> 1 secret auto-redacted by DLP</div>
+                  </div>
+                </div>
+                <div class="ai-section">
+                  <div class="ai-section-title">Follow-up items</div>
+                  <div class="ai-list">
+                    <div class="ai-list-item"><span class="ai-todo">&#9675;</span> Update deployment config</div>
+                    <div class="ai-list-item"><span class="ai-todo">&#9675;</span> Write postmortem document</div>
+                    <div class="ai-list-item"><span class="ai-todo">&#9675;</span> Add TTL validation to CI pipeline</div>
+                  </div>
+                </div>
+                <div class="ai-footer">
+                  <span class="ai-tag">Sent to: #eng-incidents on Slack</span>
+                  <span class="ai-tag">Saved to: audit log</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
