@@ -1412,7 +1412,7 @@
       <div class="nav-links">
         <a href="#features" class="nav-text-link">Documentation</a>
         <a href="https://github.com/Turje/sharedterminal-enterprise" class="nav-text-link">GitHub</a>
-        <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent btn-nav">Request Demo</a>
+        <a href="#try-it" class="btn btn-accent btn-nav">Get Started</a>
       </div>
     </div>
   </nav>
@@ -1420,11 +1420,11 @@
   <!-- ─── HERO ─── -->
   <section class="hero">
     <div class="container">
-      <h1>Collaborative Terminal Sharing<br>for Enterprise</h1>
-      <p class="subtitle">Give your engineering team a secure, shared terminal environment for incident response, pair debugging, and onboarding &mdash; without screen sharing, without leaving your firewall.</p>
+      <h1>Google Docs for Your Terminal</h1>
+      <p class="subtitle">Persistent, shareable terminal workspaces with permissions, audit logs, and session replay. Browser-native. No SSH required. Self-hosted inside your firewall.</p>
       <div class="hero-buttons">
+        <a href="#try-it" class="btn btn-accent">Try It in 10 Seconds</a>
         <a href="https://github.com/Turje/sharedterminal-enterprise" class="btn btn-outline">View on GitHub</a>
-        <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent">Request Demo</a>
       </div>
 
       <p class="section-label" style="margin-bottom:24px;">See It In Action</p>
@@ -1456,25 +1456,47 @@
     </div>
   </section>
 
-  <!-- ─── PROBLEM ─── -->
-  <section id="problem">
+  <!-- ─── WHY NOT TMUX ─── -->
+  <section id="why" style="border-bottom: 1px solid var(--border);">
     <div class="container">
-      <h2 class="section-heading reveal">Screen Sharing Wasn't Built for Engineering</h2>
-      <div class="problem-grid">
-        <div class="problem-card reveal">
-          <div class="problem-marker">&#9632;</div>
-          <h3>Latency</h3>
-          <p>Screen sharing adds 200-500ms delay. Typing in a shared terminal feels native.</p>
+      <div style="text-align:center;margin-bottom:48px;">
+        <span class="section-label">Why This Exists</span>
+        <h2 class="section-heading center reveal">What tmux + SSH Can't Do</h2>
+        <p class="subtitle reveal" style="margin:0 auto;max-width:640px;">tmux is great for sharing a single session. SharedTerminal is what you need when the whole team needs to work together with real permissions, audit trails, and persistence.</p>
+      </div>
+      <div class="problem-grid reveal">
+        <div class="problem-card" style="border-left:3px solid var(--accent);">
+          <h3 style="color:var(--accent);font-size:14px;margin-bottom:12px;">tmux / tmate</h3>
+          <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--muted);line-height:2;">
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> One shared cursor for everyone</li>
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> No access control or roles</li>
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> No audit log of who did what</li>
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Requires SSH access + client install</li>
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Session dies when host disconnects</li>
+            <li><span class="cross" style="margin-right:8px;">&#10007;</span> Secrets visible to all participants</li>
+          </ul>
         </div>
-        <div class="problem-card reveal">
-          <div class="problem-marker">&#9632;</div>
-          <h3>No Independence</h3>
-          <p>Screen sharing locks everyone to one cursor. SharedTerminal gives each engineer their own shell.</p>
+        <div class="problem-card" style="border-left:3px solid var(--green);background:rgba(74,222,128,0.03);">
+          <h3 style="color:var(--green);font-size:14px;margin-bottom:12px;">SharedTerminal</h3>
+          <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--text);line-height:2;">
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Each user gets their own independent shell</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Owner / editor / viewer roles with SSO</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Every keystroke audit-logged per user</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Browser-native — zero install for guests</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> Persistent sessions survive disconnects</li>
+            <li><span class="check" style="margin-right:8px;">&#10003;</span> DLP auto-redacts secrets in real-time</li>
+          </ul>
         </div>
-        <div class="problem-card reveal">
-          <div class="problem-marker">&#9632;</div>
-          <h3>No Audit Trail</h3>
-          <p>Zoom recordings don't capture who typed what command. SharedTerminal logs every keystroke with attribution.</p>
+        <div class="problem-card" style="border-left:3px solid #60a5fa;">
+          <h3 style="color:#60a5fa;font-size:14px;margin-bottom:12px;">Plus enterprise features</h3>
+          <ul style="list-style:none;padding:0;margin:0;font-size:14px;color:var(--text);line-height:2;">
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Full session recording with browser replay</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Admin dashboard for managers</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> AI-generated session summaries</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Built-in team chat + task board</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Docker-sandboxed (read-only rootfs)</li>
+            <li><span class="check" style="margin-right:8px;color:#60a5fa;">&#10003;</span> Self-hosted via docker-compose</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -1483,7 +1505,8 @@
   <!-- ─── FEATURES ─── -->
   <section id="features">
     <div class="container">
-      <h2 class="section-heading reveal">Enterprise-Grade by Design</h2>
+      <h2 class="section-heading reveal">What's Actually Built</h2>
+      <p class="subtitle reveal" style="max-width:640px;">These aren't roadmap items. Every feature below is implemented, tested, and in the source code.</p>
       <div class="features-grid">
         <div class="feature-card reveal">
           <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 3L4 10v12c0 7.7 6 13.3 14 16 8-2.7 14-8.3 14-16V10L18 3z" stroke="#da7756" stroke-width="2" fill="none"/><path d="M12 18l4 4 8-8" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1849,143 +1872,42 @@
     </div>
   </section>
 
-  <!-- ─── QUICKSTART ─── -->
-  <section id="quickstart">
-    <div class="container">
-      <h2 class="section-heading reveal">Deploy in 60 Seconds</h2>
-      <div class="steps">
-        <div class="step-card reveal">
-          <div class="step-number">1</div>
-          <h3>Clone</h3>
-          <code>git clone https://github.com/Turje/sharedterminal-enterprise.git</code>
-        </div>
-        <div class="step-card reveal">
-          <div class="step-number">2</div>
-          <h3>Build</h3>
-          <code>cd sharedterminal-enterprise &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm run docker:build</code>
-        </div>
-        <div class="step-card reveal">
-          <div class="step-number">3</div>
-          <h3>Start</h3>
-          <code>node dist/cli/index.js --path /your/project --server-url http://your-server:3000</code>
-        </div>
-      </div>
-      <div class="alt-step reveal">
-        <p>Or deploy with Docker Compose:</p>
-        <code>cd deploy &amp;&amp; docker-compose up -d</code>
-      </div>
-    </div>
-  </section>
+  <!-- ─── TRY IT ─── -->
+  <section id="try-it" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container" style="text-align:center;">
+      <span class="section-label">Zero Friction</span>
+      <h2 class="section-heading center reveal">Try It in 10 Seconds</h2>
+      <p class="subtitle reveal" style="margin:0 auto 48px;max-width:580px;">No signup. No cloud account. No Docker Hub login. Just clone, build, and run.</p>
 
-  <!-- ─── COMPARISON TABLE ─── -->
-  <section id="comparison">
-    <div class="container">
-      <h2 class="section-heading reveal">How SharedTerminal Compares</h2>
-      <div class="table-wrap reveal">
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>SharedTerminal</th>
-              <th>tmate</th>
-              <th>VS Code Live Share</th>
-              <th>Screen Sharing</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Independent shells</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="partial">Limited</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Browser-based</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="check">Yes</td>
-            </tr>
-            <tr>
-              <td>Docker sandboxed</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Audit logging</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Session recording</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="partial">Manual</td>
-            </tr>
-            <tr>
-              <td>DLP / Secret scanning</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>SSO / OIDC</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="partial">AAD only</td>
-              <td class="partial">Varies</td>
-            </tr>
-            <tr>
-              <td>Self-hosted</td>
-              <td class="check">Yes</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Zero install for guests</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="check">Yes</td>
-            </tr>
-            <tr>
-              <td>Built-in team chat</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Task delegation</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>Manager review</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-            <tr>
-              <td>AI session summary</td>
-              <td class="check">Yes</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-              <td class="cross">No</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="terminal-window reveal" style="max-width:680px;margin:0 auto;text-align:left;">
+        <div class="terminal-titlebar">
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <span class="terminal-title">terminal</span>
+        </div>
+        <div class="terminal-body" style="padding:24px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;">
+<span class="t-dim"># Clone and build (one time)</span>
+<span class="t-accent">git clone</span> https://github.com/Turje/sharedterminal-enterprise.git
+<span class="t-accent">cd</span> sharedterminal-enterprise <span class="t-accent">&amp;&amp;</span> npm install <span class="t-accent">&amp;&amp;</span> npm run build
+
+<span class="t-dim"># Build the sandbox container (one time)</span>
+<span class="t-accent">npm run</span> docker:build
+
+<span class="t-dim"># Start a session — share the URL + PIN with your team</span>
+<span class="t-accent">node</span> dist/cli/index.js <span class="t-accent">--path</span> /your/project
+
+<span class="t-dim"># Or self-hosted mode (no Cloudflare tunnel)</span>
+<span class="t-accent">node</span> dist/cli/index.js <span class="t-accent">--path</span> /your/project <span class="t-accent">--server-url</span> http://your-server:3000
+        </div>
+      </div>
+
+      <div style="margin-top:32px;" class="reveal">
+        <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Teammates join by opening the URL in a browser. That's it.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <a href="https://github.com/Turje/sharedterminal-enterprise" class="btn btn-accent">Get Started on GitHub</a>
+          <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20-%20Question&body=Hi%2C%20I%20have%20a%20question%20about%20SharedTerminal.%0A%0A" class="btn btn-outline">Ask a Question</a>
+        </div>
       </div>
     </div>
   </section>
@@ -1993,10 +1915,10 @@
   <!-- ─── CTA ─── -->
   <section class="cta-section">
     <div class="container">
-      <h2 class="reveal">Ready to See It In Action?</h2>
-      <p class="subtitle reveal">We offer a free 30-day Proof of Concept for qualifying engineering teams.</p>
-      <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent reveal">Request Demo</a>
-      <p class="cta-link reveal">Or explore the source on <a href="https://github.com/Turje/sharedterminal-enterprise">GitHub</a></p>
+      <h2 class="reveal">Open Source. Self-Hosted. Free.</h2>
+      <p class="subtitle reveal">SharedTerminal is MIT-licensed. Deploy it inside your firewall today.</p>
+      <a href="https://github.com/Turje/sharedterminal-enterprise" class="btn btn-accent reveal" style="padding:16px 40px;font-size:16px;">View on GitHub</a>
+      <p class="cta-link reveal">Questions? <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20-%20Question">Reach out</a></p>
     </div>
   </section>
 
