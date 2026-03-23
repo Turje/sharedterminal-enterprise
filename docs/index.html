@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SharedTerminal Enterprise — Collaborative Terminal Sharing for Engineering Teams</title>
+  <meta name="description" content="Give your engineering team a secure, shared terminal environment for incident response, pair debugging, and onboarding. Self-hosted, Docker-sandboxed, enterprise-ready.">
+  <meta property="og:title" content="SharedTerminal Enterprise — Collaborative Terminal Sharing">
+  <meta property="og:description" content="Secure, shared terminal environment for incident response, pair debugging, and onboarding. Self-hosted, Docker-sandboxed, enterprise-ready.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://turje.github.io/sharedterminal-enterprise/">
+  <meta property="og:image" content="https://turje.github.io/sharedterminal-enterprise/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SharedTerminal Enterprise — Collaborative Terminal Sharing">
+  <meta name="twitter:description" content="Secure, shared terminal environment for incident response, pair debugging, and onboarding.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #da7756;
+      --accent-hover: #e58a6a;
+      --text: #e0e0e8;
+      --muted: #8888a0;
+      --green: #4ade80;
+      --yellow: #facc15;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Reveal on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 64px;
+    }
+
+    .wordmark {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .wordmark span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(218, 119, 86, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn-nav {
+      padding: 8px 18px;
+      font-size: 13px;
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      padding: 96px 24px;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 640px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding-top: 80px;
+      padding-bottom: 64px;
+      text-align: center;
+    }
+
+    .hero .subtitle {
+      margin: 0 auto 40px;
+      max-width: 680px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+
+    .hero-buttons .btn {
+      padding: 14px 28px;
+      font-size: 15px;
+    }
+
+    /* Terminal Mockup */
+    .terminal-window {
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #0d0d14;
+      text-align: left;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    .terminal-titlebar {
+      background: #16161e;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .terminal-dot:nth-child(1) { background: #ff5f57; }
+    .terminal-dot:nth-child(2) { background: #febc2e; }
+    .terminal-dot:nth-child(3) { background: #28c840; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .terminal-body {
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: var(--muted);
+    }
+
+    .terminal-body .t-green { color: var(--green); }
+    .terminal-body .t-accent { color: var(--accent); font-weight: 500; }
+    .terminal-body .t-dim { color: #555570; }
+    .terminal-body .t-bold { color: var(--text); font-weight: 600; }
+    .terminal-body .t-yellow { color: var(--yellow); }
+    .terminal-body .t-link { color: var(--accent); font-weight: 600; }
+
+    /* ─── PROBLEM ─── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      padding: 32px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.3s;
+    }
+
+    .problem-card:hover {
+      border-color: #2a2a3e;
+    }
+
+    .problem-marker {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      background: rgba(218, 119, 86, 0.1);
+      color: var(--accent);
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .problem-card p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ─── FEATURES ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      padding: 32px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: #2a2a3e;
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(218, 119, 86, 0.08);
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ─── ARCHITECTURE ─── */
+    .arch-block {
+      max-width: 680px;
+      margin: 48px auto 0;
+    }
+
+    .arch-diagram {
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 32px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .arch-diagram .hl { color: var(--accent); }
+    .arch-diagram .gr { color: var(--green); }
+
+    .arch-description {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ─── QUICKSTART ─── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .step-card {
+      padding: 32px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .step-card h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .step-card code {
+      display: block;
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      overflow-x: auto;
+      word-break: break-all;
+    }
+
+    .alt-step {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .alt-step p {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .alt-step code {
+      display: inline-block;
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .table-wrap {
+      margin-top: 48px;
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      min-width: 680px;
+    }
+
+    thead {
+      background: var(--surface);
+    }
+
+    th {
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th:first-child {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    td:first-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .check {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .cross {
+      color: #555570;
+    }
+
+    .partial {
+      color: var(--yellow);
+    }
+
+    /* Highlight SharedTerminal column */
+    th:nth-child(2),
+    td:nth-child(2) {
+      background: rgba(218, 119, 86, 0.04);
+    }
+
+    th:nth-child(2) {
+      color: var(--accent);
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      text-align: center;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cta-section .subtitle {
+      margin: 0 auto 40px;
+    }
+
+    .cta-section .btn-accent {
+      padding: 16px 40px;
+      font-size: 16px;
+    }
+
+    .cta-link {
+      display: block;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cta-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .cta-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .footer-brand .wordmark {
+      font-size: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    .footer-copy {
+      color: #555570;
+      font-size: 12px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .problem-grid,
+      .features-grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        gap: 16px;
+      }
+
+      .nav-links .nav-text-link {
+        display: none;
+      }
+
+      section {
+        padding: 64px 20px;
+      }
+
+      .hero {
+        padding-top: 48px;
+        padding-bottom: 48px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .hero-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-links {
+        justify-content: center;
+      }
+
+      .terminal-body {
+        font-size: 11px;
+        padding: 16px;
+      }
+    }
+
+    /* Accent underline on section headings */
+    .section-heading::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-top: 16px;
+    }
+
+    .section-heading.center::after {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="wordmark">Shared<span>Terminal</span></a>
+      <div class="nav-links">
+        <a href="#features" class="nav-text-link">Documentation</a>
+        <a href="https://github.com/Turje/sharedterminal-enterprise" class="nav-text-link">GitHub</a>
+        <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent btn-nav">Request Demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="container">
+      <h1>Collaborative Terminal Sharing<br>for Enterprise</h1>
+      <p class="subtitle">Give your engineering team a secure, shared terminal environment for incident response, pair debugging, and onboarding &mdash; without screen sharing, without leaving your firewall.</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/Turje/sharedterminal-enterprise" class="btn btn-outline">View on GitHub</a>
+        <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent">Request Demo</a>
+      </div>
+
+      <div class="terminal-window reveal">
+        <div class="terminal-titlebar">
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <span class="terminal-title">sharedterminal &mdash; ~/acme-api</span>
+        </div>
+        <div class="terminal-body">
+<pre style="margin:0;font:inherit;white-space:pre;">
+  <span class="t-green">&#9679;</span> <span class="t-accent t-bold">SharedTerminal Enterprise</span> <span class="t-dim">[Self-Hosted Mode]</span>
+  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
+
+  <span class="t-dim">Secure Sandbox:</span>  <span class="t-green">&#9679;</span> Active <span class="t-dim">(Isolated Network, Read-Only RootFS)</span>
+  <span class="t-dim">Audit Logging:</span>   <span class="t-green">&#9679;</span> Active <span class="t-dim">(Writing to ./data/audit/)</span>
+  <span class="t-dim">DLP Scanner:</span>     <span class="t-green">&#9679;</span> Active <span class="t-dim">(Redacting secrets)</span>
+  <span class="t-dim">Recording:</span>       <span class="t-green">&#9679;</span> Active <span class="t-dim">(asciicast v2)</span>
+
+  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
+
+  <span class="t-dim">Invite Link:</span>  <span class="t-link">https://your-server:3000/?session=a1b2c3</span>
+  <span class="t-dim">Session PIN:</span>  <span class="t-bold">8472</span>
+
+  <span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
+
+  <span class="t-dim">Project</span>   ~/acme-api
+  <span class="t-dim">Mode</span>      read-write
+
+  <span class="t-dim">Waiting for teammates to join...</span>
+  <span class="t-dim">Type a message below to chat, or Ctrl+C to stop.</span>
+
+  <span class="t-accent">&#9656;</span> <span class="t-dim">_</span>
+</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PROBLEM ─── -->
+  <section id="problem">
+    <div class="container">
+      <h2 class="section-heading reveal">Screen Sharing Wasn't Built for Engineering</h2>
+      <div class="problem-grid">
+        <div class="problem-card reveal">
+          <div class="problem-marker">&#9632;</div>
+          <h3>Latency</h3>
+          <p>Screen sharing adds 200-500ms delay. Typing in a shared terminal feels native.</p>
+        </div>
+        <div class="problem-card reveal">
+          <div class="problem-marker">&#9632;</div>
+          <h3>No Independence</h3>
+          <p>Screen sharing locks everyone to one cursor. SharedTerminal gives each engineer their own shell.</p>
+        </div>
+        <div class="problem-card reveal">
+          <div class="problem-marker">&#9632;</div>
+          <h3>No Audit Trail</h3>
+          <p>Zoom recordings don't capture who typed what command. SharedTerminal logs every keystroke with attribution.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ─── -->
+  <section id="features">
+    <div class="container">
+      <h2 class="section-heading reveal">Enterprise-Grade by Design</h2>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9638;</div>
+          <h3>Docker Isolation</h3>
+          <p>Every session runs in a sandboxed container. Read-only root filesystem, no capabilities, isolated network. Users never touch the host.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9654;</div>
+          <h3>Audit Logging</h3>
+          <p>Every command, every connection, every chat message. NDJSON format pipes directly into Splunk, Datadog, or your SIEM of choice.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9210;</div>
+          <h3>Session Recording</h3>
+          <p>Full terminal replay in asciicast v2 format. Review any session frame-by-frame in the browser &mdash; no downloads needed.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9670;</div>
+          <h3>DLP / Secret Scanning</h3>
+          <p>Real-time regex scanning redacts AWS keys, GitHub tokens, private keys, and passwords before they reach other users' screens.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9671;</div>
+          <h3>SSO / OIDC</h3>
+          <p>Okta, Microsoft Entra, Google Workspace, Auth0, Keycloak. One-click login for your team, domain-restricted access.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">&#9644;</div>
+          <h3>Self-Hosted</h3>
+          <p>Deploy inside your VPC with docker-compose. Zero data leaves your network. No telemetry, no phone-home, no cloud dependency.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ARCHITECTURE ─── -->
+  <section id="architecture">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-heading center reveal">How It Works</h2>
+      <div class="arch-block reveal">
+        <div class="arch-diagram">
+<pre style="margin:0;font:inherit;white-space:pre;">  <span class="hl">Developer A (Host)</span>              <span class="hl">Developer B (Browser)</span>
+       |                                |
+       v                                v
+  +-----------+                  +-------------+
+  |  CLI Tool |                  |  Web Client |
+  +-----------+                  +-------------+
+       |                                |
+       +---------- <span class="gr">Your Network</span> --------+
+                      |
+               +------+------+
+               |   Express   |
+               |   Server    |
+               +------+------+
+                      |
+               +------+------+
+               |   <span class="hl">Docker</span>    |
+               |  <span class="hl">Container</span>  |
+               |  <span class="hl">(Sandbox)</span>  |
+               +------+------+
+               |  /workspace |
+               |  (shared)   |
+               +--------------+</pre>
+        </div>
+        <p class="arch-description">SharedTerminal runs entirely inside your infrastructure. The host developer starts a session from their CLI. Teammates join via browser on the internal network. All terminal I/O flows through an Express server into an isolated Docker container. No data ever leaves your firewall.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── QUICKSTART ─── -->
+  <section id="quickstart">
+    <div class="container">
+      <h2 class="section-heading reveal">Deploy in 60 Seconds</h2>
+      <div class="steps">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <h3>Clone</h3>
+          <code>git clone https://github.com/Turje/sharedterminal-enterprise.git</code>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">2</div>
+          <h3>Build</h3>
+          <code>cd sharedterminal-enterprise &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm run docker:build</code>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">3</div>
+          <h3>Start</h3>
+          <code>node dist/cli/index.js --path /your/project --server-url http://your-server:3000</code>
+        </div>
+      </div>
+      <div class="alt-step reveal">
+        <p>Or deploy with Docker Compose:</p>
+        <code>cd deploy &amp;&amp; docker-compose up -d</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── COMPARISON TABLE ─── -->
+  <section id="comparison">
+    <div class="container">
+      <h2 class="section-heading reveal">How SharedTerminal Compares</h2>
+      <div class="table-wrap reveal">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>SharedTerminal</th>
+              <th>tmate</th>
+              <th>VS Code Live Share</th>
+              <th>Screen Sharing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Independent shells</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="partial">Limited</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Browser-based</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="check">Yes</td>
+            </tr>
+            <tr>
+              <td>Docker sandboxed</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Audit logging</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Session recording</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="partial">Manual</td>
+            </tr>
+            <tr>
+              <td>DLP / Secret scanning</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>SSO / OIDC</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="partial">AAD only</td>
+              <td class="partial">Varies</td>
+            </tr>
+            <tr>
+              <td>Self-hosted</td>
+              <td class="check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Zero install for guests</td>
+              <td class="check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="check">Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ─── -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="reveal">Ready to See It In Action?</h2>
+      <p class="subtitle reveal">We offer a free 30-day Proof of Concept for qualifying engineering teams.</p>
+      <a href="mailto:saar.turjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request&body=Hi%2C%20I%27d%20like%20to%20schedule%20a%20demo%20of%20SharedTerminal%20Enterprise%20for%20my%20team.%0A%0ACompany%3A%20%0ATeam%20size%3A%20%0AUse%20case%3A%20" class="btn btn-accent reveal">Request Demo</a>
+      <p class="cta-link reveal">Or explore the source on <a href="https://github.com/Turje/sharedterminal-enterprise">GitHub</a></p>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="wordmark">Shared<span>Terminal</span> Enterprise</a>
+        <p>Built for teams that take security seriously.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/Turje/sharedterminal-enterprise">GitHub</a>
+        <a href="#features">Documentation</a>
+        <a href="https://github.com/Turje/sharedterminal-enterprise/blob/main/LICENSE">License (MIT)</a>
+      </div>
+      <span class="footer-copy">2026 SharedTerminal</span>
+    </div>
+  </footer>
+
+  <!-- ─── SCROLL REVEAL ─── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var elements = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        elements.forEach(function (el) {
+          observer.observe(el);
+        });
+      } else {
+        // Fallback: show everything
+        elements.forEach(function (el) {
+          el.classList.add('visible');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
