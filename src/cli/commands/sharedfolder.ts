@@ -15,6 +15,7 @@ import { TokenStore } from '../../server/auth/token';
 import { startTunnel, stopTunnel } from '../../server/tunnel';
 import { generatePassword } from '../../shared/utils';
 import { startupCleanup, removePidFile, writePidFile } from '../../server/docker/cleanup';
+import { LicenseValidator, TIER_LABELS } from '../../server/license';
 
 // Session file path — written to project dir so `chat` command can find the running session
 export const SESSION_FILE_NAME = '.sharedterminal.json';
@@ -118,6 +119,23 @@ export async function runSharedfolder(options: {
   checkDocker();
 
   const config = loadConfig();
+
+  // Validate license and gate enterprise features
+  const licenseValidator = new LicenseValidator();
+  await licenseValidator.validate(config.licenseKey, config.licenseServerUrl);
+
+  if (!licenseValidator.hasFeature('dlp')) {
+    config.dlpEnabled = false;
+  }
+  if (!licenseValidator.hasFeature('audit-logging')) {
+    config.auditEnabled = false;
+  }
+  if (!licenseValidator.hasFeature('session-recording')) {
+    config.recordingEnabled = false;
+  }
+  if (!licenseValidator.hasFeature('sso')) {
+    config.ssoEnabled = false;
+  }
 
   // Override config with CLI flags
   if (options.serverUrl) {
@@ -245,6 +263,19 @@ export async function runSharedfolder(options: {
   const GREEN = '\x1b[32m';
   const YELLOW = '\x1b[33m';
 
+  // License info
+  const license = licenseValidator.getLicense();
+  const tierLabel = TIER_LABELS[license.tier];
+  const isLicensed = !licenseValidator.isCommunity();
+
+  // Feature status helpers
+  const featureActive = (label: string, detail: string) =>
+    `${GREEN}●${RESET} Active ${DIM}(${detail})${RESET}`;
+  const featureGated = () =>
+    `${DIM}○ Requires commercial license${RESET}`;
+  const featureDisabled = () =>
+    `${YELLOW}●${RESET} Disabled`;
+
   // Enterprise output
   const separator = `${DIM}${'─'.repeat(56)}${RESET}`;
   const modeLabel = selfHosted ? 'Self-Hosted Mode' : 'Tunnel Mode';
@@ -253,12 +284,25 @@ export async function runSharedfolder(options: {
   console.log(`  ${GREEN}●${RESET} ${ACCENT}${BOLD}SharedTerminal Enterprise${RESET} ${DIM}[${modeLabel}]${RESET}`);
   console.log(`  ${separator}`);
   console.log('');
-  console.log(`  ${DIM}Secure Sandbox:${RESET}  ${GREEN}●${RESET} Active ${DIM}(Isolated Network, Read-Only RootFS)${RESET}`);
-  console.log(`  ${DIM}Audit Logging:${RESET}   ${GREEN}●${RESET} Active ${DIM}(Writing to ${config.dataDir}/audit/)${RESET}`);
-  console.log(`  ${DIM}DLP Scanner:${RESET}     ${config.dlpEnabled ? `${GREEN}●${RESET} Active ${DIM}(Redacting secrets)${RESET}` : `${YELLOW}●${RESET} Disabled`}`);
-  console.log(`  ${DIM}Recording:${RESET}       ${config.recordingEnabled ? `${GREEN}●${RESET} Active ${DIM}(asciicast v2)${RESET}` : `${YELLOW}●${RESET} Disabled`}`);
+
+  // License status
+  if (isLicensed) {
+    console.log(`  ${DIM}License:${RESET}         ${GREEN}●${RESET} ${BOLD}${tierLabel}${RESET} ${DIM}(${license.organization})${RESET}`);
+    if (license.validUntil !== 'unlimited') {
+      console.log(`  ${DIM}Valid Until:${RESET}      ${license.validUntil}`);
+    }
+  } else {
+    console.log(`  ${DIM}License:${RESET}         ${YELLOW}○${RESET} ${tierLabel}`);
+    console.log(`  ${DIM}Upgrade:${RESET}         ${ACCENT}https://sharedterminal.com/pricing${RESET}`);
+  }
+  console.log('');
+
+  console.log(`  ${DIM}Secure Sandbox:${RESET}  ${featureActive('Sandbox', 'Isolated Network, Read-Only RootFS')}`);
+  console.log(`  ${DIM}Audit Logging:${RESET}   ${config.auditEnabled ? featureActive('Audit', `Writing to ${config.dataDir}/audit/`) : (isLicensed ? featureDisabled() : featureGated())}`);
+  console.log(`  ${DIM}DLP Scanner:${RESET}     ${config.dlpEnabled ? featureActive('DLP', 'Redacting secrets') : (isLicensed ? featureDisabled() : featureGated())}`);
+  console.log(`  ${DIM}Recording:${RESET}       ${config.recordingEnabled ? featureActive('Recording', 'asciicast v2') : (isLicensed ? featureDisabled() : featureGated())}`);
   if (options.persistent) {
-    console.log(`  ${DIM}Persistence:${RESET}     ${GREEN}●${RESET} Active ${DIM}(State survives disconnects)${RESET}`);
+    console.log(`  ${DIM}Persistence:${RESET}     ${featureActive('Persistence', 'State survives disconnects')}`);
   }
   console.log('');
   console.log(`  ${separator}`);

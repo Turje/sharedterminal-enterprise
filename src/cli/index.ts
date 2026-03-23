@@ -7,6 +7,7 @@ import { stopCommand } from './commands/stop';
 import { statusCommand } from './commands/status';
 import { chatCommand } from './commands/chat';
 import { runSharedfolder } from './commands/sharedfolder';
+import { adminCommand } from './commands/admin';
 
 const program = new Command();
 
@@ -30,5 +31,6 @@ program.addCommand(joinCommand);
 program.addCommand(stopCommand);
 program.addCommand(statusCommand);
 program.addCommand(chatCommand);
+program.addCommand(adminCommand);
 
 program.parse();

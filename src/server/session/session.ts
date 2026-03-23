@@ -37,8 +37,8 @@ export class SessionState implements Session {
     this.expiresAt = new Date(this.createdAt.getTime() + DEFAULTS.SESSION_MAX_LIFETIME_MS);
     this.persistent = persistent;
 
-    // Initialize audit logger
-    if (config?.dataDir) {
+    // Initialize audit logger (requires license)
+    if (config?.auditEnabled !== false && config?.dataDir) {
       this.auditLogger = new AuditLogger(config.dataDir, id);
     }
 

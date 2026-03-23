@@ -9,6 +9,7 @@ import { SessionManager } from './session/session-manager';
 import { TokenStore } from './auth/token';
 import { startTunnel, stopTunnel } from './tunnel';
 import { startupCleanup, setupGracefulShutdown } from './docker/cleanup';
+import { LicenseValidator } from './license';
 import { createLogger } from './logger';
 
 const log = createLogger('server');
@@ -33,6 +34,19 @@ function findAvailablePort(startPort: number): Promise<number> {
 async function main() {
   const config = loadConfig();
   config.port = await findAvailablePort(config.port);
+
+  // Validate license and gate enterprise features
+  const licenseValidator = new LicenseValidator();
+  await licenseValidator.validate(config.licenseKey, config.licenseServerUrl);
+  const license = licenseValidator.getLicense();
+
+  if (!licenseValidator.hasFeature('dlp')) config.dlpEnabled = false;
+  if (!licenseValidator.hasFeature('audit-logging')) config.auditEnabled = false;
+  if (!licenseValidator.hasFeature('session-recording')) config.recordingEnabled = false;
+  if (!licenseValidator.hasFeature('sso')) config.ssoEnabled = false;
+
+  log.info('License validated', { tier: license.tier, org: license.organization });
+
   const tokenStore = new TokenStore();
   const sessionManager = new SessionManager(config, tokenStore);
 

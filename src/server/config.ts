@@ -17,6 +17,7 @@ export interface ServerConfig {
   tunnelEnabled: boolean;
   serverUrl: string;
   dataDir: string;
+  auditEnabled: boolean;
   recordingEnabled: boolean;
   dlpEnabled: boolean;
   selfHosted: boolean;
@@ -28,6 +29,9 @@ export interface ServerConfig {
   ssoCallbackUrl: string;
   ssoAllowedDomains: string[];
   ssoPasswordFallback: boolean; // allow password join when SSO is enabled
+  // License
+  licenseKey: string;
+  licenseServerUrl: string;
 }
 
 export function loadConfig(): ServerConfig {
@@ -63,6 +67,7 @@ export function loadConfig(): ServerConfig {
     tunnelEnabled,
     serverUrl,
     dataDir,
+    auditEnabled: process.env.AUDIT_ENABLED !== 'false',
     recordingEnabled: process.env.RECORDING_ENABLED !== 'false',
     dlpEnabled: process.env.DLP_ENABLED !== 'false',
     selfHosted: !tunnelEnabled,
@@ -74,5 +79,8 @@ export function loadConfig(): ServerConfig {
     ssoCallbackUrl: process.env.SSO_CALLBACK_URL || '',
     ssoAllowedDomains,
     ssoPasswordFallback: process.env.SSO_PASSWORD_FALLBACK !== 'false',
+    // License
+    licenseKey: process.env.LICENSE_KEY || '',
+    licenseServerUrl: process.env.LICENSE_SERVER_URL || 'https://api.sharedterminal.com/v1/license/validate',
   };
 }
