@@ -37,7 +37,20 @@ else
   echo -e "  ${GREEN}✓${RESET} Node.js $(node -v) already installed"
 fi
 
-# 3. Clone and build SharedTerminal
+# 3. Install Caddy (reverse proxy with auto-HTTPS)
+if ! command -v caddy &>/dev/null; then
+  echo -e "  ${DIM}Installing Caddy...${RESET}"
+  sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https curl
+  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+  sudo apt-get update
+  sudo apt-get install -y caddy
+  echo -e "  ${GREEN}✓${RESET} Caddy installed"
+else
+  echo -e "  ${GREEN}✓${RESET} Caddy already installed"
+fi
+
+# 4. Clone and build SharedTerminal
 INSTALL_DIR="$HOME/sharedterminal"
 if [ ! -d "$INSTALL_DIR" ]; then
   echo -e "  ${DIM}Cloning SharedTerminal...${RESET}"
@@ -54,14 +67,27 @@ npm run build
 npm run docker:build 2>/dev/null || npm run build:docker 2>/dev/null || true
 echo -e "  ${GREEN}✓${RESET} SharedTerminal built"
 
-# 4. Copy demo project
+# 5. Copy demo project
 DEMO_PROJECT="$HOME/demo-project"
 if [ ! -d "$DEMO_PROJECT" ]; then
   cp -r "$INSTALL_DIR/demo/sample-project" "$DEMO_PROJECT"
   echo -e "  ${GREEN}✓${RESET} Demo project copied to $DEMO_PROJECT"
 fi
 
-# 5. Create systemd service
+# 6. Configure Caddy reverse proxy
+DEMO_DOMAIN="${DEMO_DOMAIN:-demo.sharedterminal.dev}"
+sudo tee /etc/caddy/Caddyfile >/dev/null <<CADDY
+$DEMO_DOMAIN {
+    reverse_proxy localhost:3000 {
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+CADDY
+
+sudo systemctl restart caddy
+echo -e "  ${GREEN}✓${RESET} Caddy configured for $DEMO_DOMAIN"
+
+# 7. Create systemd service
 sudo tee /etc/systemd/system/sharedterminal-demo.service >/dev/null <<UNIT
 [Unit]
 Description=SharedTerminal Demo
@@ -73,8 +99,11 @@ Type=simple
 User=$USER
 WorkingDirectory=$INSTALL_DIR
 Environment=NODE_ENV=production
-Environment=TUNNEL_ENABLED=true
-ExecStart=$(which node) dist/cli/index.js --path $DEMO_PROJECT --tunnel --password demo
+Environment=HOST=0.0.0.0
+Environment=PORT=3000
+Environment=TUNNEL_ENABLED=false
+Environment=SERVER_URL=https://$DEMO_DOMAIN
+ExecStart=$(which node) dist/cli/index.js --path $DEMO_PROJECT --public
 Restart=always
 RestartSec=5
 
@@ -87,15 +116,14 @@ sudo systemctl enable sharedterminal-demo
 sudo systemctl start sharedterminal-demo
 echo -e "  ${GREEN}✓${RESET} Service started"
 
-# 6. Set up session cleanup cron (every 30 min, kill idle sessions)
+# 8. Set up session cleanup cron (every 30 min, kill idle sessions)
 (crontab -l 2>/dev/null | grep -v sharedterminal; echo "*/30 * * * * docker ps --filter label=sharedterminal --filter status=running --format '{{.ID}} {{.Status}}' | awk '/hours/{print \$1}' | xargs -r docker rm -f") | crontab -
 echo -e "  ${GREEN}✓${RESET} Auto-cleanup cron installed"
 
 echo ""
 echo -e "  ${GREEN}${BOLD}Done!${RESET} SharedTerminal demo is running."
-echo -e "  ${DIM}The tunnel URL will appear in the service logs:${RESET}"
+echo -e "  ${DIM}Live at:${RESET} ${ACCENT}https://$DEMO_DOMAIN${RESET}"
 echo ""
-echo -e "  ${ACCENT}sudo journalctl -u sharedterminal-demo -f${RESET}"
-echo ""
-echo -e "  ${DIM}Password: demo${RESET}"
+echo -e "  ${DIM}Check logs:${RESET} sudo journalctl -u sharedterminal-demo -f"
+echo -e "  ${DIM}Public session — no password needed${RESET}"
 echo ""
