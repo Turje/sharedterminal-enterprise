@@ -56,7 +56,7 @@ export function createSocketServer(
       cors: {
         origin: allowedOrigins.length > 0 ? allowedOrigins : true, // true = same-origin
       },
-      transports: ['websocket'], // WebSocket-only for security
+      transports: ['websocket', 'polling'], // Allow polling fallback for proxied setups (Cloudflare, etc.)
       maxHttpBufferSize: 1e6, // 1MB limit
     }
   );

@@ -131,16 +131,16 @@
   sidebarResizeHandle.addEventListener("mousedown", (e) => {
     e.preventDefault();
     sidebarResizing = true;
-    document.body.style.cursor = "col-resize";
+    document.body.style.cursor = "row-resize";
     document.body.style.userSelect = "none";
   });
   document.addEventListener("mousemove", (e) => {
     if (!sidebarResizing) return;
     const workspaceRect = workspace.getBoundingClientRect();
-    const newWidth = workspaceRect.right - e.clientX;
-    if (newWidth >= 200 && newWidth <= 500) {
-      sidebarWidth = newWidth;
-      sidebar.style.width = `${newWidth}px`;
+    const newHeight = workspaceRect.bottom - e.clientY;
+    if (newHeight >= 100 && newHeight <= 400) {
+      sidebarWidth = newHeight;
+      sidebar.style.height = `${newHeight}px`;
       const tab = tabs.get(activeTabId || "");
       if (tab) tab.fitAddon.fit();
       if (followFitAddon && isFollowing) followFitAddon.fit();

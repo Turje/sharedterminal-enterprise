@@ -425,7 +425,7 @@ body {
 #workspace {
   flex: 1;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   overflow: hidden;
   min-height: 0;
 }
@@ -534,10 +534,10 @@ body {
   height: 100%;
 }
 
-/* ── Sidebar resize handle (vertical divider between terminal and sidebar) ── */
+/* ── Sidebar resize handle (horizontal divider between terminal and sidebar) ── */
 #sidebar-resize-handle {
-  width: 4px;
-  cursor: col-resize;
+  height: 4px;
+  cursor: row-resize;
   background: transparent;
   flex-shrink: 0;
   transition: background 0.2s;
@@ -547,31 +547,27 @@ body {
   background: #da7756;
 }
 
-/* ── Right Sidebar ── */
+/* ── Bottom Sidebar (horizontal panel) ── */
 #sidebar {
-  width: 280px;
+  height: 200px;
   flex-shrink: 0;
   background: #161b22;
-  border-left: 1px solid #30363d;
+  border-top: 1px solid #30363d;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   overflow: hidden;
-  transition: width 0.25s ease, opacity 0.25s ease;
+  transition: height 0.25s ease, opacity 0.25s ease;
 }
 
 #sidebar.collapsed {
-  width: 0;
+  height: 0;
   opacity: 0;
   overflow: hidden;
-  border-left: none;
+  border-top: none;
 }
 
 #sidebar-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid #30363d;
-  flex-shrink: 0;
+  display: none;
 }
 
 .sidebar-header-title {
@@ -582,11 +578,14 @@ body {
   letter-spacing: 0.06em;
 }
 
-/* Sidebar sections */
+/* Sidebar sections (horizontal layout) */
 .sidebar-section {
-  border-bottom: 1px solid #21262d;
+  border-right: 1px solid #21262d;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sidebar-section-header {
@@ -662,7 +661,7 @@ body {
 /* ── Users panel ── */
 #users-list {
   padding: 4px 0;
-  max-height: 180px;
+  flex: 1;
   overflow-y: auto;
 }
 
