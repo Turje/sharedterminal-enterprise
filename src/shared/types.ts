@@ -16,6 +16,7 @@ export interface SessionConfig {
   allowGitPush?: boolean;
   readOnly?: boolean;
   persistent?: boolean;
+  isPublic?: boolean;
 }
 
 export interface Session {

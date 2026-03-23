@@ -21,6 +21,7 @@ program
   .option('--git', 'Allow git push (mounts SSH keys and gitconfig)')
   .option('--read-only', 'Share folder as read-only')
   .option('--persistent', 'Enable persistent sessions (state survives disconnects)')
+  .option('--public', 'Public session — no password required to join')
   .option('--server-url <url>', 'Self-hosted server URL (disables tunnel)')
   .action(async (options) => {
     await runSharedfolder(options);

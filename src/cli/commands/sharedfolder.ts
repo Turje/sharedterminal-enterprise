@@ -115,6 +115,7 @@ export async function runSharedfolder(options: {
   readOnly?: boolean;
   persistent?: boolean;
   serverUrl?: string;
+  public?: boolean;
 }) {
   checkDocker();
 
@@ -171,7 +172,8 @@ export async function runSharedfolder(options: {
   const { chatBridge } = createSocketServer(server, sessionManager, tokenStore, config);
 
   const projectPath = path.resolve(options.path || process.cwd());
-  const password = options.password || generatePassword();
+  const isPublic = options.public || false;
+  const password = isPublic ? 'public' : (options.password || generatePassword());
   const sessionName = options.name || path.basename(projectPath);
   const ownerName = os.userInfo().username;
 
@@ -203,6 +205,7 @@ export async function runSharedfolder(options: {
     allowGitPush: options.git || false,
     readOnly: options.readOnly || false,
     persistent: options.persistent || false,
+    isPublic,
   });
 
   const hostUserId = 'host-owner';
@@ -308,7 +311,11 @@ export async function runSharedfolder(options: {
   console.log(`  ${separator}`);
   console.log('');
   console.log(`  ${DIM}Invite Link:${RESET}  ${ACCENT}${BOLD}${url}${RESET}${clipboardHint}`);
-  console.log(`  ${DIM}Session PIN:${RESET}  ${BOLD}${password}${RESET}`);
+  if (isPublic) {
+    console.log(`  ${DIM}Access:${RESET}      ${GREEN}${BOLD}Public${RESET} ${DIM}(no password required)${RESET}`);
+  } else {
+    console.log(`  ${DIM}Session PIN:${RESET}  ${BOLD}${password}${RESET}`);
+  }
   console.log('');
   console.log(`  ${separator}`);
   console.log('');

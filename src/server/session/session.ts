@@ -19,6 +19,7 @@ export class SessionState implements Session {
   public readonly createdAt: Date;
   public readonly expiresAt: Date;
   public readonly persistent: boolean;
+  public readonly isPublic: boolean;
 
   constructor(
     public readonly id: string,
@@ -29,13 +30,15 @@ export class SessionState implements Session {
     public readonly passwordHash: string,
     dockerManager: DockerManager,
     config?: ServerConfig,
-    persistent = false
+    persistent = false,
+    isPublic = false
   ) {
     this.terminalManager = new TerminalManager(dockerManager, containerId);
     this.presenceManager = new PresenceManager();
     this.createdAt = new Date();
     this.expiresAt = new Date(this.createdAt.getTime() + DEFAULTS.SESSION_MAX_LIFETIME_MS);
     this.persistent = persistent;
+    this.isPublic = isPublic;
 
     // Initialize audit logger (requires license)
     if (config?.auditEnabled !== false && config?.dataDir) {

@@ -84,7 +84,8 @@ export class SessionManager {
       });
     }
 
-    const pHash = await hashPassword(sessionConfig.password);
+    const isPublic = sessionConfig.isPublic || false;
+    const pHash = isPublic ? '' : await hashPassword(sessionConfig.password);
 
     const session = new SessionState(
       sessionId,
@@ -95,7 +96,8 @@ export class SessionManager {
       pHash,
       this.dockerManager,
       this.config,
-      persistent
+      persistent,
+      isPublic
     );
 
     const owner: User = {

@@ -217,6 +217,8 @@ document.addEventListener('mouseup', () => {
 const urlParams = new URLSearchParams(window.location.search);
 const urlSession = urlParams.get('session');
 const urlName = urlParams.get('name');
+let isPublicSession = false;
+
 if (urlSession) {
   sessionInput.value = urlSession;
   // If we have a project name, show it and hide the raw UUID
@@ -231,6 +233,19 @@ if (urlSession) {
     sessionLabel.classList.remove('hidden');
     sessionInput.type = 'hidden';
   }
+
+  // Check if session is public — hide password field if so
+  fetch(`/api/session/public-info?sessionId=${encodeURIComponent(urlSession)}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data?.isPublic) {
+        isPublicSession = true;
+        passwordInput.style.display = 'none';
+        // Auto-focus the name field
+        nameInput.focus();
+      }
+    })
+    .catch(() => {});
 }
 
 // ── Auth event listeners ──
@@ -270,7 +285,7 @@ async function connect() {
   const name = nameInput.value.trim() || 'anonymous';
 
   if (!sessionId) { showError('Please enter a Session ID'); return; }
-  if (!password) { showError('Please enter the Session PIN'); return; }
+  if (!isPublicSession && !password) { showError('Please enter the Session PIN'); return; }
 
   joinBtn.textContent = 'Connecting...';
   (joinBtn as HTMLButtonElement).disabled = true;

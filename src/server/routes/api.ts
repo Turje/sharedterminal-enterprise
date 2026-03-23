@@ -69,6 +69,21 @@ export function createApiRouter(
     }
   });
 
+  // Check if a session is public (no auth needed)
+  router.get('/api/session/public-info', (req: Request, res: Response) => {
+    try {
+      const sessionId = req.query.sessionId as string;
+      if (!sessionId) {
+        res.status(400).json({ error: 'sessionId is required' });
+        return;
+      }
+      const session = sessionManager.getSession(sessionId);
+      res.json({ isPublic: session.isPublic, sessionName: session.name });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
   // Join session (no auth — password is verified in body, brute-force protected)
   router.post('/api/session/join', async (req: Request, res: Response) => {
     try {
@@ -83,33 +98,55 @@ export function createApiRouter(
       }
 
       const body = req.body as JoinSessionRequest;
-      if (!body.sessionId || !body.password || !body.name) {
+      if (!body.sessionId || !body.name) {
+        res.status(400).json({ error: 'sessionId and name are required' });
+        return;
+      }
+
+      // Check if session is public (skip password)
+      let isPublicSession = false;
+      try {
+        const session = sessionManager.getSession(body.sessionId);
+        isPublicSession = session.isPublic;
+      } catch {}
+
+      if (!isPublicSession && !body.password) {
         res.status(400).json({ error: 'sessionId, password, and name are required' });
         return;
       }
 
-      // Brute-force protection per IP
+      // Brute-force protection per IP (skip for public sessions)
       const ip = req.ip || 'unknown';
-      const attempt = loginAttempts.get(ip);
-      if (attempt && Date.now() < attempt.lockedUntil) {
-        const waitSec = Math.ceil((attempt.lockedUntil - Date.now()) / 1000);
+      if (!isPublicSession) {
+        const attempt = loginAttempts.get(ip);
+        if (attempt && Date.now() < attempt.lockedUntil) {
+          const waitSec = Math.ceil((attempt.lockedUntil - Date.now()) / 1000);
 
-        // Audit: lockout
-        try {
-          const session = sessionManager.getSession(body.sessionId);
-          session.auditLogger?.log('auth.lockout', { ip });
-        } catch {}
+          // Audit: lockout
+          try {
+            const session = sessionManager.getSession(body.sessionId);
+            session.auditLogger?.log('auth.lockout', { ip });
+          } catch {}
 
-        res.status(429).json({ error: `Too many attempts. Try again in ${waitSec}s` });
-        return;
+          res.status(429).json({ error: `Too many attempts. Try again in ${waitSec}s` });
+          return;
+        }
       }
 
       try {
-        const { token: userToken, userId } = await sessionManager.authenticateAndJoin(
-          body.sessionId,
-          body.password,
-          body.name
-        );
+        let userToken: string;
+        let userId: string;
+
+        if (isPublicSession) {
+          // Public session — no password needed, just generate a token
+          ({ token: userToken, userId } = sessionManager.generateJoinToken(body.sessionId, body.name));
+        } else {
+          ({ token: userToken, userId } = await sessionManager.authenticateAndJoin(
+            body.sessionId,
+            body.password!,
+            body.name
+          ));
+        }
 
         // Clear attempts on success
         loginAttempts.delete(ip);
@@ -137,14 +174,16 @@ export function createApiRouter(
           role: 'editor',
         });
       } catch (authErr) {
-        // Track failed attempts
-        const current = loginAttempts.get(ip) || { count: 0, lockedUntil: 0 };
-        current.count++;
-        if (current.count >= MAX_LOGIN_ATTEMPTS) {
-          current.lockedUntil = Date.now() + LOCKOUT_MS;
-          current.count = 0;
+        // Track failed attempts (only for non-public sessions)
+        if (!isPublicSession) {
+          const current = loginAttempts.get(ip) || { count: 0, lockedUntil: 0 };
+          current.count++;
+          if (current.count >= MAX_LOGIN_ATTEMPTS) {
+            current.lockedUntil = Date.now() + LOCKOUT_MS;
+            current.count = 0;
+          }
+          loginAttempts.set(ip, current);
         }
-        loginAttempts.set(ip, current);
 
         // Audit: auth failure
         try {
