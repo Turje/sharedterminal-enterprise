@@ -1993,52 +1993,60 @@
     // HTML spans are embedded directly; only plain-text portions get typed.
 
     var leftLines = [
-      // Saar starts session and assigns tasks
+      // Saar starts session
       { text: '<span class="t-accent">$ sharedterminal --path ./acme-api</span>', mode: 'type', typeText: '$ sharedterminal --path ./acme-api' },
       { text: '<span class="t-green">\u25CF</span> <span class="t-accent t-bold">SharedTerminal</span> <span class="t-dim">session started</span>', mode: 'instant' },
       { text: '<span class="t-dim">Online:</span> <span class="t-white">Saar (owner)</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Create tasks and team joins
+      // Create tasks, Alex joins
       { text: '<span class="t-accent">saar@acme-api$ /tasks create</span>', mode: 'type', typeText: 'saar@acme-api$ /tasks create' },
       { text: '<span class="t-dim">\u2610</span> <span class="t-white">Fix memory leak in redis pool</span>  <span class="t-dim">\u2192 Alex</span>', mode: 'instant' },
       { text: '<span class="t-dim">\u2610</span> <span class="t-white">Add rate limiter to /api/upload</span> <span class="t-dim">\u2192 Saar</span>', mode: 'instant' },
       { text: '<span class="t-green">\u2713 2 tasks assigned</span>', mode: 'instant' },
       { text: '<span class="t-green">\u2713</span> <span class="t-white">Alex joined</span>', mode: 'instant', trigger: 'showRight' },
       { text: '', mode: 'instant' },
-      // Saar works on his own task
+      // Saar works on his task
       { text: '<span class="t-accent">saar@acme-api$ vim src/middleware/rate-limit.ts</span>', mode: 'type', typeText: 'saar@acme-api$ vim src/middleware/rate-limit.ts' },
-      { text: '<span class="t-dim">  1 |</span> <span class="t-white">import { RateLimiter } from \'./limiter\';</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  2 |</span> <span class="t-white">export const uploadLimit = new RateLimiter({</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  3 |</span> <span class="t-green">  max: 10, windowMs: 60_000</span>', mode: 'instant' },
-      { text: '<span class="t-dim">  4 |</span> <span class="t-white">});</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  1 |</span> <span class="t-white">export const uploadLimit = new RateLimiter({</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  2 |</span> <span class="t-green">  max: 10, windowMs: 60_000</span>', mode: 'instant' },
+      { text: '<span class="t-dim">  3 |</span> <span class="t-white">});</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Saar sees Alex's AI session output in real time
-      { text: '<span class="t-dim">[activity]</span> <span class="t-white">Alex activated Claude Code on his task</span>', mode: 'instant' },
-      { text: '<span class="t-dim">[activity]</span> <span class="t-white">Alex\u2019s AI editing src/cache/redis-pool.ts</span>', mode: 'instant' },
+      // Activity feed — Alex using AI
+      { text: '<span class="t-dim">[activity]</span> <span class="t-white">Alex activated Claude Code</span>', mode: 'instant' },
+      { text: '<span class="t-dim">[activity]</span> <span class="t-white">AI editing src/cache/redis-pool.ts</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // DLP catches a secret from AI output
-      { text: '<span class="t-red t-bold">\u26A0 DLP:</span> <span class="t-red">Secret redacted in AI output (password)</span>', mode: 'instant' },
-      { text: '<span class="t-dim">\u2192 REDIS_URL=redis://admin:</span><span class="t-red t-bold">***REDACTED***</span><span class="t-dim">@prod-cluster</span>', mode: 'instant' },
+      // DLP catches a secret
+      { text: '<span class="t-red t-bold">\u26A0 DLP:</span> <span class="t-red">Secret redacted in AI output</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2192 REDIS_URL=redis://admin:</span><span class="t-red t-bold">***REDACTED***</span><span class="t-dim">@prod</span>', mode: 'instant' },
       { text: '<span class="t-dim">\u2192 Logged to audit trail</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
+      // Check task status
       { text: '<span class="t-accent">saar@acme-api$ /tasks status</span>', mode: 'type', typeText: 'saar@acme-api$ /tasks status' },
       { text: '<span class="t-green">\u2611</span> <span class="t-white">Fix memory leak</span> <span class="t-green">done</span> <span class="t-dim">(Alex + AI)</span>', mode: 'instant' },
-      { text: '<span class="t-green">\u2611</span> <span class="t-white">Add rate limiter</span> <span class="t-green">done</span> <span class="t-dim">(Saar)</span>', mode: 'instant' }
+      { text: '<span class="t-green">\u2611</span> <span class="t-white">Add rate limiter</span> <span class="t-green">done</span> <span class="t-dim">(Saar)</span>', mode: 'instant' },
+      { text: '', mode: 'instant' },
+      // AI session summary — the closer
+      { text: '<span class="t-accent">saar@acme-api$ @agent summarize session</span>', mode: 'type', typeText: 'saar@acme-api$ @agent summarize session' },
+      { text: '<span class="t-dim">\u2728 AI</span> <span class="t-white t-bold">Session Summary</span> <span class="t-dim">\u2014 14 min, 2 devs</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2502</span> <span class="t-white">Memory leak fixed in redis-pool.ts (try/finally)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2502</span> <span class="t-white">Rate limiter added to /api/upload (10 req/min)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2502</span> <span class="t-white">DLP blocked 1 secret from reaching clients</span>', mode: 'instant' },
+      { text: '<span class="t-dim">\u2502</span> <span class="t-white">12 tests passing, ready to merge</span>', mode: 'instant' },
+      { text: '<span class="t-green t-bold">\u2713 All tasks complete. Session ended.</span>', mode: 'instant' }
     ];
 
     var rightLines = [
       // Alex picks up task
       { text: '<span class="t-dim">Your task:</span> <span class="t-white">Fix memory leak in redis pool</span> <span class="t-red">\u25CF urgent</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Alex investigates first
+      // Alex investigates
       { text: '<span class="t-accent">alex@acme-api$ grep -r ".release" src/</span>', mode: 'type', typeText: 'alex@acme-api$ grep -r ".release" src/' },
-      { text: '<span class="t-dim">(no results)</span>', mode: 'instant' },
+      { text: '<span class="t-dim">(no results — pool never releases)</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      // Alex calls AI to help with the fix
-      { text: '<span class="t-accent">alex@acme-api$ claude "Fix the pool leak in redis-pool.ts"</span>', mode: 'type', typeText: 'alex@acme-api$ claude "Fix the pool leak in redis-pool.ts"' },
+      // Alex calls AI
+      { text: '<span class="t-accent">alex@acme-api$ claude "Fix the pool leak"</span>', mode: 'type', typeText: 'alex@acme-api$ claude "Fix the pool leak"' },
       { text: '<span class="t-dim">\u2728 Claude Code</span> <span class="t-white">Analyzing redis-pool.ts...</span>', mode: 'instant' },
-      { text: '<span class="t-dim">[Claude]</span> <span class="t-white">Pool.acquire() called but never released</span>', mode: 'instant' },
-      { text: '<span class="t-dim">[Claude]</span> <span class="t-white">Patching with try/finally pattern:</span>', mode: 'instant' },
+      { text: '<span class="t-dim">[Claude]</span> <span class="t-white">acquire() never released. Patching:</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
       { text: '<span class="t-red">-    const conn = pool.acquire();</span>', mode: 'instant' },
       { text: '<span class="t-red">-    return conn.exec(cmd);</span>', mode: 'instant' },
@@ -2046,7 +2054,6 @@
       { text: '<span class="t-green">+    try { return conn.exec(cmd); }</span>', mode: 'instant' },
       { text: '<span class="t-green">+    finally { pool.release(conn); }</span>', mode: 'instant' },
       { text: '', mode: 'instant' },
-      { text: '<span class="t-dim">\u2728 Claude Code</span> <span class="t-white">Writing tests...</span>', mode: 'instant' },
       { text: '<span class="t-accent">alex@acme-api$ npm test</span>', mode: 'type', typeText: 'alex@acme-api$ npm test' },
       { text: '  <span class="t-green">\u2713</span> <span class="t-white">redis-pool.test.ts (4 passed)</span>', mode: 'instant' },
       { text: '  <span class="t-green">\u2713</span> <span class="t-white">handlers.test.ts (8 passed)</span>', mode: 'instant' },
