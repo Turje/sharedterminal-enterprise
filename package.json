@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "tsc && npm run build:client && npm run copy:client",
-    "build:client": "esbuild src/client/js/main.ts --bundle --outfile=src/client/js/bundle.js --platform=browser --format=iife",
+    "build:client": "node scripts/build-client.js",
     "copy:client": "mkdir -p dist/client && cp -r src/client/index.html src/client/admin.html src/client/player.html src/client/css src/client/js dist/client/",
     "dev": "npm run build:client && npx tsc && npm run copy:client && node dist/server/index.js",
     "start": "node dist/server/index.js",
