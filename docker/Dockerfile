@@ -31,11 +31,19 @@ RUN groupadd -g 1000 developer && \
 RUN mkdir -p /workspace && chown 1000:1000 /workspace
 
 # Pre-create directories that need to exist in tmpfs home
-RUN mkdir -p /etc/skel/.local/share /etc/skel/.cache /etc/skel/.config && \
+RUN mkdir -p /etc/skel/.local/share /etc/skel/.cache /etc/skel/.config /etc/skel/.npm-global && \
     cp /etc/skel/.bashrc /etc/skel/.bashrc 2>/dev/null || true
+
+# Configure npm to use user-writable global prefix
+ENV NPM_CONFIG_PREFIX=/home/developer/.npm-global
+ENV PATH="/home/developer/.npm-global/bin:${PATH}"
 
 # Add AI CLI helper to bashrc — catches common AI commands with a helpful message
 RUN cat >> /etc/skel/.bashrc <<'AIHELPER'
+
+# npm global path for non-root installs
+export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+export PATH="$HOME/.npm-global/bin:$PATH"
 
 # SharedTerminal: helpful message when AI CLI tools aren't installed
 _st_ai_hint() {
