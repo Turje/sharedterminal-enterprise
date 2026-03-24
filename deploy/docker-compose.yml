@@ -28,6 +28,9 @@ services:
       AUDIT_ENABLED: "${AUDIT_ENABLED:-true}"
       LICENSE_KEY: "${LICENSE_KEY:-}"
       LICENSE_SERVER_URL: "${LICENSE_SERVER_URL:-https://api.sharedterminal.com/v1/license/validate}"
+      DEMO_PROJECT_PATH: "${DEMO_PROJECT_PATH:-}"
+      MAX_DEMO_ROOMS: "${MAX_DEMO_ROOMS:-5}"
+      DEMO_SESSION_DURATION_MS: "${DEMO_SESSION_DURATION_MS:-600000}"
       TLS_CERT_PATH: /certs/cert.pem
       TLS_KEY_PATH: /certs/key.pem
     healthcheck:
