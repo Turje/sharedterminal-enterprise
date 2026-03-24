@@ -503,10 +503,11 @@ export function createApiRouter(
             detail = `${user} left`;
           } else if (event.type === 'security.dlp_detected') {
             detail = `Secret blocked: ${event.data?.pattern || 'unknown'}`;
-          } else if (event.type === 'ai.query') {
-            detail = event.data?.prompt || event.data?.type || 'query';
-          } else if (event.type === 'ai.summary' || event.type === 'ai.postmortem') {
-            detail = event.type.split('.')[1] + ' generated';
+          } else if (event.type === 'ai.request') {
+            detail = event.data?.message || event.data?.type || 'query';
+          } else if (event.type === 'ai.response') {
+            const aiType = event.data?.type ? `[${event.data.type}] ` : '';
+            detail = aiType + (event.data?.response || 'response received');
           } else {
             detail = event.type;
           }
