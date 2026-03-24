@@ -1,5 +1,6 @@
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
+import { WebLinksAddon } from 'xterm-addon-web-links';
 declare const io: any;
 
 interface PresenceUser {
@@ -1087,6 +1088,7 @@ function createTab(tabId: string, index: number) {
   const term = new Terminal({ cursorBlink: true, fontSize: 14, fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace", theme: termTheme });
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
+  term.loadAddon(new WebLinksAddon());
 
   const el = document.createElement('div');
   el.className = 'tab-terminal';

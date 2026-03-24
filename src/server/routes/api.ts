@@ -446,7 +446,7 @@ export function createApiRouter(
     }
   });
 
-  // Export command history as text (auth required, any role)
+  // Export full session activity log (auth required, any role)
   router.get('/api/session/export/history', authMiddleware, async (req: Request, res: Response) => {
     try {
       const { sessionId, userId } = req.tokenPayload!;
@@ -454,29 +454,64 @@ export function createApiRouter(
 
       const filePath = session.auditLogger?.getFilePath();
       if (!filePath || !fs.existsSync(filePath)) {
-        // No audit log yet — return empty history
         res.setHeader('Content-Type', 'text/plain');
-        res.setHeader('Content-Disposition', `attachment; filename="history-${session.name}.txt"`);
-        res.send('# No commands recorded yet in this session.\n');
+        res.setHeader('Content-Disposition', `attachment; filename="activity-${session.name}.txt"`);
+        res.send('# No activity recorded yet in this session.\n');
         return;
       }
 
       const lines: string[] = [];
+      lines.push(`# SharedTerminal Session Activity Log`);
+      lines.push(`# Session: ${session.name} (${sessionId})`);
+      lines.push(`# Exported: ${new Date().toISOString()}`);
+      lines.push('');
+
       const rl = readline.createInterface({
         input: fs.createReadStream(filePath),
         crlfDelay: Infinity,
       });
 
+      const eventLabels: Record<string, string> = {
+        'terminal.input': 'CMD',
+        'user.connected': 'JOIN',
+        'user.disconnected': 'LEFT',
+        'security.dlp_detected': 'DLP',
+        'ai.query': 'AI',
+        'ai.response': 'AI',
+        'ai.summary': 'AI',
+        'ai.postmortem': 'AI',
+        'session.created': 'SESSION',
+        'session.stopped': 'SESSION',
+        'workspace.exported': 'EXPORT',
+        'history.exported': 'EXPORT',
+      };
+
       for await (const line of rl) {
         try {
           const event = JSON.parse(line);
+          const ts = new Date(event.ts);
+          const date = ts.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
+          const user = event.userName || event.userId || 'system';
+          const label = eventLabels[event.type] || event.type.split('.')[0].toUpperCase();
+          let detail = '';
+
           if (event.type === 'terminal.input') {
-            const ts = new Date(event.ts);
-            const date = ts.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
-            const user = event.userName || event.userId || 'unknown';
-            const cmd = event.data?.input || '';
-            lines.push(`[${date}] ${user}: ${cmd}`);
+            detail = event.data?.input || '';
+          } else if (event.type === 'user.connected') {
+            detail = `${user} joined as ${event.data?.role || 'viewer'}`;
+          } else if (event.type === 'user.disconnected') {
+            detail = `${user} left`;
+          } else if (event.type === 'security.dlp_detected') {
+            detail = `Secret blocked: ${event.data?.pattern || 'unknown'}`;
+          } else if (event.type === 'ai.query') {
+            detail = event.data?.prompt || event.data?.type || 'query';
+          } else if (event.type === 'ai.summary' || event.type === 'ai.postmortem') {
+            detail = event.type.split('.')[1] + ' generated';
+          } else {
+            detail = event.type;
           }
+
+          lines.push(`[${date}] [${label}] ${user}: ${detail}`);
         } catch {
           // Skip malformed lines
         }
@@ -485,7 +520,7 @@ export function createApiRouter(
       session.auditLogger?.log('history.exported', { userId, ip: req.ip });
 
       res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Content-Disposition', `attachment; filename="history-${session.name}.txt"`);
+      res.setHeader('Content-Disposition', `attachment; filename="activity-${session.name}.txt"`);
       res.send(lines.join('\n'));
     } catch (err) {
       handleError(res, err);
