@@ -488,7 +488,6 @@ followStopBtn.addEventListener('click', stopFollowing);
 const leadModal = document.getElementById('lead-modal')!;
 const leadEmailInput = document.getElementById('lead-email-input') as HTMLInputElement;
 const leadSubmitBtn = document.getElementById('lead-submit-btn')!;
-const leadSkipBtn = document.getElementById('lead-skip-btn')!;
 const leadError = document.getElementById('lead-error')!;
 let pendingLeadAction: (() => void) | null = null;
 
@@ -540,12 +539,6 @@ async function submitLead() {
   leadEmailInput.value = '';
   if (pendingLeadAction) { pendingLeadAction(); pendingLeadAction = null; }
 }
-
-leadSkipBtn.addEventListener('click', () => {
-  localStorage.setItem('st_lead_email', 'skipped');
-  leadModal.classList.add('hidden');
-  if (pendingLeadAction) { pendingLeadAction(); pendingLeadAction = null; }
-});
 
 // ── Export buttons (gated by lead capture) ──
 document.getElementById('export-workspace-btn')?.addEventListener('click', () => {
