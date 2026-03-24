@@ -1696,6 +1696,37 @@ body {
   }
 }
 
+/* ── Password strength ── */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 32px;
+}
+
+.password-hint-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 16px;
+  color: #6e7681;
+  cursor: help;
+  user-select: none;
+}
+
+.password-strength {
+  font-size: 11px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+
+.password-strength.weak { color: #f85149; }
+.password-strength.strong { color: #3fb950; }
+
 /* ── AI Setup prompt ── */
 #ai-setup {
   padding: 16px 12px;

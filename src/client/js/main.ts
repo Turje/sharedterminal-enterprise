@@ -42,6 +42,14 @@ let followTerm: any = null;
 let followFitAddon: any = null;
 let isFollowing = false;
 
+// ── Password validation ──
+function isStrongPassword(pw: string): { valid: boolean; message: string } {
+  if (pw.length < 6) return { valid: false, message: 'At least 6 characters' };
+  if (!/[A-Z]/.test(pw)) return { valid: false, message: 'Add 1 uppercase letter' };
+  if (!/[!@_]/.test(pw)) return { valid: false, message: 'Add 1 symbol (! @ _)' };
+  return { valid: true, message: 'Strong password' };
+}
+
 // AI state
 let currentAiMessageId: string | null = null;
 
@@ -295,7 +303,8 @@ if (urlTeam) {
       const createTeamSession = async () => {
         const pin = teamPinInput.value.trim();
         const userName = teamUserInput.value.trim() || 'host';
-        if (!pin || pin.length < 4) { showError('Password must be at least 4 characters'); return; }
+        const pwCheck = isStrongPassword(pin);
+        if (!pwCheck.valid) { showError(pwCheck.message); return; }
 
         (startDemoBtn as HTMLButtonElement).disabled = true;
         startDemoBtn.textContent = 'Creating...';
@@ -407,7 +416,8 @@ function showDemoAuthFlow() {
           const teamName = teamNameInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
           if (!teamName) { showError('Please enter a team name'); return; }
           const pin = teamPinInput.value.trim();
-          if (!pin || pin.length < 4) { showError('Password must be at least 4 characters'); return; }
+          const pwCheck = isStrongPassword(pin);
+          if (!pwCheck.valid) { showError(pwCheck.message); return; }
           const userName = teamUserInput.value.trim() || 'host';
 
           (startDemoBtn as HTMLButtonElement).disabled = true;
@@ -453,9 +463,17 @@ function showDemoAuthFlow() {
           }
         };
 
-        // Auto-generate a password to avoid Chrome breach warnings on weak passwords
-        const rnd = Array.from(crypto.getRandomValues(new Uint8Array(4))).map(b => b.toString(36)).join('').slice(0, 5);
-        teamPinInput.value = `demo-${rnd}`;
+        // Real-time password strength indicator
+        const pwStrength = document.getElementById('password-strength');
+        teamPinInput.addEventListener('input', () => {
+          const val = teamPinInput.value;
+          if (!val) { pwStrength?.classList.add('hidden'); return; }
+          const check = isStrongPassword(val);
+          if (pwStrength) {
+            pwStrength.textContent = check.message;
+            pwStrength.className = 'password-strength ' + (check.valid ? 'strong' : 'weak');
+          }
+        });
 
         startDemoBtn.addEventListener('click', startDemo);
         teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
