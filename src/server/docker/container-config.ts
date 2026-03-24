@@ -67,7 +67,7 @@ export function buildContainerOptions(config: ContainerConfig, sessionId: string
         '/tmp': 'rw,noexec,nosuid,size=64m',
         '/run': 'rw,noexec,nosuid,size=16m',
         '/var/tmp': 'rw,noexec,nosuid,size=32m',
-        ...(config.persistent ? {} : { '/home/developer': 'rw,nosuid,size=128m' }),
+        ...(config.persistent ? {} : { '/home/developer': 'rw,nosuid,size=128m,uid=1000,gid=1000,mode=0755' }),
       },
       Ulimits: [
         { Name: 'nofile', Soft: 1024, Hard: 2048 },
