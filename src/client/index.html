@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=1e7f4dfb">
-  <link rel="stylesheet" href="css/terminal.css?v=1e7f4dfb">
+  <link rel="stylesheet" href="css/xterm.css?v=0d4976aa">
+  <link rel="stylesheet" href="css/terminal.css?v=0d4976aa">
 </head>
 <body>
   <div id="app">
@@ -135,6 +135,23 @@
       <div id="terminal-tabs">
         <div id="tab-list"></div>
         <button id="new-tab-btn" title="New terminal (Ctrl+T)">+</button>
+      </div>
+
+      <!-- Pinned demo MOTD (immune to terminal clear) -->
+      <div id="demo-motd" class="hidden">
+        <button id="demo-motd-dismiss" class="demo-motd-dismiss" title="Dismiss">&times;</button>
+        <div class="demo-motd-content">
+          <div class="demo-motd-header">SharedTerminal <span class="demo-motd-dim">&mdash; Cross-Stack Incident Sandbox</span> &#x1f6e1;</div>
+          <div class="demo-motd-scenario">
+            <strong>SCENARIO</strong> &nbsp;A production stack is failing. The Node API is leaking secrets and crashing. The Python inference service is hitting a memory error.
+          </div>
+          <div class="demo-motd-cmds">
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>npm start</strong> <span class="demo-motd-dim">Run the API</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>python3 model.py</strong> <span class="demo-motd-dim">Run inference</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>cat .env</strong> <span class="demo-motd-dim">Test DLP</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>curl :3001/crash</strong> <span class="demo-motd-dim">Trigger crash</span></span>
+          </div>
+        </div>
       </div>
 
       <div id="workspace">
@@ -326,6 +343,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-XMWZ7LMP.js"></script>
+  <script src="js/main-ES7MK6BF.js"></script>
 </body>
 </html>

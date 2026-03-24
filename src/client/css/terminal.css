@@ -1746,6 +1746,58 @@ body {
   color: #3fb950;
 }
 
+/* ── Pinned Demo MOTD ── */
+#demo-motd {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  font-size: 12px;
+  color: #c9d1d9;
+  position: relative;
+  line-height: 1.6;
+}
+
+.demo-motd-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #6e7681;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.demo-motd-dismiss:hover { color: #f85149; }
+
+.demo-motd-header {
+  font-weight: 700;
+  color: #da7756;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.demo-motd-dim { color: #6e7681; font-weight: 400; }
+
+.demo-motd-scenario {
+  color: #8b949e;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.demo-motd-cmds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.demo-motd-cmd { font-size: 11px; }
+
+.demo-motd-arrow { color: #58a6ff; font-size: 9px; }
+
 /* ── AI Setup prompt ── */
 #ai-setup {
   padding: 16px 12px;

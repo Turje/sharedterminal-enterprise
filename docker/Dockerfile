@@ -55,13 +55,7 @@ command -v claude >/dev/null 2>&1 || claude() { _st_ai_hint "Claude Code" "npm i
 command -v aider >/dev/null 2>&1 || aider() { _st_ai_hint "Aider" "pip install aider-chat && aider"; }
 command -v copilot >/dev/null 2>&1 || copilot() { _st_ai_hint "GitHub Copilot CLI" "npm install -g @githubnext/github-copilot-cli && copilot"; }
 
-# clear keeps MOTD, clearall removes everything
-alias clear='command clear && cat /etc/sharedterminal-motd 2>/dev/null'
-alias clearall='command clear'
 AIHELPER
-
-# Static MOTD displayed on clear (dynamic version sent by server on connect)
-RUN printf '\n\033[2m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n  \033[1m\033[38;5;173mSharedTerminal\033[0m \033[2m— Cross-Stack Incident Sandbox\033[0m \033[32m🛡\033[0m\n\033[2m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n\n  \033[36m►\033[0m \033[1mnpm start\033[0m           Run the API \033[2m(watch for redacted keys)\033[0m\n  \033[36m►\033[0m \033[1mpython3 model.py\033[0m    Run inference \033[2m(hits OOM on batch 3)\033[0m\n  \033[36m►\033[0m \033[1mcat .env\033[0m            Test DLP \033[2m(secrets auto-masked)\033[0m\n  \033[36m►\033[0m \033[1mcurl :3001/crash\033[0m    Hit 5x to trigger the crash\n\n  \033[1mCollaborate\033[0m  Share this URL — teammates join instantly\n  \033[1mCompliance\033[0m   Tamper-evident audit log & DLP active\n  \033[1mAI Tools\033[0m     Install any AI CLI — the sidebar connects automatically\n\n\033[2m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n\n' > /etc/sharedterminal-motd
 
 # Bake demo workspace into image (seeded into /workspace by entrypoint)
 COPY demo-workspace/package*.json /opt/demo-workspace/
