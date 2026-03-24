@@ -453,6 +453,10 @@ function showDemoAuthFlow() {
           }
         };
 
+        // Auto-generate a password to avoid Chrome breach warnings on weak passwords
+        const rnd = Array.from(crypto.getRandomValues(new Uint8Array(4))).map(b => b.toString(36)).join('').slice(0, 5);
+        teamPinInput.value = `demo-${rnd}`;
+
         startDemoBtn.addEventListener('click', startDemo);
         teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
         teamPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
