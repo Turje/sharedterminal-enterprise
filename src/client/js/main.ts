@@ -377,22 +377,63 @@ if (urlTeam) {
         teamCreate.classList.remove('hidden');
 
         const teamNameInput = document.getElementById('team-name-input') as HTMLInputElement;
+        const teamPinInput = document.getElementById('team-pin-input') as HTMLInputElement;
         const teamUserInput = document.getElementById('team-user-input') as HTMLInputElement;
         const startDemoBtn = document.getElementById('start-demo-btn')!;
 
-        const startDemo = () => {
+        const startDemo = async () => {
           const teamName = teamNameInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
           if (!teamName) { showError('Please enter a team name'); return; }
-          // Store user name for after redirect
-          const userName = teamUserInput.value.trim();
-          if (userName) {
-            sessionStorage.setItem('demo-user-name', userName);
+          const pin = teamPinInput.value.trim();
+          if (!pin || pin.length < 4) { showError('Password must be at least 4 characters'); return; }
+          const userName = teamUserInput.value.trim() || 'host';
+
+          (startDemoBtn as HTMLButtonElement).disabled = true;
+          startDemoBtn.textContent = 'Creating...';
+
+          try {
+            const res = await fetch('/api/demo/team', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: teamName, password: pin, ownerName: userName }),
+            });
+            const result = await res.json();
+            if (!res.ok) { showError(result.error || 'Failed to create session'); (startDemoBtn as HTMLButtonElement).disabled = false; startDemoBtn.textContent = 'Start Private Demo'; return; }
+
+            // Auto-connect as owner — go straight to terminal
+            sessionInput.value = result.sessionId;
+            teamCreate.classList.add('hidden');
+            sessionInput.type = 'hidden';
+            passwordInput.style.display = 'none';
+            isPublicSession = false;
+
+            myRole = 'owner';
+            document.title = `${teamName} — SharedTerminal Enterprise`;
+            sessionDisplayNameEl.textContent = teamName;
+            securityBannerSession.textContent = teamName;
+            authScreen.classList.add('hidden');
+            terminalScreen.classList.remove('hidden');
+            sessionStartTime = Date.now();
+            timerInterval = window.setInterval(updateTimer, 1000);
+            statusRole.textContent = 'owner';
+            if ('Notification' in window && Notification.permission === 'default') {
+              Notification.requestPermission().then((p) => { notificationsPermission = p === 'granted'; });
+            } else if ('Notification' in window) {
+              notificationsPermission = Notification.permission === 'granted';
+            }
+            // Update URL so host can share it
+            window.history.replaceState({}, '', `?team=${encodeURIComponent(teamName)}`);
+            initSocket(result.token, userName);
+          } catch {
+            showError('Connection failed. Is the server running?');
+            (startDemoBtn as HTMLButtonElement).disabled = false;
+            startDemoBtn.textContent = 'Start Private Demo';
           }
-          window.location.href = `?team=${encodeURIComponent(teamName)}`;
         };
 
         startDemoBtn.addEventListener('click', startDemo);
         teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
+        teamPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
         teamUserInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
         teamNameInput.focus();
       } else {
@@ -418,13 +459,6 @@ if (urlTeam) {
         })
         .catch(() => {});
     });
-}
-
-// Restore name from sessionStorage (set before team redirect)
-const savedDemoName = sessionStorage.getItem('demo-user-name');
-if (savedDemoName && urlTeam) {
-  nameInput.value = savedDemoName;
-  sessionStorage.removeItem('demo-user-name');
 }
 
 // ── Auth event listeners ──
