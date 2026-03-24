@@ -53,7 +53,7 @@ function buildDemoMotd(session: SessionState): string {
     '',
     `  ${bold}Multiplayer${reset}  Share this URL — teammates join instantly`,
     `  ${bold}Compliance${reset}   Tamper-evident Audit & DLP Active`,
-    `  ${bold}AI Support${reset}   Ask the sidebar (${accent}@claude${reset}) for a fix`,
+    `  ${bold}AI Support${reset}   Open the ${accent}AI panel${reset} in the sidebar ${dim}\u2192${reset}`,
     '',
     `  ${dim}Session expires in ${mins} min \u00b7 Work is ephemeral${reset}`,
     line,
