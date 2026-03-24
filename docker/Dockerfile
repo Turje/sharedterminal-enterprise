@@ -34,6 +34,20 @@ RUN mkdir -p /workspace && chown 1000:1000 /workspace
 RUN mkdir -p /etc/skel/.local/share /etc/skel/.cache /etc/skel/.config && \
     cp /etc/skel/.bashrc /etc/skel/.bashrc 2>/dev/null || true
 
+# Add AI CLI helper to bashrc — catches common AI commands with a helpful message
+RUN cat >> /etc/skel/.bashrc <<'AIHELPER'
+
+# SharedTerminal: helpful message when AI CLI tools aren't installed
+_st_ai_hint() {
+  echo -e "\e[1;34m[SharedTerminal]\e[0m $1 is not pre-installed (saves ~200MB)."
+  echo -e "\e[1;33mOption 1:\e[0m Use the \e[1;32mAI Assistant\e[0m panel in the sidebar — it has full terminal context."
+  echo -e "\e[1;33mOption 2:\e[0m Install it yourself:  \e[1;36m$2\e[0m"
+}
+command -v claude >/dev/null 2>&1 || claude() { _st_ai_hint "Claude Code" "npm install -g @anthropic-ai/claude-code && claude"; }
+command -v aider >/dev/null 2>&1 || aider() { _st_ai_hint "Aider" "pip install aider-chat && aider"; }
+command -v copilot >/dev/null 2>&1 || copilot() { _st_ai_hint "GitHub Copilot CLI" "npm install -g @githubnext/github-copilot-cli && copilot"; }
+AIHELPER
+
 # Bake demo workspace into image (seeded into /workspace by entrypoint)
 COPY demo-workspace/package*.json /opt/demo-workspace/
 RUN cd /opt/demo-workspace && npm install --omit=dev 2>/dev/null || true
