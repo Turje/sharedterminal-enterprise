@@ -382,26 +382,9 @@ if (urlTeam) {
     })
     .catch(() => {});
 } else {
-  // No params — show landing page
-  landingScreen.classList.remove('hidden');
-
-  // "Try the Demo" — transition to demo/team-create flow
-  if (landingDemoBtn) {
-    landingDemoBtn.addEventListener('click', () => {
-      landingScreen.classList.add('hidden');
-      authScreen.classList.remove('hidden');
-      showDemoAuthFlow();
-    });
-  }
-
-  // "Join a Session" — show normal join form
-  if (landingJoinBtn) {
-    landingJoinBtn.addEventListener('click', () => {
-      landingScreen.classList.add('hidden');
-      authScreen.classList.remove('hidden');
-      sessionInput.focus();
-    });
-  }
+  // No params — go straight to auth screen with demo flow
+  authScreen.classList.remove('hidden');
+  showDemoAuthFlow();
 }
 
 function showDemoAuthFlow() {
