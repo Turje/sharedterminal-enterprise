@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=afacfb47">
-  <link rel="stylesheet" href="css/terminal.css?v=afacfb47">
+  <link rel="stylesheet" href="css/xterm.css?v=1e7f4dfb">
+  <link rel="stylesheet" href="css/terminal.css?v=1e7f4dfb">
 </head>
 <body>
   <div id="app">
@@ -78,9 +78,13 @@
             <input type="text" id="team-name-input" placeholder="Team or company name" autocomplete="off" />
             <div class="password-wrapper">
               <input type="password" id="team-pin-input" placeholder="Choose a password" autocomplete="off" />
-              <span class="password-hint-icon" id="password-hint-icon" title="Min 6 chars, 1 uppercase, 1 symbol (!@_)">&#9432;</span>
+              <span class="password-hint-icon" id="password-hint-icon">&#9432;</span>
+              <div class="password-tooltip" id="password-tooltip">
+                <div class="pw-rule" id="pw-rule-len">&#10005; At least 6 characters</div>
+                <div class="pw-rule" id="pw-rule-upper">&#10005; 1 uppercase letter</div>
+                <div class="pw-rule" id="pw-rule-symbol">&#10005; 1 symbol (! @ _)</div>
+              </div>
             </div>
-            <div id="password-strength" class="password-strength hidden"></div>
             <input type="text" id="team-user-input" placeholder="Your name" autocomplete="off" />
             <button id="start-demo-btn">Start Private Demo</button>
             <p class="demo-hint">You'll get an isolated sandbox. Share the link + password with your team.</p>
@@ -322,6 +326,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-6WL6ZX2E.js"></script>
+  <script src="js/main-ZQX44LCT.js"></script>
 </body>
 </html>

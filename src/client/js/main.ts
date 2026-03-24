@@ -463,17 +463,40 @@ function showDemoAuthFlow() {
           }
         };
 
-        // Real-time password strength indicator
-        const pwStrength = document.getElementById('password-strength');
-        teamPinInput.addEventListener('input', () => {
+        // Password tooltip toggle + real-time rule checking
+        const pwTooltip = document.getElementById('password-tooltip');
+        const pwHintIcon = document.getElementById('password-hint-icon');
+        const ruleLen = document.getElementById('pw-rule-len');
+        const ruleUpper = document.getElementById('pw-rule-upper');
+        const ruleSymbol = document.getElementById('pw-rule-symbol');
+
+        if (pwHintIcon && pwTooltip) {
+          pwHintIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pwTooltip.classList.toggle('visible');
+          });
+          document.addEventListener('click', () => pwTooltip.classList.remove('visible'));
+        }
+
+        const ruleLabels = new Map<HTMLElement, string>();
+        if (ruleLen) ruleLabels.set(ruleLen, 'At least 6 characters');
+        if (ruleUpper) ruleLabels.set(ruleUpper, '1 uppercase letter');
+        if (ruleSymbol) ruleLabels.set(ruleSymbol, '1 symbol (! @ _)');
+
+        const updatePwRules = () => {
           const val = teamPinInput.value;
-          if (!val) { pwStrength?.classList.add('hidden'); return; }
-          const check = isStrongPassword(val);
-          if (pwStrength) {
-            pwStrength.textContent = check.message;
-            pwStrength.className = 'password-strength ' + (check.valid ? 'strong' : 'weak');
-          }
-        });
+          const setRule = (el: HTMLElement | null, pass: boolean) => {
+            if (!el) return;
+            el.classList.toggle('pass', pass);
+            const label = ruleLabels.get(el) || '';
+            el.textContent = (pass ? '\u2713 ' : '\u2717 ') + label;
+          };
+          setRule(ruleLen, val.length >= 6);
+          setRule(ruleUpper, /[A-Z]/.test(val));
+          setRule(ruleSymbol, /[!@_]/.test(val));
+        };
+        teamPinInput.addEventListener('input', updatePwRules);
+        teamPinInput.addEventListener('focus', () => pwTooltip?.classList.add('visible'));
 
         startDemoBtn.addEventListener('click', startDemo);
         teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
