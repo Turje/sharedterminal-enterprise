@@ -726,6 +726,16 @@ body {
   border-color: rgba(218, 119, 86, 0.3);
 }
 
+.user-item.is-me {
+  background: rgba(218, 119, 86, 0.06);
+}
+
+.you-label {
+  color: #8b949e;
+  font-size: 10px;
+  font-weight: 400;
+}
+
 /* ── Activity panel ── */
 #activity-panel-content {
   max-height: 160px;

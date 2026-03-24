@@ -738,13 +738,25 @@ function stopFollowing() {
 
 // ── Presence ──
 function updatePresence(users: PresenceUser[]) {
-  usersList.innerHTML = users.map((u) => {
+  // Sort: current user first, then owner, then alphabetical
+  const myId = socket?.id;
+  const sorted = [...users].sort((a, b) => {
+    if (a.id === myId) return -1;
+    if (b.id === myId) return 1;
+    if (a.role === 'owner' && b.role !== 'owner') return -1;
+    if (b.role === 'owner' && a.role !== 'owner') return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  usersList.innerHTML = sorted.map((u) => {
+    const isMe = u.id === myId;
     const roleClass = u.role === 'owner' ? ' owner' : '';
     const initials = getInitials(u.name);
     const color = hashColor(u.name);
-    return `<div class="user-item" data-user-id="${escapeHtml(u.id)}">
+    const youLabel = isMe ? ' <span class="you-label">(You)</span>' : '';
+    return `<div class="user-item${isMe ? ' is-me' : ''}" data-user-id="${escapeHtml(u.id)}">
       <span class="user-avatar" style="background:${color}">${escapeHtml(initials)}<span class="presence-dot"></span></span>
-      <span class="user-name">${escapeHtml(u.name)}</span>
+      <span class="user-name">${escapeHtml(u.name)}${youLabel}</span>
       <span class="user-role${roleClass}">${u.role}</span>
     </div>`;
   }).join('');
