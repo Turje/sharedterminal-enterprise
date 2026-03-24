@@ -327,8 +327,11 @@ if (savedToken && savedRole && savedName) {
       const createTeamSession = async () => {
         const pin = teamPinInput.value.trim();
         const userName = teamUserInput.value.trim() || 'host';
+        const adminPinInput = document.getElementById('admin-pin-input') as HTMLInputElement;
+        const adminPin = adminPinInput?.value.trim() || '';
         const pwCheck = isStrongPassword(pin);
         if (!pwCheck.valid) { showError(pwCheck.message); return; }
+        if (adminPin && !/^\d{6}$/.test(adminPin)) { showError('Admin PIN must be exactly 6 digits'); return; }
 
         (startDemoBtn as HTMLButtonElement).disabled = true;
         startDemoBtn.textContent = 'Creating...';
@@ -337,7 +340,7 @@ if (savedToken && savedRole && savedName) {
           const res = await fetch('/api/demo/team', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: urlTeam, password: pin, ownerName: userName }),
+            body: JSON.stringify({ name: urlTeam, password: pin, ownerName: userName, adminPin: adminPin || undefined }),
           });
           const result = await res.json();
           if (!res.ok) { showError(result.error || 'Failed to create session'); (startDemoBtn as HTMLButtonElement).disabled = false; startDemoBtn.textContent = 'Start Private Demo'; return; }
@@ -447,6 +450,9 @@ function showDemoAuthFlow() {
           const pwCheck = isStrongPassword(pin);
           if (!pwCheck.valid) { showError(pwCheck.message); return; }
           const userName = teamUserInput.value.trim() || 'host';
+          const adminPinInput = document.getElementById('admin-pin-input') as HTMLInputElement;
+          const adminPin = adminPinInput?.value.trim() || '';
+          if (adminPin && !/^\d{6}$/.test(adminPin)) { showError('Admin PIN must be exactly 6 digits'); return; }
 
           (startDemoBtn as HTMLButtonElement).disabled = true;
           startDemoBtn.textContent = 'Creating...';
@@ -455,7 +461,7 @@ function showDemoAuthFlow() {
             const res = await fetch('/api/demo/team', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: teamName, password: pin, ownerName: userName }),
+              body: JSON.stringify({ name: teamName, password: pin, ownerName: userName, adminPin: adminPin || undefined }),
             });
             const result = await res.json();
             if (!res.ok) { showError(result.error || 'Failed to create session'); (startDemoBtn as HTMLButtonElement).disabled = false; startDemoBtn.textContent = 'Start Private Demo'; return; }

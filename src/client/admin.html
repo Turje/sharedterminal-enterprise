@@ -548,6 +548,26 @@
   <p>Append <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:4px;">?token=YOUR_TOKEN</code> to the URL to authenticate.</p>
 </div>
 
+<!-- Admin PIN gate (shown when PIN is required) -->
+<div id="pin-gate" class="auth-gate" style="display:none;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+  </svg>
+  <h2>Admin PIN Required</h2>
+  <p style="color:var(--text-secondary);margin-bottom:16px;">Enter the 6-digit admin PIN to access the dashboard.</p>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input type="password" id="admin-pin-input" maxlength="6" placeholder="000000"
+      style="background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);padding:10px 16px;border-radius:8px;font-size:20px;letter-spacing:8px;text-align:center;width:180px;font-family:monospace;"
+      autocomplete="off" />
+    <button id="admin-pin-submit"
+      style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
+      Verify
+    </button>
+  </div>
+  <p id="admin-pin-error" style="color:var(--red);font-size:13px;margin-top:8px;display:none;"></p>
+</div>
+
 <!-- Dashboard (shown if token present) -->
 <div id="dashboard" style="display:none;">
 
@@ -767,7 +787,77 @@
     return;
   }
 
-  document.getElementById('dashboard').style.display = 'block';
+  var ADMIN_TOKEN = sessionStorage.getItem('st_admin_token') || '';
+
+  // Check if admin PIN is required before showing dashboard
+  function initDashboard() {
+    document.getElementById('dashboard').style.display = 'block';
+    loadStats();
+  }
+
+  fetch('/api/admin/pin-required', {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.required) {
+        // No PIN configured — go straight to dashboard
+        initDashboard();
+      } else if (ADMIN_TOKEN) {
+        // Already verified this session — go to dashboard
+        initDashboard();
+      } else {
+        // Show PIN gate
+        document.getElementById('pin-gate').style.display = 'flex';
+        var pinInput = document.getElementById('admin-pin-input');
+        var pinSubmit = document.getElementById('admin-pin-submit');
+        var pinError = document.getElementById('admin-pin-error');
+        pinInput.focus();
+
+        function verifyPin() {
+          var pin = pinInput.value.trim();
+          if (!pin) return;
+          pinSubmit.disabled = true;
+          pinSubmit.textContent = 'Verifying...';
+          pinError.style.display = 'none';
+
+          fetch('/api/admin/verify-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+            body: JSON.stringify({ pin: pin })
+          })
+            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(result) {
+              if (result.ok && result.data.verified) {
+                ADMIN_TOKEN = result.data.adminToken || '';
+                if (ADMIN_TOKEN) sessionStorage.setItem('st_admin_token', ADMIN_TOKEN);
+                document.getElementById('pin-gate').style.display = 'none';
+                initDashboard();
+              } else {
+                pinError.textContent = result.data.error || 'Invalid PIN';
+                pinError.style.display = 'block';
+                pinInput.value = '';
+                pinInput.focus();
+                pinSubmit.disabled = false;
+                pinSubmit.textContent = 'Verify';
+              }
+            })
+            .catch(function() {
+              pinError.textContent = 'Connection error';
+              pinError.style.display = 'block';
+              pinSubmit.disabled = false;
+              pinSubmit.textContent = 'Verify';
+            });
+        }
+
+        pinSubmit.addEventListener('click', verifyPin);
+        pinInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') verifyPin(); });
+      }
+    })
+    .catch(function() {
+      // If check fails, show dashboard anyway (fallback)
+      initDashboard();
+    });
 
   // Color palette for user avatars
   var AVATAR_COLORS = [
@@ -838,14 +928,38 @@
     return div.innerHTML;
   }
 
+  // Auth headers helper (includes admin PIN token if present)
+  function authHeaders(extra) {
+    var h = { 'Authorization': 'Bearer ' + TOKEN };
+    if (ADMIN_TOKEN) h['X-Admin-Token'] = ADMIN_TOKEN;
+    if (extra) { for (var k in extra) h[k] = extra[k]; }
+    return h;
+  }
+
   // ── Fetch data ──
   async function fetchStats() {
     try {
       var res = await fetch('/api/admin/stats', {
-        headers: { 'Authorization': 'Bearer ' + TOKEN }
+        headers: authHeaders()
       });
       if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
+        if (res.status === 401) {
+          var errData = await res.json().catch(function() { return {}; });
+          if (errData.code === 'ADMIN_PIN_REQUIRED') {
+            // Admin PIN token expired — re-prompt
+            sessionStorage.removeItem('st_admin_token');
+            ADMIN_TOKEN = '';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('pin-gate').style.display = 'flex';
+            document.getElementById('admin-pin-input').focus();
+            return null;
+          }
+          document.getElementById('dashboard').style.display = 'none';
+          document.getElementById('auth-gate').style.display = 'flex';
+          document.querySelector('#auth-gate p').textContent = 'Invalid or expired token. Please use a valid owner token.';
+          return null;
+        }
+        if (res.status === 403) {
           document.getElementById('dashboard').style.display = 'none';
           document.getElementById('auth-gate').style.display = 'flex';
           document.querySelector('#auth-gate p').textContent = 'Invalid or expired token. Please use a valid owner token.';
@@ -1010,7 +1124,7 @@
     if (!text && !role) { feedbackModal.style.display = 'none'; return; }
     fetch('/api/admin/feedback', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ role: role, feedback: text, email: email })
     }).then(function() {
       feedbackModal.style.display = 'none';
@@ -1027,7 +1141,7 @@
     if (!confirm('Kill session "' + sessionName + '"? All connected users will be disconnected.')) return;
     fetch('/api/admin/session/' + sessionId + '/kill', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
+      headers: authHeaders()
     }).then(function(res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
@@ -1042,7 +1156,7 @@
   // ── Audit log download ──
   window.downloadAudit = function(sessionId) {
     fetch('/api/admin/audit/' + sessionId, {
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
+      headers: authHeaders()
     }).then(function(res) {
       if (!res.ok) throw new Error('Audit log not found');
       return res.blob();
@@ -1100,7 +1214,7 @@
 
     try {
       var res = await fetch(url, {
-        headers: { 'Authorization': 'Bearer ' + TOKEN }
+        headers: authHeaders()
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var data = await res.json();
@@ -1175,9 +1289,11 @@
     renderDashboard(data);
   }
 
-  // Initial load
-  refresh();
-  setInterval(tick, 1000);
+  // Initial load is triggered by initDashboard() after PIN verification
+  function loadStats() {
+    refresh();
+    setInterval(tick, 1000);
+  }
 
 })();
 </script>

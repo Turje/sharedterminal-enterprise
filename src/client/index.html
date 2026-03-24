@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=0d4976aa">
-  <link rel="stylesheet" href="css/terminal.css?v=0d4976aa">
+  <link rel="stylesheet" href="css/xterm.css?v=31ada7b6">
+  <link rel="stylesheet" href="css/terminal.css?v=31ada7b6">
 </head>
 <body>
   <div id="app">
@@ -86,8 +86,9 @@
               </div>
             </div>
             <input type="text" id="team-user-input" placeholder="Your name" autocomplete="off" />
+            <input type="password" id="admin-pin-input" placeholder="Admin PIN (6 digits)" maxlength="6" autocomplete="off" />
             <button id="start-demo-btn">Start Private Demo</button>
-            <p class="demo-hint">You'll get an isolated sandbox. Share the link + password with your team.</p>
+            <p class="demo-hint">You'll get an isolated sandbox. Share the link + password with your team.<br><span class="demo-hint-dim">Admin PIN protects the dashboard from other session members.</span></p>
           </div>
           <div id="auth-error" class="error hidden"></div>
           <p class="auth-footer">Secure sandbox environment. All sessions are audited and recorded.</p>
@@ -343,6 +344,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-ZCN32MNH.js"></script>
+  <script src="js/main-PYNEMLST.js"></script>
 </body>
 </html>

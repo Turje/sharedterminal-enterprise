@@ -24,6 +24,7 @@ export class SessionState implements Session {
   public readonly isDemo: boolean;
   public readonly demoExpiresAt: Date | null;
   public readonly dockerManager: DockerManager;
+  public adminPin: string = '';
 
   constructor(
     public readonly id: string,

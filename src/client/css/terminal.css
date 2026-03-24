@@ -409,6 +409,17 @@ body {
   margin-top: 4px;
 }
 
+.demo-hint-dim {
+  color: #3d434b;
+  font-size: 11px;
+}
+
+#admin-pin-input {
+  font-family: monospace;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
 .error {
   color: #f85149;
   font-size: 12px;

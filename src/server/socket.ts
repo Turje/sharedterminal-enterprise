@@ -21,49 +21,8 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import readline from 'readline';
 import { createLogger } from './logger';
-import { SessionState } from './session/session';
 
 const log = createLogger('socket');
-
-function buildDemoMotd(session: SessionState): string {
-  const remaining = session.demoRemainingMs();
-  const mins = Math.ceil(remaining / 60000);
-  const accent = '\x1b[38;5;173m';
-  const bold = '\x1b[1m';
-  const dim = '\x1b[2m';
-  const cyan = '\x1b[36m';
-  const green = '\x1b[32m';
-  const reset = '\x1b[0m';
-  const shield = `${green}\u{1f6e1}${reset}`;
-  const line = `${dim}${'━'.repeat(51)}${reset}`;
-
-  return [
-    '\r\n',
-    line,
-    `  ${bold}${accent}SharedTerminal${reset} ${dim}— Cross-Stack Incident Sandbox${reset} ${shield}`,
-    line,
-    '',
-    `  ${bold}SCENARIO${reset}  A production stack is failing. The Node API`,
-    `            is leaking secrets and crashing. The Python`,
-    `            inference service is hitting a memory error.`,
-    '',
-    `  ${cyan}►${reset} ${bold}npm start${reset}           Run the API ${dim}(watch for redacted keys)${reset}`,
-    `  ${cyan}►${reset} ${bold}python3 model.py${reset}    Run inference ${dim}(hits OOM on batch 3)${reset}`,
-    `  ${cyan}►${reset} ${bold}cat .env${reset}            Test DLP ${dim}(secrets auto-masked)${reset}`,
-    `  ${cyan}►${reset} ${bold}curl :3001/crash${reset}    Hit 5x to trigger the crash`,
-    '',
-    `  ${bold}Collaborate${reset}  Share this URL — teammates join instantly`,
-    `  ${bold}Compliance${reset}   Tamper-evident audit log & DLP active`,
-    `  ${bold}AI Tools${reset}     Install any AI CLI — the sidebar connects automatically`,
-    '',
-    `  ${dim}\u{1F4A1} npm install -g @anthropic-ai/claude-code && claude${reset}`,
-    `  ${dim}   Then use the AI Assistant in the sidebar for summaries & debugging${reset}`,
-    '',
-    `  ${dim}Session expires in ${mins} min \u00b7 Work is ephemeral${reset}`,
-    line,
-    '\r\n',
-  ].join('\r\n');
-}
 
 type AppSocket = Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
@@ -287,9 +246,17 @@ export function createSocketServer(
 
         socket.emit('terminal:created', { tabId, index: 0 });
 
-        // Inject MOTD for demo sessions (first terminal only)
+        // Demo MOTD is shown via pinned HTML banner (immune to `clear`).
+        // Only inject a minimal welcome line into the terminal buffer.
         if (session.isDemo) {
-          socket.emit('terminal:output', { tabId, output: buildDemoMotd(session) });
+          const remaining = session.demoRemainingMs();
+          const mins = Math.ceil(remaining / 60000);
+          const dim = '\x1b[2m';
+          const reset = '\x1b[0m';
+          socket.emit('terminal:output', {
+            tabId,
+            output: `\r\n${dim}SharedTerminal demo · ${mins} min remaining · type "help" for commands${reset}\r\n\r\n`,
+          });
         }
       }
 

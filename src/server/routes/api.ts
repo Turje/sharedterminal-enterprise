@@ -349,7 +349,7 @@ export function createApiRouter(
         return;
       }
 
-      const { name: rawName, password, ownerName } = req.body as { name?: string; password?: string; ownerName?: string };
+      const { name: rawName, password, ownerName, adminPin } = req.body as { name?: string; password?: string; ownerName?: string; adminPin?: string };
       const teamName = (rawName || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30);
       if (!teamName) {
         res.status(400).json({ error: 'Team name is required' });
@@ -409,6 +409,11 @@ export function createApiRouter(
         demoDurationMs: config.demoSessionDurationMs,
         persistent: true,
       });
+
+      // Store admin PIN on session if provided
+      if (adminPin && /^\d{6}$/.test(adminPin)) {
+        session.adminPin = adminPin;
+      }
 
       teamSessions.set(teamName, session.id);
       ipTimestamps.push(now);

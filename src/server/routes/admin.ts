@@ -14,6 +14,9 @@ const CHAIN_SEED = 'sharedterminal-audit-chain-v1';
 // DLP stats cache
 let dlpCache: { data: any; expiresAt: number } | null = null;
 
+// Admin PIN session tokens (in-memory, survive until server restart)
+const adminPinTokens = new Set<string>();
+
 export function createAdminRouter(
   sessionManager: SessionManager,
   tokenStore: TokenStore,
@@ -43,11 +46,69 @@ export function createAdminRouter(
     }
   });
 
-  // All admin routes require owner auth
+  // Helper: get admin PIN for the session from the token
+  function getSessionAdminPin(req: Request): string {
+    const sessionId = req.tokenPayload?.sessionId;
+    if (!sessionId) return '';
+    try {
+      const session = sessionManager.getSession(sessionId);
+      return session.adminPin || '';
+    } catch {
+      return '';
+    }
+  }
+
+  // Admin PIN verification endpoint
+  router.post('/api/admin/verify-pin', authMiddleware, (req: Request, res: Response) => {
+    try {
+      if (req.tokenPayload?.role !== 'owner') {
+        res.status(403).json({ error: 'Owner access required' });
+        return;
+      }
+      const sessionPin = getSessionAdminPin(req);
+      if (!sessionPin) {
+        // No PIN set for this session — auto-grant access
+        res.json({ verified: true });
+        return;
+      }
+      const { pin } = req.body as { pin?: string };
+      if (!pin || pin !== sessionPin) {
+        res.status(401).json({ error: 'Invalid admin PIN' });
+        return;
+      }
+      // Issue an admin session token
+      const adminToken = crypto.randomBytes(16).toString('hex');
+      adminPinTokens.add(adminToken);
+      res.json({ verified: true, adminToken });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // Check if admin PIN is required for this session
+  router.get('/api/admin/pin-required', authMiddleware, (req: Request, res: Response) => {
+    if (req.tokenPayload?.role !== 'owner') {
+      res.status(403).json({ error: 'Owner access required' });
+      return;
+    }
+    const sessionPin = getSessionAdminPin(req);
+    res.json({ required: !!sessionPin });
+  });
+
+  // All admin routes require owner auth + admin PIN (if set on session)
   function ownerOnly(req: Request, res: Response): boolean {
     if (req.tokenPayload?.role !== 'owner') {
       res.status(403).json({ error: 'Owner access required' });
       return false;
+    }
+    // If session has an admin PIN, verify the admin token header
+    const sessionPin = getSessionAdminPin(req);
+    if (sessionPin) {
+      const adminToken = req.headers['x-admin-token'] as string;
+      if (!adminToken || !adminPinTokens.has(adminToken)) {
+        res.status(401).json({ error: 'Admin PIN verification required', code: 'ADMIN_PIN_REQUIRED' });
+        return false;
+      }
     }
     return true;
   }
