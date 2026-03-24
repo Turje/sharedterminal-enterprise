@@ -261,7 +261,30 @@ function setupPublicSession(sid: string, sName?: string) {
   nameInput.focus();
 }
 
-if (urlTeam) {
+// ── Session restore on refresh ──
+const savedToken = sessionStorage.getItem('st_token');
+const savedRole = sessionStorage.getItem('st_role');
+const savedName = sessionStorage.getItem('st_name');
+const savedSessionName = sessionStorage.getItem('st_session_name');
+
+if (savedToken && savedRole && savedName) {
+  // Auto-reconnect with saved credentials
+  myRole = savedRole;
+  if (savedSessionName) {
+    document.title = `${savedSessionName} \u2014 SharedTerminal`;
+    sessionDisplayNameEl.textContent = savedSessionName;
+    securityBannerSession.textContent = savedSessionName;
+  }
+  authScreen.classList.add('hidden');
+  terminalScreen.classList.remove('hidden');
+  sessionStartTime = Date.now();
+  timerInterval = window.setInterval(updateTimer, 1000);
+  statusRole.textContent = savedRole;
+  if ('Notification' in window) {
+    notificationsPermission = Notification.permission === 'granted';
+  }
+  initSocket(savedToken, savedName);
+} else if (urlTeam) {
   // Team demo mode: look up existing team session
   authScreen.classList.remove('hidden');
   sessionInput.type = 'hidden';
@@ -352,6 +375,10 @@ if (urlTeam) {
           } else if ('Notification' in window) {
             notificationsPermission = Notification.permission === 'granted';
           }
+          sessionStorage.setItem('st_token', result.token);
+          sessionStorage.setItem('st_role', 'owner');
+          sessionStorage.setItem('st_name', userName);
+          sessionStorage.setItem('st_session_name', urlTeam);
           initSocket(result.token, userName);
         } catch {
           showError('Connection failed. Is the server running?');
@@ -456,6 +483,10 @@ function showDemoAuthFlow() {
             }
             // Update URL so host can share it
             window.history.replaceState({}, '', `?team=${encodeURIComponent(teamName)}`);
+            sessionStorage.setItem('st_token', result.token);
+            sessionStorage.setItem('st_role', 'owner');
+            sessionStorage.setItem('st_name', userName);
+            sessionStorage.setItem('st_session_name', teamName);
             initSocket(result.token, userName);
           } catch {
             showError('Connection failed. Is the server running?');
@@ -697,6 +728,12 @@ async function connect() {
       notificationsPermission = Notification.permission === 'granted';
     }
 
+    // Persist session for reconnect on refresh
+    sessionStorage.setItem('st_token', userToken);
+    sessionStorage.setItem('st_role', role);
+    sessionStorage.setItem('st_name', name);
+    sessionStorage.setItem('st_session_name', sessionName || '');
+
     initSocket(userToken, name);
   } catch {
     showError('Connection failed. Is the server running?');
@@ -904,6 +941,10 @@ function initSocket(token: string, name: string) {
   });
 
   socket.on('session:stopped', () => {
+    sessionStorage.removeItem('st_token');
+    sessionStorage.removeItem('st_role');
+    sessionStorage.removeItem('st_name');
+    sessionStorage.removeItem('st_session_name');
     const active = tabs.get(activeTabId || '');
     if (active) active.term.write('\r\n[Session has been stopped by the owner]\r\n');
   });
@@ -945,6 +986,10 @@ function initSocket(token: string, name: string) {
   });
 
   socket.on('demo:expired', () => {
+    sessionStorage.removeItem('st_token');
+    sessionStorage.removeItem('st_role');
+    sessionStorage.removeItem('st_name');
+    sessionStorage.removeItem('st_session_name');
     if (demoTimerInterval) { clearInterval(demoTimerInterval); demoTimerInterval = null; }
     // Disable all terminals
     for (const [, tab] of tabs) {
