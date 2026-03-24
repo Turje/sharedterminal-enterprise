@@ -484,12 +484,79 @@ newTabBtn.addEventListener('click', () => { if (socket) socket.emit('terminal:cr
 // ── Follow stop ──
 followStopBtn.addEventListener('click', stopFollowing);
 
-// ── Export buttons ──
+// ── Lead capture ──
+const leadModal = document.getElementById('lead-modal')!;
+const leadEmailInput = document.getElementById('lead-email-input') as HTMLInputElement;
+const leadSubmitBtn = document.getElementById('lead-submit-btn')!;
+const leadSkipBtn = document.getElementById('lead-skip-btn')!;
+const leadError = document.getElementById('lead-error')!;
+let pendingLeadAction: (() => void) | null = null;
+
+function hasLeadEmail(): boolean {
+  return !!localStorage.getItem('st_lead_email');
+}
+
+function requireLead(source: string, action: () => void) {
+  if (hasLeadEmail()) { action(); return; }
+  pendingLeadAction = action;
+  const titleEl = document.getElementById('lead-modal-title');
+  if (titleEl) {
+    titleEl.textContent = source === 'postmortem'
+      ? 'Get Your Incident Report'
+      : 'Get Your Session Artifacts';
+  }
+  leadModal.classList.remove('hidden');
+  leadEmailInput.focus();
+}
+
+leadSubmitBtn.addEventListener('click', submitLead);
+leadEmailInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitLead();
+});
+
+async function submitLead() {
+  const email = leadEmailInput.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    leadError.textContent = 'Please enter a valid email.';
+    leadError.style.display = 'block';
+    return;
+  }
+  leadError.style.display = 'none';
+  (leadSubmitBtn as HTMLButtonElement).disabled = true;
+  leadSubmitBtn.textContent = 'Saving...';
+
+  try {
+    await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'demo' }),
+    });
+  } catch { /* best effort */ }
+
+  localStorage.setItem('st_lead_email', email);
+  leadModal.classList.add('hidden');
+  (leadSubmitBtn as HTMLButtonElement).disabled = false;
+  leadSubmitBtn.textContent = 'Continue';
+  leadEmailInput.value = '';
+  if (pendingLeadAction) { pendingLeadAction(); pendingLeadAction = null; }
+}
+
+leadSkipBtn.addEventListener('click', () => {
+  localStorage.setItem('st_lead_email', 'skipped');
+  leadModal.classList.add('hidden');
+  if (pendingLeadAction) { pendingLeadAction(); pendingLeadAction = null; }
+});
+
+// ── Export buttons (gated by lead capture) ──
 document.getElementById('export-workspace-btn')?.addEventListener('click', () => {
-  if (authToken) window.open(`/api/session/export/workspace?token=${authToken}`, '_blank');
+  requireLead('export', () => {
+    if (authToken) window.open(`/api/session/export/workspace?token=${authToken}`, '_blank');
+  });
 });
 document.getElementById('export-history-btn')?.addEventListener('click', () => {
-  if (authToken) window.open(`/api/session/export/history?token=${authToken}`, '_blank');
+  requireLead('export', () => {
+    if (authToken) window.open(`/api/session/export/history?token=${authToken}`, '_blank');
+  });
 });
 
 // ── Summary button ──
@@ -501,9 +568,11 @@ function requestSummary() {
   socket.emit('summary:request', '');
 }
 
-// ── Post-Mortem button ──
+// ── Post-Mortem button (gated by lead capture) ──
 if (postmortemBtn) {
-  postmortemBtn.addEventListener('click', requestPostMortem);
+  postmortemBtn.addEventListener('click', () => {
+    requireLead('postmortem', requestPostMortem);
+  });
 }
 
 function requestPostMortem() {

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
+import path from 'path';
 import readline from 'readline';
 import { SessionManager } from '../session/session-manager';
 import { TokenStore } from '../auth/token';
@@ -483,6 +484,36 @@ export function createApiRouter(
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Content-Disposition', `attachment; filename="history-${session.name}.txt"`);
       res.send(lines.join('\n'));
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // ── Lead capture (no auth required) ──
+  router.post('/api/leads', (req: Request, res: Response) => {
+    try {
+      const email = (req.body?.email || '').trim().toLowerCase();
+      const source = (req.body?.source || 'demo').trim().slice(0, 50);
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        res.status(400).json({ error: 'Valid email required' });
+        return;
+      }
+
+      const leadsDir = path.join(config.dataDir, 'leads');
+      fs.mkdirSync(leadsDir, { recursive: true });
+      const leadsFile = path.join(leadsDir, 'leads.ndjson');
+
+      const entry = JSON.stringify({
+        email,
+        source,
+        ip: req.ip,
+        ts: new Date().toISOString(),
+        userAgent: (req.headers['user-agent'] || '').slice(0, 200),
+      }) + '\n';
+
+      fs.appendFileSync(leadsFile, entry);
+      res.json({ ok: true });
     } catch (err) {
       handleError(res, err);
     }
