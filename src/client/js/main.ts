@@ -1,5 +1,5 @@
-declare const Terminal: any;
-declare const FitAddon: any;
+import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
 declare const io: any;
 
 interface PresenceUser {
@@ -604,7 +604,7 @@ function createTab(tabId: string, index: number) {
   };
 
   const term = new Terminal({ cursorBlink: true, fontSize: 14, fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace", theme: termTheme });
-  const fitAddon = new FitAddon.FitAddon();
+  const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
 
   const el = document.createElement('div');
@@ -712,7 +712,7 @@ function startFollowing(userId: string, userName: string) {
     theme: { background: '#0d1117', foreground: '#c9d1d9', cursor: '#da7756' },
     disableStdin: true,
   });
-  followFitAddon = new FitAddon.FitAddon();
+  followFitAddon = new FitAddon();
   followTerm.loadAddon(followFitAddon);
   followTerm.open(followTerminalEl);
   followFitAddon.fit();
