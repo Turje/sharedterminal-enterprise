@@ -556,6 +556,27 @@ document.getElementById('export-history-btn')?.addEventListener('click', () => {
   });
 });
 
+// ── AI Setup / Connect flow ──
+const aiSetup = document.getElementById('ai-setup');
+const aiConnected = document.getElementById('ai-connected');
+const aiInstallBtn = document.getElementById('ai-setup-install-btn');
+
+function showAiConnected() {
+  if (aiSetup) aiSetup.classList.add('hidden');
+  if (aiConnected) aiConnected.classList.remove('hidden');
+}
+
+if (aiInstallBtn) {
+  aiInstallBtn.addEventListener('click', () => {
+    // Type the install command into the active terminal
+    const active = tabs.get(activeTabId || '');
+    if (active && socket) {
+      const cmd = 'npm install -g @anthropic-ai/claude-code && claude\n';
+      socket.emit('terminal:input', { tabId: activeTabId, input: cmd });
+    }
+  });
+}
+
 // ── Summary button ──
 summaryAiBtn.addEventListener('click', requestSummary);
 
@@ -771,6 +792,7 @@ function initSocket(token: string, name: string) {
 
   // ── AI events ──
   socket.on('ai:stream', (data: { chunk: string; id: string }) => {
+    showAiConnected();
     appendAiChunk(data.chunk, data.id);
   });
 
@@ -798,6 +820,7 @@ function initSocket(token: string, name: string) {
   });
 
   socket.on('summary:response', (summary: string) => {
+    showAiConnected();
     (summaryAiBtn as HTMLButtonElement).disabled = false;
     summaryAiBtn.textContent = 'Generate Session Summary';
     // Show in AI section
@@ -806,6 +829,7 @@ function initSocket(token: string, name: string) {
 
   // ── Post-Mortem events ──
   socket.on('postmortem:stream', (data: { chunk: string; id: string }) => {
+    showAiConnected();
     appendAiChunk(data.chunk, data.id);
   });
 

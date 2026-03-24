@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=acbf8a0d">
-  <link rel="stylesheet" href="css/terminal.css?v=acbf8a0d">
+  <link rel="stylesheet" href="css/xterm.css?v=efb26016">
+  <link rel="stylesheet" href="css/terminal.css?v=efb26016">
 </head>
 <body>
   <div id="app">
@@ -254,11 +254,21 @@
               <span class="sidebar-section-chevron collapsed-chevron">&#9654;</span>
             </div>
             <div id="claude-panel-content" class="sidebar-section-body collapsed">
-              <div id="claude-messages"></div>
-              <div id="claude-input-container">
-                <button id="summary-ai-btn">Generate Session Summary</button>
-                <button id="postmortem-btn">Generate Post-Mortem</button>
-                <input type="text" id="claude-input" placeholder="Ask about this session..." autocomplete="off" maxlength="2000" />
+              <!-- AI Setup prompt (shown when no AI CLI is connected) -->
+              <div id="ai-setup">
+                <div class="ai-setup-status">NOT CONNECTED</div>
+                <p class="ai-setup-text">SharedTerminal acts as a secure bridge for AI agents. Connect one to enable real-time summaries, error analysis, and post-mortems.</p>
+                <button id="ai-setup-install-btn" class="ai-setup-btn">Install Claude Code in Terminal</button>
+                <p class="ai-setup-hint">Or run any AI CLI you prefer &mdash; Aider, Copilot, etc.</p>
+              </div>
+              <!-- AI tools (shown once AI is connected) -->
+              <div id="ai-connected" class="hidden">
+                <div id="claude-messages"></div>
+                <div id="claude-input-container">
+                  <button id="summary-ai-btn">Generate Session Summary</button>
+                  <button id="postmortem-btn">Generate Post-Mortem</button>
+                  <input type="text" id="claude-input" placeholder="Ask about this session..." autocomplete="off" maxlength="2000" />
+                </div>
               </div>
             </div>
           </div>
@@ -308,6 +318,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-HDZN6ECZ.js"></script>
+  <script src="js/main-SVAVEC6C.js"></script>
 </body>
 </html>
