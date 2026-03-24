@@ -102,8 +102,9 @@ export interface ClientToServerEvents {
   'chat:send': (message: string) => void;
   'follow:start': (targetUserId: string) => void;
   'follow:stop': () => void;
-  'ai:ask': (data: { message: string; apiKey: string }) => void;
+  'ai:ask': (data: { message: string; apiKey: string; terminalBuffer?: string }) => void;
   'summary:request': (apiKey: string) => void;
+  'postmortem:request': () => void;
   'terminal:sync': (tabId: string) => void;
   'user:kick': (userId: string) => void;
   'user:ban': (userId: string) => void;
@@ -128,6 +129,8 @@ export interface ServerToClientEvents {
   'ai:stream': (data: { chunk: string; id: string }) => void;
   'ai:error': (error: string) => void;
   'summary:response': (summary: string) => void;
+  'postmortem:stream': (data: { chunk: string; id: string }) => void;
+  'postmortem:done': (data: { id: string }) => void;
   'terminal:sync': (data: { tabId: string; scrollback: string }) => void;
   'security:warning': (message: string) => void;
   'user:kicked': (reason: string) => void;

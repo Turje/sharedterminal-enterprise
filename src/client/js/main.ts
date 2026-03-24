@@ -88,6 +88,7 @@ const claudeMessages = document.getElementById('claude-messages')!;
 const claudeInput = document.getElementById('claude-input') as HTMLInputElement;
 const claudeUnread = document.getElementById('claude-unread')!;
 const summaryAiBtn = document.getElementById('summary-ai-btn')!;
+const postmortemBtn = document.getElementById('postmortem-btn');
 const sidebar = document.getElementById('sidebar')!;
 const sidebarResizeHandle = document.getElementById('sidebar-resize-handle')!;
 const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn')!;
@@ -500,6 +501,18 @@ function requestSummary() {
   socket.emit('summary:request', '');
 }
 
+// ── Post-Mortem button ──
+if (postmortemBtn) {
+  postmortemBtn.addEventListener('click', requestPostMortem);
+}
+
+function requestPostMortem() {
+  if (!postmortemBtn) return;
+  (postmortemBtn as HTMLButtonElement).disabled = true;
+  postmortemBtn.textContent = 'Generating...';
+  socket.emit('postmortem:request');
+}
+
 // ── Connect ──
 async function connect() {
   const sessionId = sessionInput.value.trim();
@@ -709,9 +722,13 @@ function initSocket(token: string, name: string) {
   socket.on('ai:error', (error: string) => {
     appendAiError(error);
     currentAiMessageId = null;
-    // Re-enable summary button
+    // Re-enable buttons
     (summaryAiBtn as HTMLButtonElement).disabled = false;
     summaryAiBtn.textContent = 'Generate Session Summary';
+    if (postmortemBtn) {
+      (postmortemBtn as HTMLButtonElement).disabled = false;
+      postmortemBtn.textContent = 'Generate Post-Mortem';
+    }
   });
 
   socket.on('summary:response', (summary: string) => {
@@ -719,6 +736,19 @@ function initSocket(token: string, name: string) {
     summaryAiBtn.textContent = 'Generate Session Summary';
     // Show in AI section
     appendAiSummary(summary);
+  });
+
+  // ── Post-Mortem events ──
+  socket.on('postmortem:stream', (data: { chunk: string; id: string }) => {
+    appendAiChunk(data.chunk, data.id);
+  });
+
+  socket.on('postmortem:done', (_data: { id: string }) => {
+    if (postmortemBtn) {
+      (postmortemBtn as HTMLButtonElement).disabled = false;
+      postmortemBtn.textContent = 'Generate Post-Mortem';
+    }
+    sendBrowserNotification('Post-Mortem', 'Incident report generated');
   });
 
   // ── Session events ──
@@ -795,7 +825,8 @@ function initSocket(token: string, name: string) {
       const text = claudeInput.value.trim();
       if (!text) return;
       appendAiUserMessage(text);
-      socket.emit('ai:ask', { message: text, apiKey: '' });
+      const terminalBuffer = getTerminalBuffer(100);
+      socket.emit('ai:ask', { message: text, apiKey: '', terminalBuffer });
       claudeInput.value = '';
     }
   });
@@ -1061,6 +1092,23 @@ function appendChatMessage(msg: ChatMessage) {
   <div class="chat-msg-text">${escapeHtml(msg.message)}</div>`;
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// ── Terminal Buffer Extraction ──
+function getTerminalBuffer(maxLines = 100): string {
+  const tab = tabs.get(activeTabId || '');
+  if (!tab) return '';
+  const buf = tab.term.buffer.active;
+  const totalRows = buf.length;
+  const startRow = Math.max(0, totalRows - maxLines);
+  const lines: string[] = [];
+  for (let i = startRow; i < totalRows; i++) {
+    const line = buf.getLine(i);
+    if (line) lines.push(line.translateToString(true));
+  }
+  // Trim trailing empty lines
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+  return lines.join('\n');
 }
 
 // ── AI Chat ──
