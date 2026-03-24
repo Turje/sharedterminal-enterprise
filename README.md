@@ -5,7 +5,7 @@
 <h3 align="center">Stop screensharing your terminal.<br/>This is multiplayer for the command line.</h3>
 
 <p align="center">
-  Jump into a live session, spawn parallel shells, and ship fixes together.
+  Jump into one live session, spawn parallel shells, and team up with AI to ship fixes together.
 </p>
 
 <p align="center">
