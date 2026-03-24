@@ -18,6 +18,7 @@ export class SessionState implements Session {
   public bannedIps = new Set<string>();
   public readonly createdAt: Date;
   public readonly expiresAt: Date;
+  public lastActivity: number;
   public readonly persistent: boolean;
   public readonly isPublic: boolean;
 
@@ -39,6 +40,7 @@ export class SessionState implements Session {
     this.expiresAt = new Date(this.createdAt.getTime() + DEFAULTS.SESSION_MAX_LIFETIME_MS);
     this.persistent = persistent;
     this.isPublic = isPublic;
+    this.lastActivity = Date.now();
 
     // Initialize audit logger (requires license)
     if (config?.auditEnabled !== false && config?.dataDir) {
@@ -53,6 +55,14 @@ export class SessionState implements Session {
 
   isExpired(): boolean {
     return Date.now() >= this.expiresAt.getTime();
+  }
+
+  isIdle(): boolean {
+    return Date.now() - this.lastActivity > DEFAULTS.SESSION_IDLE_TIMEOUT_MS;
+  }
+
+  touch(): void {
+    this.lastActivity = Date.now();
   }
 
   addUser(user: User): void {

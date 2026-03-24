@@ -89,8 +89,16 @@ export function buildContainerOptions(config: ContainerConfig, sessionId: string
 }
 
 export function buildExecOptions(cmd: string[], cols: number, rows: number) {
+  // Wrap shell command to bootstrap home directory from /etc/skel if needed
+  // (tmpfs home is empty on first exec since entrypoint only runs on container start)
+  const bootstrapCmd = [
+    '/bin/bash', '-c',
+    'if [ ! -f "$HOME/.bashrc" ]; then cp -r /etc/skel/. "$HOME/" 2>/dev/null; fi; exec /bin/bash',
+  ];
+  const finalCmd = cmd.length === 1 && cmd[0] === '/bin/bash' ? bootstrapCmd : cmd;
+
   return {
-    Cmd: cmd,
+    Cmd: finalCmd,
     AttachStdin: true,
     AttachStdout: true,
     AttachStderr: true,

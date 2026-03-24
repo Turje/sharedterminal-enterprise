@@ -393,8 +393,14 @@ function initSocket(token: string, name: string) {
     connectionDot.title = 'Connected';
     statusConnection.textContent = 'Connected';
     reconnectingBanner.classList.add('hidden');
-    const active = tabs.get(activeTabId || '');
-    if (active) active.term.write('\r\n\x1b[32m[Reconnected]\x1b[0m\r\n');
+    // Clear stale tabs — server will emit terminal:created with a fresh exec
+    for (const [id, tab] of tabs) {
+      tab.term.dispose();
+      tab.element.remove();
+    }
+    tabs.clear();
+    tabListEl.innerHTML = '';
+    activeTabId = null;
     showToast('Reconnected to server');
   });
 

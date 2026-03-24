@@ -8,6 +8,9 @@ import { hashPassword, verifyPassword } from '../auth/password';
 import { SessionState } from './session';
 import { PersistentStore, PersistentSessionRecord } from './persistent-store';
 import { ServerConfig } from '../config';
+import { createLogger } from '../logger';
+
+const log = createLogger('session-manager');
 
 export class SessionManager {
   private sessions = new Map<string, SessionState>();
@@ -15,6 +18,7 @@ export class SessionManager {
   private tokenStore: TokenStore;
   private tunnelUrl: string | null = null;
   private persistentStore: PersistentStore;
+  private idleCheckInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private config: ServerConfig,
@@ -23,6 +27,21 @@ export class SessionManager {
     this.dockerManager = new DockerManager();
     this.tokenStore = tokenStore;
     this.persistentStore = new PersistentStore(config.dataDir);
+
+    // Sweep for idle/expired sessions every 60 seconds
+    this.idleCheckInterval = setInterval(() => this.sweepSessions(), 60_000);
+  }
+
+  private sweepSessions(): void {
+    for (const [id, session] of this.sessions) {
+      if (session.isExpired()) {
+        log.info('Session expired, stopping', { sessionId: id });
+        this.stopSession(id).catch(() => {});
+      } else if (session.isIdle() && session.presenceManager.getUsers().length === 0) {
+        log.info('Session idle with no users, stopping', { sessionId: id });
+        this.stopSession(id).catch(() => {});
+      }
+    }
   }
 
   getDockerManager(): DockerManager {
@@ -267,6 +286,7 @@ export class SessionManager {
   }
 
   async shutdown(): Promise<void> {
+    if (this.idleCheckInterval) clearInterval(this.idleCheckInterval);
     const ids = Array.from(this.sessions.keys());
     await Promise.allSettled(ids.map((id) => this.stopSession(id)));
   }

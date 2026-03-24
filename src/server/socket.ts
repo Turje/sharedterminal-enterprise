@@ -281,6 +281,7 @@ export function createSocketServer(
       socket.on('terminal:input', (data: { tabId: string; input: string }) => {
         if (role === 'viewer') return;
         if (!data || typeof data.tabId !== 'string' || typeof data.input !== 'string') return;
+        session.touch();
         const tabs = socketTerminals.get(socket.id);
         if (!tabs) return;
         const terminal = tabs.get(data.tabId);
@@ -332,6 +333,7 @@ export function createSocketServer(
       // Handle chat messages
       socket.on('chat:send', (message: string) => {
         if (typeof message !== 'string') return;
+        session.touch();
         const text = message.trim().slice(0, 500);
         if (!text) return;
 
