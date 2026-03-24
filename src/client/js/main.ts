@@ -501,7 +501,6 @@ function hasLeadEmail(): boolean {
 }
 
 function requireLead(source: string, action: () => void) {
-  if (hasLeadEmail()) { action(); return; }
   pendingLeadAction = action;
   const titleEl = document.getElementById('lead-modal-title');
   if (titleEl) {
