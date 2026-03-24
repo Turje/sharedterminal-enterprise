@@ -216,6 +216,7 @@ document.addEventListener('mouseup', () => {
 // ── URL session ID + project name ──
 const urlParams = new URLSearchParams(window.location.search);
 const urlSession = urlParams.get('session');
+const urlTeam = urlParams.get('team');
 const urlName = urlParams.get('name');
 let isPublicSession = false;
 
@@ -236,7 +237,27 @@ function setupPublicSession(sid: string, sName?: string) {
   nameInput.focus();
 }
 
-if (urlSession) {
+if (urlTeam) {
+  // Team demo mode: fetch or create team session
+  const authForm = document.getElementById('auth-form')!;
+  sessionInput.type = 'hidden';
+  passwordInput.style.display = 'none';
+
+  fetch(`/api/demo/team?name=${encodeURIComponent(urlTeam)}`)
+    .then((r) => {
+      if (!r.ok) return r.json().then((d: any) => { throw new Error(d.error || 'Failed to load demo'); });
+      return r.json();
+    })
+    .then((data: any) => {
+      setupPublicSession(data.sessionId, data.sessionName);
+    })
+    .catch((err: any) => {
+      showError(err.message || 'Failed to load team demo');
+      // Show auth form inputs again so user isn't stuck
+      sessionInput.type = 'text';
+      passwordInput.style.display = '';
+    });
+} else if (urlSession) {
   sessionInput.value = urlSession;
   // If we have a project name, show it and hide the raw UUID
   if (urlName) {
@@ -262,15 +283,66 @@ if (urlSession) {
     })
     .catch(() => {});
 } else {
-  // No session in URL — auto-discover a public demo session
-  fetch('/api/session/demo')
+  // No params — check if demo mode is enabled for team flow
+  fetch('/api/demo/available')
     .then(r => r.ok ? r.json() : null)
     .then(data => {
-      if (data?.isPublic && data?.sessionId) {
-        setupPublicSession(data.sessionId, data.sessionName);
+      if (data?.enabled) {
+        // Show team-create UI, hide normal session/password inputs
+        const authForm = document.getElementById('auth-form')!;
+        authForm.classList.add('hidden');
+        const teamCreate = document.getElementById('team-create')!;
+        teamCreate.classList.remove('hidden');
+
+        const teamNameInput = document.getElementById('team-name-input') as HTMLInputElement;
+        const teamUserInput = document.getElementById('team-user-input') as HTMLInputElement;
+        const startDemoBtn = document.getElementById('start-demo-btn')!;
+
+        const startDemo = () => {
+          const teamName = teamNameInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+          if (!teamName) { showError('Please enter a team name'); return; }
+          // Store user name for after redirect
+          const userName = teamUserInput.value.trim();
+          if (userName) {
+            sessionStorage.setItem('demo-user-name', userName);
+          }
+          window.location.href = `?team=${encodeURIComponent(teamName)}`;
+        };
+
+        startDemoBtn.addEventListener('click', startDemo);
+        teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
+        teamUserInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
+        teamNameInput.focus();
+      } else {
+        // Demo mode not enabled — fall back to auto-discover
+        fetch('/api/session/demo')
+          .then(r => r.ok ? r.json() : null)
+          .then(demoData => {
+            if (demoData?.isPublic && demoData?.sessionId) {
+              setupPublicSession(demoData.sessionId, demoData.sessionName);
+            }
+          })
+          .catch(() => {});
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      // /api/demo/available failed — fall back to existing demo auto-discover
+      fetch('/api/session/demo')
+        .then(r => r.ok ? r.json() : null)
+        .then(demoData => {
+          if (demoData?.isPublic && demoData?.sessionId) {
+            setupPublicSession(demoData.sessionId, demoData.sessionName);
+          }
+        })
+        .catch(() => {});
+    });
+}
+
+// Restore name from sessionStorage (set before team redirect)
+const savedDemoName = sessionStorage.getItem('demo-user-name');
+if (savedDemoName && urlTeam) {
+  nameInput.value = savedDemoName;
+  sessionStorage.removeItem('demo-user-name');
 }
 
 // ── Auth event listeners ──

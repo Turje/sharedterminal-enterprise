@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal Enterprise</title>
-  <link rel="stylesheet" href="css/xterm.css?v=21174380">
-  <link rel="stylesheet" href="css/terminal.css?v=21174380">
+  <link rel="stylesheet" href="css/xterm.css?v=c7d587ad">
+  <link rel="stylesheet" href="css/terminal.css?v=c7d587ad">
 </head>
 <body>
   <div id="app">
@@ -32,6 +32,12 @@
               <span class="divider-line"></span>
             </div>
             <button id="sso-btn" class="hidden">Login with SSO</button>
+          </div>
+          <div id="team-create" class="hidden">
+            <input type="text" id="team-name-input" placeholder="Team or company name" autocomplete="off" />
+            <input type="text" id="team-user-input" placeholder="Your name" autocomplete="off" />
+            <button id="start-demo-btn">Start Private Demo</button>
+            <p class="demo-hint">Your team gets an isolated sandbox. Share the link with teammates.</p>
           </div>
           <div id="auth-error" class="error hidden"></div>
           <p class="auth-footer">Secure sandbox environment. All sessions are audited and recorded.</p>
@@ -187,6 +193,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-6B54RLV7.js"></script>
+  <script src="js/main-EU3RO72I.js"></script>
 </body>
 </html>

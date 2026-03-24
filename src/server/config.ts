@@ -32,6 +32,9 @@ export interface ServerConfig {
   // License
   licenseKey: string;
   licenseServerUrl: string;
+  // Demo rooms
+  demoProjectPath: string;
+  maxDemoRooms: number;
 }
 
 export function loadConfig(): ServerConfig {
@@ -82,5 +85,8 @@ export function loadConfig(): ServerConfig {
     // License
     licenseKey: process.env.LICENSE_KEY || '',
     licenseServerUrl: process.env.LICENSE_SERVER_URL || 'https://api.sharedterminal.com/v1/license/validate',
+    // Demo rooms
+    demoProjectPath: process.env.DEMO_PROJECT_PATH || '',
+    maxDemoRooms: parseInt(process.env.MAX_DEMO_ROOMS || '5', 10),
   };
 }

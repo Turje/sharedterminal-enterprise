@@ -9,6 +9,8 @@ import { ServerConfig } from '../config';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MS = 5 * 60 * 1000; // 5 minutes
+const DEMO_CREATE_LIMIT = 3;
+const DEMO_CREATE_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 export function createApiRouter(
   sessionManager: SessionManager,
@@ -18,13 +20,30 @@ export function createApiRouter(
   const router = Router();
   const authMiddleware = createExpressAuthMiddleware(tokenStore);
   const loginAttempts = new Map<string, { count: number; lockedUntil: number }>();
+  const teamSessions = new Map<string, string>(); // team name → sessionId
+  const demoCreateAttempts = new Map<string, number[]>(); // IP → timestamps
 
-  // Periodically clean up expired lockouts to prevent memory leak
+  // Periodically clean up expired lockouts and stale demo data
   setInterval(() => {
     const now = Date.now();
     for (const [ip, attempt] of loginAttempts) {
       if (attempt.lockedUntil > 0 && now > attempt.lockedUntil) {
         loginAttempts.delete(ip);
+      }
+    }
+    // Clean demo rate-limit entries older than the window
+    for (const [ip, timestamps] of demoCreateAttempts) {
+      const valid = timestamps.filter((t) => now - t < DEMO_CREATE_WINDOW_MS);
+      if (valid.length === 0) demoCreateAttempts.delete(ip);
+      else demoCreateAttempts.set(ip, valid);
+    }
+    // Clean team→session map for stopped sessions
+    for (const [team, sessionId] of teamSessions) {
+      try {
+        const session = sessionManager.getSession(sessionId);
+        if (session.status !== 'running') teamSessions.delete(team);
+      } catch {
+        teamSessions.delete(team);
       }
     }
   }, 60_000);
@@ -275,6 +294,87 @@ export function createApiRouter(
       });
 
       res.json({ status: 'kicked' });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // Check if demo mode is available (no auth)
+  router.get('/api/demo/available', (_req: Request, res: Response) => {
+    res.json({ enabled: !!config.demoProjectPath });
+  });
+
+  // Find or create a team demo session (no auth)
+  router.get('/api/demo/team', async (req: Request, res: Response) => {
+    try {
+      if (!config.demoProjectPath) {
+        res.status(404).json({ error: 'Demo mode is not enabled' });
+        return;
+      }
+
+      const rawName = (req.query.name as string || '').trim();
+      // Sanitize: lowercase, alphanumeric + hyphens, max 30 chars
+      const teamName = rawName.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30);
+      if (!teamName) {
+        res.status(400).json({ error: 'Team name is required' });
+        return;
+      }
+
+      // Check if team already has a running session
+      const existingId = teamSessions.get(teamName);
+      if (existingId) {
+        try {
+          const session = sessionManager.getSession(existingId);
+          if (session.status === 'running') {
+            res.json({ sessionId: existingId, sessionName: teamName, isPublic: true });
+            return;
+          }
+        } catch {
+          // Session no longer exists, clean up
+          teamSessions.delete(teamName);
+        }
+      }
+
+      // Rate limit: max DEMO_CREATE_LIMIT creates per IP per window
+      const ip = req.ip || 'unknown';
+      const now = Date.now();
+      const ipTimestamps = (demoCreateAttempts.get(ip) || []).filter(
+        (t) => now - t < DEMO_CREATE_WINDOW_MS
+      );
+      if (ipTimestamps.length >= DEMO_CREATE_LIMIT) {
+        res.status(429).json({ error: 'Too many demo rooms created. Try again later.' });
+        return;
+      }
+
+      // Check max concurrent demo rooms
+      let activeDemoCount = 0;
+      for (const sessionId of teamSessions.values()) {
+        try {
+          const s = sessionManager.getSession(sessionId);
+          if (s.status === 'running') activeDemoCount++;
+        } catch {
+          // will be cleaned up by periodic sweep
+        }
+      }
+      if (activeDemoCount >= config.maxDemoRooms) {
+        res.status(429).json({ error: 'Maximum demo rooms reached. Try again later.' });
+        return;
+      }
+
+      // Create new session
+      const { session } = await sessionManager.createSession({
+        projectPath: config.demoProjectPath,
+        ownerName: 'host',
+        password: 'demo',
+        isPublic: true,
+        name: teamName,
+      });
+
+      teamSessions.set(teamName, session.id);
+      ipTimestamps.push(now);
+      demoCreateAttempts.set(ip, ipTimestamps);
+
+      res.json({ sessionId: session.id, sessionName: teamName, isPublic: true });
     } catch (err) {
       handleError(res, err);
     }

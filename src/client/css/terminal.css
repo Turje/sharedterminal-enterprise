@@ -189,6 +189,64 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* ── Team demo create ── */
+#team-create {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+#team-create input {
+  padding: 10px 14px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#team-create input::placeholder {
+  color: #484f58;
+}
+
+#team-create input:focus {
+  border-color: #da7756;
+  box-shadow: 0 0 0 2px rgba(218, 119, 86, 0.15);
+}
+
+#start-demo-btn {
+  padding: 10px;
+  background: #da7756;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s;
+}
+
+#start-demo-btn:hover {
+  background: #e5896a;
+}
+
+#start-demo-btn:active {
+  background: #c56a49;
+}
+
+.demo-hint {
+  color: #484f58;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 4px;
+}
+
 .error {
   color: #f85149;
   font-size: 12px;
