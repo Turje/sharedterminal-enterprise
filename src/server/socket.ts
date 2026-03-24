@@ -63,6 +63,9 @@ export function createSocketServer(
 
   io.use(createSocketAuthMiddleware(tokenStore));
 
+  // Demo session timers: sessionId → timer handles (set once per session)
+  const demoTimers = new Map<string, ReturnType<typeof setTimeout>[]>();
+
   // Track terminals per socket: socket.id → Map<tabId, Terminal>
   const socketTerminals = new Map<string, Map<string, Terminal>>();
   // Track activity per session → per user
@@ -211,6 +214,54 @@ export function createSocketServer(
         session.auditLogger?.log('terminal.created', { userId, userName, data: { tabId } });
 
         socket.emit('terminal:created', { tabId, index: 0 });
+      }
+
+      // Set up demo countdown timers (once per session)
+      if (session.isDemo && session.demoExpiresAt && !demoTimers.has(sessionId)) {
+        const remaining = session.demoRemainingMs();
+        const timers: ReturnType<typeof setTimeout>[] = [];
+
+        // 5-minute warning
+        const fiveMinBefore = remaining - 5 * 60 * 1000;
+        if (fiveMinBefore > 0) {
+          timers.push(setTimeout(() => {
+            io.to(sessionId).emit('demo:warning', {
+              remainingMs: 5 * 60 * 1000,
+              message: '5 minutes remaining in this demo session.',
+            });
+          }, fiveMinBefore));
+        }
+
+        // 1-minute warning
+        const oneMinBefore = remaining - 60 * 1000;
+        if (oneMinBefore > 0) {
+          timers.push(setTimeout(() => {
+            io.to(sessionId).emit('demo:warning', {
+              remainingMs: 60 * 1000,
+              message: '60 seconds until this demo session ends.',
+            });
+          }, oneMinBefore));
+        }
+
+        // Session expiry
+        if (remaining > 0) {
+          timers.push(setTimeout(() => {
+            io.to(sessionId).emit('demo:expired');
+            sessionManager.stopSession(sessionId).catch(() => {});
+            demoTimers.delete(sessionId);
+          }, remaining));
+        }
+
+        demoTimers.set(sessionId, timers);
+      }
+
+      // Send demo time info to newly connected client
+      if (session.isDemo && session.demoExpiresAt) {
+        const remaining = session.demoRemainingMs();
+        socket.emit('demo:warning', {
+          remainingMs: remaining,
+          message: `Demo session: ${Math.ceil(remaining / 60000)} minutes remaining.`,
+        });
       }
 
       // Init activity tracking for this session/user
@@ -640,10 +691,15 @@ export function createSocketServer(
         }
         broadcastActivity(sessionId);
 
-        // Clean up chat when session empties
+        // Clean up chat and demo timers when session empties
         const room = io.sockets.adapter.rooms.get(sessionId);
         if (!room || room.size === 0) {
           sessionChat.delete(sessionId);
+          const timers = demoTimers.get(sessionId);
+          if (timers) {
+            timers.forEach(clearTimeout);
+            demoTimers.delete(sessionId);
+          }
         }
 
         // Clean up AI rate limit

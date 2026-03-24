@@ -368,6 +368,7 @@ export function createApiRouter(
         password: 'demo',
         isPublic: true,
         name: teamName,
+        demoDurationMs: config.demoSessionDurationMs,
       });
 
       teamSessions.set(teamName, session.id);

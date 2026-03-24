@@ -21,6 +21,8 @@ export class SessionState implements Session {
   public lastActivity: number;
   public readonly persistent: boolean;
   public readonly isPublic: boolean;
+  public readonly isDemo: boolean;
+  public readonly demoExpiresAt: Date | null;
 
   constructor(
     public readonly id: string,
@@ -32,7 +34,8 @@ export class SessionState implements Session {
     dockerManager: DockerManager,
     config?: ServerConfig,
     persistent = false,
-    isPublic = false
+    isPublic = false,
+    demoDurationMs = 0
   ) {
     this.terminalManager = new TerminalManager(dockerManager, containerId);
     this.presenceManager = new PresenceManager();
@@ -40,6 +43,8 @@ export class SessionState implements Session {
     this.expiresAt = new Date(this.createdAt.getTime() + DEFAULTS.SESSION_MAX_LIFETIME_MS);
     this.persistent = persistent;
     this.isPublic = isPublic;
+    this.isDemo = demoDurationMs > 0;
+    this.demoExpiresAt = demoDurationMs > 0 ? new Date(this.createdAt.getTime() + demoDurationMs) : null;
     this.lastActivity = Date.now();
 
     // Initialize audit logger (requires license)
@@ -55,6 +60,15 @@ export class SessionState implements Session {
 
   isExpired(): boolean {
     return Date.now() >= this.expiresAt.getTime();
+  }
+
+  isDemoExpired(): boolean {
+    return this.demoExpiresAt !== null && Date.now() >= this.demoExpiresAt.getTime();
+  }
+
+  demoRemainingMs(): number {
+    if (!this.demoExpiresAt) return Infinity;
+    return Math.max(0, this.demoExpiresAt.getTime() - Date.now());
   }
 
   isIdle(): boolean {

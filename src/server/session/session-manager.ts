@@ -37,6 +37,9 @@ export class SessionManager {
       if (session.isExpired()) {
         log.info('Session expired, stopping', { sessionId: id });
         this.stopSession(id).catch(() => {});
+      } else if (session.isDemoExpired()) {
+        log.info('Demo session expired, stopping', { sessionId: id });
+        this.stopSession(id).catch(() => {});
       } else if (session.isIdle() && session.presenceManager.getUsers().length === 0) {
         log.info('Session idle with no users, stopping', { sessionId: id });
         this.stopSession(id).catch(() => {});
@@ -116,7 +119,8 @@ export class SessionManager {
       this.dockerManager,
       this.config,
       persistent,
-      isPublic
+      isPublic,
+      sessionConfig.demoDurationMs || 0
     );
 
     const owner: User = {

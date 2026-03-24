@@ -17,6 +17,7 @@ export interface SessionConfig {
   readOnly?: boolean;
   persistent?: boolean;
   isPublic?: boolean;
+  demoDurationMs?: number;
 }
 
 export interface Session {
@@ -131,6 +132,8 @@ export interface ServerToClientEvents {
   'security:warning': (message: string) => void;
   'user:kicked': (reason: string) => void;
   'user:banned': (reason: string) => void;
+  'demo:warning': (data: { remainingMs: number; message: string }) => void;
+  'demo:expired': () => void;
 }
 
 export interface InterServerEvents {}

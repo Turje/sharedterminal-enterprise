@@ -35,6 +35,7 @@ export interface ServerConfig {
   // Demo rooms
   demoProjectPath: string;
   maxDemoRooms: number;
+  demoSessionDurationMs: number;
 }
 
 export function loadConfig(): ServerConfig {
@@ -88,5 +89,6 @@ export function loadConfig(): ServerConfig {
     // Demo rooms
     demoProjectPath: process.env.DEMO_PROJECT_PATH || '',
     maxDemoRooms: parseInt(process.env.MAX_DEMO_ROOMS || '5', 10),
+    demoSessionDurationMs: parseInt(process.env.DEMO_SESSION_DURATION_MS || String(10 * 60 * 1000), 10),
   };
 }

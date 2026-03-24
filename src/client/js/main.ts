@@ -603,6 +603,46 @@ function initSocket(token: string, name: string) {
     statusConnection.textContent = 'Disconnected';
   });
 
+  // ── Demo countdown ──
+  let demoTimerInterval: number | null = null;
+  let demoExpiresAtMs: number | null = null;
+
+  socket.on('demo:warning', (data: { remainingMs: number; message: string }) => {
+    demoExpiresAtMs = Date.now() + data.remainingMs;
+
+    if (data.remainingMs <= 60_000) {
+      // Final minute — red urgent banner
+      showDemoBanner(data.message, 'urgent');
+    } else if (data.remainingMs <= 5 * 60_000) {
+      showDemoBanner(data.message, 'warning');
+    }
+
+    // Start or update the countdown in the session timer
+    if (!demoTimerInterval) {
+      demoTimerInterval = window.setInterval(() => {
+        if (!demoExpiresAtMs) return;
+        const left = Math.max(0, demoExpiresAtMs - Date.now());
+        const m = Math.floor(left / 60_000);
+        const s = Math.floor((left % 60_000) / 1000);
+        sessionTimerEl.textContent = `${m}:${String(s).padStart(2, '0')}`;
+        if (left <= 60_000) {
+          sessionTimerEl.style.color = '#f85149';
+        } else if (left <= 5 * 60_000) {
+          sessionTimerEl.style.color = '#da7756';
+        }
+      }, 1000);
+    }
+  });
+
+  socket.on('demo:expired', () => {
+    if (demoTimerInterval) { clearInterval(demoTimerInterval); demoTimerInterval = null; }
+    // Disable all terminals
+    for (const [, tab] of tabs) {
+      tab.term.write('\r\n\x1b[1;31m[Demo session has ended. Your sandbox has been destroyed.]\x1b[0m\r\n');
+    }
+    showDemoExpiredOverlay();
+  });
+
   // ── Chat input ──
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
@@ -991,4 +1031,33 @@ function escapeHtml(str: string): string {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ── Demo countdown UI ──
+function showDemoBanner(message: string, level: 'warning' | 'urgent') {
+  let banner = document.getElementById('demo-countdown-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'demo-countdown-banner';
+    const securityBanner = document.getElementById('security-banner');
+    if (securityBanner) {
+      securityBanner.after(banner);
+    }
+  }
+  banner.className = `demo-banner demo-banner-${level}`;
+  banner.textContent = message;
+}
+
+function showDemoExpiredOverlay() {
+  const overlay = document.createElement('div');
+  overlay.id = 'demo-expired-overlay';
+  overlay.innerHTML = `
+    <div class="demo-expired-card">
+      <h2>Demo Session Ended</h2>
+      <p>Your sandbox has been securely destroyed.</p>
+      <p class="demo-expired-sub">Enjoyed the experience? Get a permanent instance for your team.</p>
+      <a href="/" class="demo-expired-btn">Start New Demo</a>
+    </div>
+  `;
+  document.body.appendChild(overlay);
 }

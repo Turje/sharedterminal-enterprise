@@ -1230,3 +1230,89 @@ body {
     display: none !important;
   }
 }
+
+/* ── Demo countdown banner ── */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.demo-banner-warning {
+  background: rgba(218, 119, 86, 0.15);
+  border-bottom: 1px solid #da7756;
+  color: #da7756;
+}
+
+.demo-banner-urgent {
+  background: rgba(248, 81, 73, 0.2);
+  border-bottom: 1px solid #f85149;
+  color: #f85149;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Demo expired overlay ── */
+#demo-expired-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(13, 17, 23, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  animation: fadeIn 0.4s ease;
+}
+
+.demo-expired-card {
+  text-align: center;
+  padding: 48px 40px;
+  max-width: 440px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.demo-expired-card h2 {
+  font-size: 1.4rem;
+  color: #c9d1d9;
+  margin-bottom: 12px;
+}
+
+.demo-expired-card p {
+  color: #8b949e;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.demo-expired-sub {
+  font-size: 13px !important;
+  color: #484f58 !important;
+  margin-top: 16px !important;
+  margin-bottom: 20px !important;
+}
+
+.demo-expired-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: #da7756;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.demo-expired-btn:hover {
+  background: #e5896a;
+}
