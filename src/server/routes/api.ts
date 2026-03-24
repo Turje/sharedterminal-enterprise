@@ -454,7 +454,10 @@ export function createApiRouter(
 
       const filePath = session.auditLogger?.getFilePath();
       if (!filePath || !fs.existsSync(filePath)) {
-        res.status(404).json({ error: 'No audit log available' });
+        // No audit log yet — return empty history
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Disposition', `attachment; filename="history-${session.name}.txt"`);
+        res.send('# No commands recorded yet in this session.\n');
         return;
       }
 

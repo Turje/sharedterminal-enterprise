@@ -1,4 +1,4 @@
-const REDACTED = '[***REDACTED BY DLP***]';
+const REDACTED = '\x1b[1;31m[REDACTED BY SHAREDTERMINAL DLP]\x1b[0m';
 
 interface SecretPattern {
   name: string;

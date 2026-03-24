@@ -64,7 +64,7 @@
           <div id="session-label" class="hidden"></div>
           <div id="auth-form">
             <input type="text" id="session-input" placeholder="Session ID" autocomplete="off" spellcheck="false" />
-            <input type="password" id="password-input" placeholder="Session PIN" />
+            <input type="password" id="password-input" placeholder="Session PIN" autocomplete="new-password" />
             <input type="text" id="name-input" placeholder="Your name" autocomplete="off" />
             <button id="join-btn">Join Session</button>
             <div id="sso-divider" class="hidden">
@@ -76,7 +76,7 @@
           </div>
           <div id="team-create" class="hidden">
             <input type="text" id="team-name-input" placeholder="Team or company name" autocomplete="off" />
-            <input type="password" id="team-pin-input" placeholder="Choose a password" />
+            <input type="password" id="team-pin-input" placeholder="Choose a password" autocomplete="new-password" />
             <input type="text" id="team-user-input" placeholder="Your name" autocomplete="off" />
             <button id="start-demo-btn">Start Private Demo</button>
             <p class="demo-hint">You'll get an isolated sandbox. Share the link + password with your team.</p>
@@ -171,8 +171,8 @@
           <div id="sidebar-header">
             <span class="sidebar-header-title">Session Panel</span>
             <div id="sidebar-export" class="sidebar-export-buttons">
-              <button id="export-workspace-btn" class="sidebar-export-btn" title="Download workspace as .tar.gz">&#128229; Workspace</button>
-              <button id="export-history-btn" class="sidebar-export-btn" title="Download command history">&#128196; History</button>
+              <button id="export-workspace-btn" class="sidebar-export-btn" title="Download workspace as .tar.gz">&#128229; Save Workspace</button>
+              <button id="export-history-btn" class="sidebar-export-btn" title="Download command history">&#128196; Save History</button>
             </div>
           </div>
 
@@ -246,10 +246,10 @@
             </div>
           </div>
 
-          <!-- AI Summary (collapsed by default, accessible via tab) -->
+          <!-- AI Assistant (collapsed by default, accessible via tab) -->
           <div class="sidebar-section" id="sidebar-ai-section">
             <div class="sidebar-section-header sidebar-section-toggle" data-section="ai">
-              <span class="sidebar-section-title">AI Summary</span>
+              <span class="sidebar-section-title">AI Assistant</span>
               <span id="claude-unread" class="unread-badge hidden">0</span>
               <span class="sidebar-section-chevron collapsed-chevron">&#9654;</span>
             </div>
@@ -308,6 +308,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-3V3J2KRT.js"></script>
+  <script src="js/main-HDZN6ECZ.js"></script>
 </body>
 </html>
