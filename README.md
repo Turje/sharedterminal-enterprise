@@ -120,6 +120,13 @@ The built-in demo includes a cross-stack incident sandbox:
 
 Run `npm start` and `python3 model.py` in the sandbox, then watch the HUD light up.
 
+## Roadmap
+
+- Kernel-level observability via eBPF (Tetragon) for syscall-level audit trails
+- Agentic safety rails: command throttling, destructive-command approval gates, and per-session cost limits
+- Git integration: commit, push, and PR creation from within the sandbox
+- VS Code and JetBrains terminal embedding
+
 ## License
 
 AGPL-3.0-or-later
