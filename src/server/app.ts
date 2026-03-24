@@ -30,13 +30,16 @@ export function createApp(
     next();
   });
 
-  // DNS rebinding protection: validate Host header
+  // DNS rebinding protection: validate Host header (only when a real domain is configured)
   if (config.serverUrl) {
     const expectedHost = (() => {
       try { return new URL(config.serverUrl).host; } catch { return null; }
     })();
 
-    if (expectedHost) {
+    // Only enforce host validation when SERVER_URL points to a real domain (not localhost/IP)
+    const isRealDomain = expectedHost && !expectedHost.startsWith('localhost') && !expectedHost.startsWith('127.0.0.1') && !/^\d+\.\d+\.\d+\.\d+/.test(expectedHost);
+
+    if (isRealDomain) {
       app.use((req: Request, res: Response, next: NextFunction) => {
         const host = req.headers.host;
         if (host && host !== expectedHost && host !== `localhost:${config.port}` && host !== `127.0.0.1:${config.port}`) {
