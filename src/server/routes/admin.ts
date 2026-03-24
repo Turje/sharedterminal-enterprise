@@ -159,7 +159,10 @@ export function createAdminRouter(
         return;
       }
 
-      res.status(404).json({ error: 'Audit log not found' });
+      // Return empty file instead of 404 — audit may not have events yet
+      res.setHeader('Content-Type', 'application/x-ndjson');
+      res.setHeader('Content-Disposition', `attachment; filename="${sessionId}.ndjson"`);
+      res.send('');
     } catch (err) {
       handleError(res, err);
     }

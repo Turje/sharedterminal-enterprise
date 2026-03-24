@@ -54,6 +54,9 @@ _st_ai_hint() {
 command -v claude >/dev/null 2>&1 || claude() { _st_ai_hint "Claude Code" "npm install -g @anthropic-ai/claude-code && claude"; }
 command -v aider >/dev/null 2>&1 || aider() { _st_ai_hint "Aider" "pip install aider-chat && aider"; }
 command -v copilot >/dev/null 2>&1 || copilot() { _st_ai_hint "GitHub Copilot CLI" "npm install -g @githubnext/github-copilot-cli && copilot"; }
+
+# Re-show compact header after clear
+alias clear='command clear && echo -e "\e[2m━━━ SharedTerminal \u{1f6e1} ━━━  \e[1;36m►\e[0m\e[2m npm start  \e[1;36m►\e[0m\e[2m python3 model.py  \e[1;36m►\e[0m\e[2m cat .env  \e[1;36m►\e[0m\e[2m curl :3001/crash\e[0m"'
 AIHELPER
 
 # Bake demo workspace into image (seeded into /workspace by entrypoint)
