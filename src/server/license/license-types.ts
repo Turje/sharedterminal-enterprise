@@ -26,6 +26,7 @@ export const TIER_FEATURES: Record<LicenseTier, string[]> = {
     'chat',
     'follow-mode',
     'ai-assistant',
+    'dlp',
   ],
   professional: [
     'terminal-sharing',
