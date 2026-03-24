@@ -256,7 +256,7 @@ if (urlTeam) {
       sessionLabel.appendChild(labelSpan);
       sessionLabel.appendChild(document.createTextNode(' ' + data.sessionName));
       sessionLabel.classList.remove('hidden');
-      passwordInput.placeholder = 'Session PIN';
+      passwordInput.placeholder = 'Session password';
       passwordInput.style.display = '';
       nameInput.focus();
     })
@@ -279,7 +279,7 @@ if (urlTeam) {
       const createTeamSession = async () => {
         const pin = teamPinInput.value.trim();
         const userName = teamUserInput.value.trim() || 'host';
-        if (!pin || pin.length < 4) { showError('PIN must be at least 4 characters'); return; }
+        if (!pin || pin.length < 4) { showError('Password must be at least 4 characters'); return; }
 
         (startDemoBtn as HTMLButtonElement).disabled = true;
         startDemoBtn.textContent = 'Creating...';
@@ -464,7 +464,7 @@ async function connect() {
   const name = nameInput.value.trim() || 'anonymous';
 
   if (!sessionId) { showError('Please enter a Session ID'); return; }
-  if (!isPublicSession && !password) { showError('Please enter the Session PIN'); return; }
+  if (!isPublicSession && !password) { showError('Please enter the session password'); return; }
 
   joinBtn.textContent = 'Connecting...';
   (joinBtn as HTMLButtonElement).disabled = true;

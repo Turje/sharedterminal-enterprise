@@ -332,7 +332,7 @@ export function createApiRouter(
         }
       }
 
-      res.status(404).json({ error: 'No session found for this team. Ask your team lead for the PIN.' });
+      res.status(404).json({ error: 'No session found for this team. Ask your team lead for the password.' });
     } catch (err) {
       handleError(res, err);
     }
@@ -353,7 +353,7 @@ export function createApiRouter(
         return;
       }
       if (!password || password.length < 4) {
-        res.status(400).json({ error: 'A PIN of at least 4 characters is required' });
+        res.status(400).json({ error: 'A password of at least 4 characters is required' });
         return;
       }
 
@@ -363,7 +363,7 @@ export function createApiRouter(
         try {
           const session = sessionManager.getSession(existingId);
           if (session.status === 'running') {
-            res.status(409).json({ error: 'A session for this team already exists. Join with the PIN instead.' });
+            res.status(409).json({ error: 'A session for this team already exists. Join with the password instead.' });
             return;
           }
         } catch {
