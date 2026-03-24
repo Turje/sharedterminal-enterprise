@@ -38,8 +38,8 @@ export class SessionManager {
         log.info('Session expired, stopping', { sessionId: id });
         this.stopSession(id).catch(() => {});
       } else if (session.isDemoExpired()) {
-        log.info('Demo session expired, stopping', { sessionId: id });
-        this.stopSession(id).catch(() => {});
+        log.info('Demo session expired, destroying', { sessionId: id });
+        this.destroySession(id).catch(() => {});
       } else if (session.isIdle() && session.presenceManager.getUsers().length === 0) {
         log.info('Session idle with no users, stopping', { sessionId: id });
         this.stopSession(id).catch(() => {});
@@ -86,15 +86,16 @@ export class SessionManager {
       sessionId
     );
 
-    // For persistent mode on first run, copy project files into the volume
-    if (persistent) {
+    // For persistent mode on first run, copy project files into the volume.
+    // Demo sessions skip this — the entrypoint seeds /workspace from the baked-in template.
+    if (persistent && !sessionConfig.demoDurationMs) {
       await this.dockerManager.copyToVolume(
         this.config.dockerImage,
         `sharedterm-${sessionId}`,
         projectPath,
         '/workspace'
       );
-      // Save persistent session record
+      // Save persistent session record (not for demo sessions — they're ephemeral)
       this.persistentStore.saveSession({
         sessionId,
         containerId,
@@ -274,6 +275,13 @@ export class SessionManager {
 
   listSessions() {
     return Array.from(this.sessions.values()).map((s) => s.toInfo());
+  }
+
+  listSessionDetails() {
+    return Array.from(this.sessions.values()).map((s) => ({
+      ...s.toInfo(),
+      containerId: s.containerId,
+    }));
   }
 
   findPublicSession(): SessionState | null {

@@ -398,6 +398,7 @@ export function createApiRouter(
       }
 
       // Create session with password (not public)
+      // persistent: true gives each demo its own Docker volume for isolation
       const { session, token } = await sessionManager.createSession({
         projectPath: config.demoProjectPath,
         ownerName: ownerName || 'host',
@@ -405,6 +406,7 @@ export function createApiRouter(
         isPublic: false,
         name: teamName,
         demoDurationMs: config.demoSessionDurationMs,
+        persistent: true,
       });
 
       teamSessions.set(teamName, session.id);

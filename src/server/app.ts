@@ -73,7 +73,7 @@ export function createApp(
 
   // Routes
   app.use(createApiRouter(sessionManager, tokenStore, config));
-  app.use(createAdminRouter(sessionManager, tokenStore));
+  app.use(createAdminRouter(sessionManager, tokenStore, config));
   if (config.ssoEnabled) {
     app.use(createSsoRouter(sessionManager, tokenStore, config));
     log.info('SSO/OIDC enabled', { issuer: config.ssoIssuerUrl });

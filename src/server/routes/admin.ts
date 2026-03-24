@@ -1,14 +1,23 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+import readline from 'readline';
 import { SessionManager } from '../session/session-manager';
 import { TokenStore } from '../auth/token';
+import { ServerConfig } from '../config';
 import { createExpressAuthMiddleware } from '../auth/middleware';
 import { SharedTerminalError } from '../../shared/errors';
 
+const CHAIN_SEED = 'sharedterminal-audit-chain-v1';
+
+// DLP stats cache
+let dlpCache: { data: any; expiresAt: number } | null = null;
+
 export function createAdminRouter(
   sessionManager: SessionManager,
-  tokenStore: TokenStore
+  tokenStore: TokenStore,
+  config: ServerConfig
 ): Router {
   const router = Router();
   const authMiddleware = createExpressAuthMiddleware(tokenStore);
@@ -43,15 +52,49 @@ export function createAdminRouter(
     return true;
   }
 
-  // Admin stats endpoint for the dashboard
-  router.get('/api/admin/stats', authMiddleware, (req: Request, res: Response) => {
+  // Helper: resolve audit file path for a session
+  function resolveAuditPath(sessionId: string): string | null {
+    // Try active session first
+    try {
+      const session = sessionManager.getSession(sessionId);
+      const filePath = session.auditLogger?.getFilePath();
+      if (filePath && fs.existsSync(filePath)) return filePath;
+    } catch {
+      // Not active, try data dir
+    }
+    const fallback = path.join(config.dataDir, 'audit', `${sessionId}.ndjson`);
+    if (fs.existsSync(fallback)) return fallback;
+    return null;
+  }
+
+  // ── Admin Stats (enhanced with container resources + DLP hits) ──
+  router.get('/api/admin/stats', authMiddleware, async (req: Request, res: Response) => {
     try {
       if (!ownerOnly(req, res)) return;
-      const activeSessions = sessionManager.listSessions();
+
+      const sessions = sessionManager.listSessionDetails();
+      const dockerManager = sessionManager.getDockerManager();
+
+      // Fetch container stats in parallel with 3s timeout
+      const sessionsWithResources = await Promise.all(
+        sessions.map(async (s) => {
+          const resources = await dockerManager.getContainerStats(s.containerId);
+          return { ...s, resources };
+        })
+      );
+
+      // Quick DLP hit count from cache or scan
+      let dlpHits = 0;
+      try {
+        const dlpData = await getDlpStats(config);
+        dlpHits = dlpData.totalHits;
+      } catch { /* ignore */ }
+
       const persistentSessions = sessionManager.listPersistentSessions();
       res.json({
-        activeSessions,
+        activeSessions: sessionsWithResources,
         persistentSessions,
+        dlpHits,
         uptime: process.uptime(),
         nodeVersion: process.version,
         platform: process.platform,
@@ -61,7 +104,7 @@ export function createAdminRouter(
     }
   });
 
-  // List all active sessions
+  // ── List Sessions ──
   router.get('/api/admin/sessions', authMiddleware, (req: Request, res: Response) => {
     try {
       if (!ownerOnly(req, res)) return;
@@ -73,24 +116,47 @@ export function createAdminRouter(
     }
   });
 
-  // Download audit log for a session
+  // ── Kill Session ──
+  router.post('/api/admin/session/:sessionId/kill', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      if (!ownerOnly(req, res)) return;
+      const sessionId = req.params.sessionId as string;
+      const destroy = req.query.destroy === 'true';
+
+      // Log audit event before stopping
+      try {
+        const session = sessionManager.getSession(sessionId);
+        session.auditLogger?.log('session.stopped', {
+          userId: req.tokenPayload?.userId,
+          userName: 'admin',
+          data: { reason: 'admin_kill', destroy },
+        });
+      } catch { /* session may not exist */ }
+
+      if (destroy) {
+        await sessionManager.destroySession(sessionId);
+      } else {
+        await sessionManager.stopSession(sessionId);
+      }
+
+      res.json({ status: 'killed', sessionId });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // ── Download Audit Log ──
   router.get('/api/admin/audit/:sessionId', authMiddleware, (req: Request, res: Response) => {
     try {
       if (!ownerOnly(req, res)) return;
       const sessionId = req.params.sessionId as string;
+      const filePath = resolveAuditPath(sessionId);
 
-      // Try to get audit file from active session first
-      try {
-        const session = sessionManager.getSession(sessionId);
-        const filePath = session.auditLogger?.getFilePath();
-        if (filePath && fs.existsSync(filePath)) {
-          res.setHeader('Content-Type', 'application/x-ndjson');
-          res.setHeader('Content-Disposition', `attachment; filename="${sessionId}.ndjson"`);
-          fs.createReadStream(filePath).pipe(res);
-          return;
-        }
-      } catch {
-        // Session may not be active, that's ok
+      if (filePath) {
+        res.setHeader('Content-Type', 'application/x-ndjson');
+        res.setHeader('Content-Disposition', `attachment; filename="${sessionId}.ndjson"`);
+        fs.createReadStream(filePath).pipe(res);
+        return;
       }
 
       res.status(404).json({ error: 'Audit log not found' });
@@ -99,7 +165,76 @@ export function createAdminRouter(
     }
   });
 
-  // List recording files for a session
+  // ── Audit Log Search ──
+  router.get('/api/admin/audit/:sessionId/search', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      if (!ownerOnly(req, res)) return;
+      const sessionId = req.params.sessionId as string;
+      const q = (req.query.q as string || '').toLowerCase();
+      const typeFilter = req.query.type ? (req.query.type as string).split(',') : [];
+      const offset = parseInt(req.query.offset as string || '0', 10);
+      const limit = Math.min(parseInt(req.query.limit as string || '100', 10), 500);
+
+      const filePath = resolveAuditPath(sessionId);
+      if (!filePath) {
+        res.json({ events: [], total: 0, offset, limit });
+        return;
+      }
+
+      const events: any[] = [];
+      let total = 0;
+
+      const rl = readline.createInterface({
+        input: fs.createReadStream(filePath),
+        crlfDelay: Infinity,
+      });
+
+      let prevHash = CHAIN_SEED;
+
+      for await (const line of rl) {
+        if (!line.trim()) continue;
+        try {
+          const event = JSON.parse(line);
+
+          // Verify hash chain integrity for this event
+          const storedHash = event.hash;
+          const { hash: _, ...eventWithoutHash } = event;
+          const payload = JSON.stringify(eventWithoutHash);
+          const expectedHash = crypto.createHash('sha256').update(prevHash + payload).digest('hex');
+          const hashValid = event.prevHash === prevHash && storedHash === expectedHash;
+          prevHash = storedHash || prevHash;
+
+          // Apply filters
+          const matchesType = typeFilter.length === 0 || typeFilter.includes(event.type);
+          const matchesText = !q || JSON.stringify(event.data || {}).toLowerCase().includes(q);
+
+          if (matchesType && matchesText) {
+            if (total >= offset && events.length < limit) {
+              events.push({ ...event, hashValid });
+            }
+            total++;
+          }
+        } catch { /* skip malformed lines */ }
+      }
+
+      res.json({ events, total, offset, limit });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // ── DLP Stats ──
+  router.get('/api/admin/dlp/stats', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      if (!ownerOnly(req, res)) return;
+      const data = await getDlpStats(config);
+      res.json(data);
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // ── Recordings ──
   router.get('/api/admin/recordings/:sessionId', authMiddleware, (req: Request, res: Response) => {
     try {
       if (!ownerOnly(req, res)) return;
@@ -117,7 +252,6 @@ export function createAdminRouter(
     }
   });
 
-  // Download a specific recording file
   router.get('/api/admin/recordings/:sessionId/:terminalId', authMiddleware, (req: Request, res: Response) => {
     try {
       if (!ownerOnly(req, res)) return;
@@ -150,6 +284,57 @@ export function createAdminRouter(
   });
 
   return router;
+}
+
+async function getDlpStats(config: ServerConfig): Promise<{
+  totalHits: number;
+  byPattern: Record<string, number>;
+  bySession: Record<string, number>;
+  recentHits: any[];
+}> {
+  const now = Date.now();
+  if (dlpCache && now < dlpCache.expiresAt) {
+    return dlpCache.data;
+  }
+
+  const result = { totalHits: 0, byPattern: {} as Record<string, number>, bySession: {} as Record<string, number>, recentHits: [] as any[] };
+  const auditDir = path.join(config.dataDir, 'audit');
+
+  if (!fs.existsSync(auditDir)) {
+    dlpCache = { data: result, expiresAt: now + 30_000 };
+    return result;
+  }
+
+  const files = fs.readdirSync(auditDir).filter((f) => f.endsWith('.ndjson'));
+
+  for (const file of files) {
+    const filePath = path.join(auditDir, file);
+    const sessionId = path.basename(file, '.ndjson');
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      for (const line of content.split('\n')) {
+        if (!line.trim()) continue;
+        try {
+          const event = JSON.parse(line);
+          if (event.type === 'security.dlp_detected') {
+            result.totalHits++;
+            result.bySession[sessionId] = (result.bySession[sessionId] || 0) + 1;
+            const pattern = event.data?.pattern || 'unknown';
+            result.byPattern[pattern] = (result.byPattern[pattern] || 0) + 1;
+            if (result.recentHits.length < 20) {
+              result.recentHits.push({ ts: event.ts, sessionId, pattern, data: event.data });
+            }
+          }
+        } catch { /* skip */ }
+      }
+    } catch { /* skip unreadable files */ }
+  }
+
+  // Sort recent hits by timestamp descending
+  result.recentHits.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+
+  dlpCache = { data: result, expiresAt: now + 30_000 };
+  return result;
 }
 
 function handleError(res: Response, err: unknown): void {

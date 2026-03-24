@@ -146,6 +146,43 @@ export class DockerManager extends EventEmitter {
     }
   }
 
+  async getContainerStats(containerId: string): Promise<{
+    cpu_percent: number;
+    memory_usage_mb: number;
+    memory_limit_mb: number;
+    memory_percent: number;
+    pids: number;
+  } | null> {
+    try {
+      const container = this.docker.getContainer(containerId);
+      const stats: any = await Promise.race([
+        container.stats({ stream: false }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+      ]);
+
+      // Calculate CPU percentage
+      const cpuDelta = stats.cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
+      const systemDelta = stats.cpu_stats.system_cpu_usage - stats.precpu_stats.system_cpu_usage;
+      const numCpus = stats.cpu_stats.online_cpus || stats.cpu_stats.cpu_usage.percpu_usage?.length || 1;
+      const cpu_percent = systemDelta > 0 ? (cpuDelta / systemDelta) * numCpus * 100 : 0;
+
+      const memory_usage_mb = (stats.memory_stats.usage || 0) / (1024 * 1024);
+      const memory_limit_mb = (stats.memory_stats.limit || 0) / (1024 * 1024);
+      const memory_percent = memory_limit_mb > 0 ? (memory_usage_mb / memory_limit_mb) * 100 : 0;
+      const pids = stats.pids_stats?.current || 0;
+
+      return {
+        cpu_percent: Math.round(cpu_percent * 10) / 10,
+        memory_usage_mb: Math.round(memory_usage_mb * 10) / 10,
+        memory_limit_mb: Math.round(memory_limit_mb * 10) / 10,
+        memory_percent: Math.round(memory_percent * 10) / 10,
+        pids,
+      };
+    } catch {
+      return null;
+    }
+  }
+
   async isContainerRunning(containerId: string): Promise<boolean> {
     try {
       const container = this.docker.getContainer(containerId);

@@ -29,22 +29,31 @@ function buildDemoMotd(session: SessionState): string {
   const accent = '\x1b[38;5;173m';
   const bold = '\x1b[1m';
   const dim = '\x1b[2m';
+  const cyan = '\x1b[36m';
+  const green = '\x1b[32m';
   const reset = '\x1b[0m';
+  const shield = `${green}\u{1f6e1}${reset}`;
   const line = `${dim}${'━'.repeat(51)}${reset}`;
 
   return [
     '\r\n',
     line,
-    `  ${bold}${accent}SharedTerminal Enterprise Demo${reset}`,
+    `  ${bold}${accent}SharedTerminal${reset} ${dim}— Incident Sandbox${reset} ${shield}`,
     line,
     '',
-    `  ${bold}Multiplayer${reset}   Share this URL — teammates join instantly`,
-    `  ${bold}Security${reset}      Secrets (AWS keys, tokens) are auto-redacted`,
-    `  ${bold}Isolation${reset}     Hardened Docker sandbox (read-only rootfs)`,
-    `  ${bold}AI${reset}            Use the AI Summary panel in the sidebar`,
-    `  ${bold}Export${reset}        Download your workspace from the sidebar`,
+    `  ${bold}MISSION${reset}  The app in /workspace is leaking secrets and`,
+    `           crashing under load. Your team needs to find`,
+    `           and fix both issues.`,
     '',
-    `  ${dim}Session expires in ${mins} min. Push your work with git!${reset}`,
+    `  ${cyan}►${reset} ${bold}npm start${reset}        Run the app (watch for redacted secrets)`,
+    `  ${cyan}►${reset} ${bold}cat .env${reset}         Test DLP — secrets are auto-masked`,
+    `  ${cyan}►${reset} ${bold}curl :3001/crash${reset}  Hit 5x to trigger the "Incident"`,
+    '',
+    `  ${bold}Multiplayer${reset}  Share this URL — teammates join instantly`,
+    `  ${bold}Compliance${reset}   Tamper-evident Audit & DLP Active`,
+    `  ${bold}AI Support${reset}   Ask the sidebar (${accent}@claude${reset}) for a fix`,
+    '',
+    `  ${dim}Session expires in ${mins} min \u00b7 Work is ephemeral${reset}`,
     line,
     '\r\n',
   ].join('\r\n');
@@ -276,11 +285,11 @@ export function createSocketServer(
           }, oneMinBefore));
         }
 
-        // Session expiry
+        // Session expiry — destroySession cleans up volumes for demo sessions
         if (remaining > 0) {
           timers.push(setTimeout(() => {
             io.to(sessionId).emit('demo:expired');
-            sessionManager.stopSession(sessionId).catch(() => {});
+            sessionManager.destroySession(sessionId).catch(() => {});
             demoTimers.delete(sessionId);
           }, remaining));
         }

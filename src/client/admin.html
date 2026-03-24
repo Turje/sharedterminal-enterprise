@@ -124,7 +124,7 @@
     /* Stats cards row */
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -264,6 +264,30 @@
       background: currentColor;
     }
 
+    /* Resource bars */
+    .resource-bar {
+      width: 80px;
+      height: 6px;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .resource-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease, background-color 0.5s ease;
+    }
+
+    .resource-text {
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--text-secondary);
+    }
+
     /* Users list */
     .users-grid {
       padding: 16px 20px;
@@ -339,6 +363,32 @@
     .btn-accent:hover {
       background: var(--accent);
       color: #fff;
+    }
+
+    .btn-danger {
+      background: var(--red-dim);
+      color: var(--red);
+      border-color: transparent;
+    }
+
+    .btn-danger:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn-primary:hover {
+      background: #e5896a;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 6px;
     }
 
     /* Empty state */
@@ -417,7 +467,67 @@
       background: #e5896a;
     }
 
+    /* Audit log viewer */
+    .audit-controls {
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .audit-controls select,
+    .audit-controls input[type="text"] {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 13px;
+      padding: 6px 10px;
+      outline: none;
+    }
+
+    .audit-controls select:focus,
+    .audit-controls input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .audit-controls select { min-width: 180px; }
+    .audit-controls input[type="text"] { min-width: 200px; }
+
+    .audit-pagination {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .audit-pagination .page-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .integrity-ok { color: var(--green); }
+    .integrity-fail { color: var(--red); }
+
+    .audit-data-cell {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
     /* Responsive */
+    @media (max-width: 1100px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
     }
@@ -474,6 +584,11 @@
         <div class="stat-sub" id="stat-users-sub">across all sessions</div>
       </div>
       <div class="stat-card">
+        <div class="stat-label">Secrets Blocked</div>
+        <div class="stat-value" id="stat-dlp">--</div>
+        <div class="stat-sub" id="stat-dlp-sub">DLP detections</div>
+      </div>
+      <div class="stat-card">
         <div class="stat-label">Uptime</div>
         <div class="stat-value" id="stat-uptime">--</div>
         <div class="stat-sub" id="stat-uptime-sub">server process</div>
@@ -502,6 +617,8 @@
               <th>Session Name</th>
               <th>ID</th>
               <th>Users</th>
+              <th>CPU</th>
+              <th>Memory</th>
               <th>Status</th>
               <th>Created</th>
               <th>Actions</th>
@@ -509,6 +626,55 @@
           </thead>
           <tbody id="sessions-body"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Audit Log Viewer -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Audit Log Viewer</span>
+      </div>
+      <div class="audit-controls">
+        <select id="audit-session-select">
+          <option value="">Select session...</option>
+        </select>
+        <input type="text" id="audit-search-input" placeholder="Search text (e.g. sudo)..." />
+        <select id="audit-type-filter">
+          <option value="">All event types</option>
+          <option value="terminal.input">terminal.input</option>
+          <option value="terminal.created,terminal.closed">terminal (created/closed)</option>
+          <option value="session.created,session.joined,session.left,session.stopped">session events</option>
+          <option value="security.dlp_detected">DLP detections</option>
+          <option value="auth.success,auth.failure,auth.lockout">auth events</option>
+          <option value="chat.message">chat messages</option>
+          <option value="user.kicked,user.banned">user moderation</option>
+        </select>
+        <button class="btn btn-primary" id="audit-search-btn">Search</button>
+      </div>
+      <div id="audit-results-wrap" class="table-wrap">
+        <div class="empty" id="audit-empty">
+          <div class="empty-icon">&#128270;</div>
+          Select a session and search to view audit events
+        </div>
+        <table id="audit-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Event Type</th>
+              <th>Data</th>
+              <th>Integrity</th>
+            </tr>
+          </thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+      <div class="audit-pagination" id="audit-pagination" style="display:none;">
+        <span id="audit-page-info">Page 1</span>
+        <div class="page-btns">
+          <button class="btn" id="audit-prev-btn" disabled>Prev</button>
+          <button class="btn" id="audit-next-btn" disabled>Next</button>
+        </div>
       </div>
     </div>
 
@@ -566,8 +732,8 @@
   'use strict';
 
   // Extract token from query params
-  const params = new URLSearchParams(window.location.search);
-  const TOKEN = params.get('token');
+  var params = new URLSearchParams(window.location.search);
+  var TOKEN = params.get('token');
 
   if (!TOKEN) {
     document.getElementById('auth-gate').style.display = 'flex';
@@ -577,14 +743,14 @@
   document.getElementById('dashboard').style.display = 'block';
 
   // Color palette for user avatars
-  const AVATAR_COLORS = [
+  var AVATAR_COLORS = [
     '#da7756', '#58a6ff', '#3fb950', '#d29922',
     '#bc8cff', '#f778ba', '#79c0ff', '#7ee787'
   ];
 
   function avatarColor(name) {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
+    var hash = 0;
+    for (var i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
@@ -596,9 +762,9 @@
   }
 
   function formatUptime(seconds) {
-    const d = Math.floor(seconds / 86400);
-    const h = Math.floor((seconds % 86400) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+    var d = Math.floor(seconds / 86400);
+    var h = Math.floor((seconds % 86400) / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
     if (d > 0) return d + 'd ' + h + 'h';
     if (h > 0) return h + 'h ' + m + 'm';
     return m + 'm ' + Math.floor(seconds % 60) + 's';
@@ -606,7 +772,7 @@
 
   function formatTime(isoStr) {
     if (!isoStr) return '--';
-    const d = new Date(isoStr);
+    var d = new Date(isoStr);
     return d.toLocaleString(undefined, {
       month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
@@ -614,16 +780,41 @@
   }
 
   function statusBadge(status) {
-    const cls = status === 'running' ? 'status-running'
+    var cls = status === 'running' ? 'status-running'
       : status === 'stopped' ? 'status-stopped'
       : 'status-creating';
     return '<span class="status-badge ' + cls + '"><span class="status-dot"></span>' + status + '</span>';
   }
 
-  // Fetch data
+  function cpuColor(pct) {
+    if (pct < 50) return 'var(--green)';
+    if (pct < 80) return 'var(--yellow)';
+    return 'var(--red)';
+  }
+
+  function memColor(pct) {
+    if (pct < 50) return 'var(--green)';
+    if (pct < 80) return 'var(--yellow)';
+    return 'var(--red)';
+  }
+
+  function resourceCell(pct, label) {
+    if (pct === null || pct === undefined) return '<span class="resource-text" style="color:var(--text-muted);">--</span>';
+    var color = pct < 50 ? 'var(--green)' : pct < 80 ? 'var(--yellow)' : 'var(--red)';
+    return '<span class="resource-text" style="color:' + color + ';">' + pct + '%</span>' +
+      '<span class="resource-bar"><span class="resource-fill" style="width:' + Math.min(pct, 100) + '%;background:' + color + ';"></span></span>';
+  }
+
+  function escHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // ── Fetch data ──
   async function fetchStats() {
     try {
-      const res = await fetch('/api/admin/stats', {
+      var res = await fetch('/api/admin/stats', {
         headers: { 'Authorization': 'Bearer ' + TOKEN }
       });
       if (!res.ok) {
@@ -642,14 +833,15 @@
     }
   }
 
+  // ── Render dashboard ──
   function renderDashboard(data) {
     if (!data) return;
 
-    const activeSessions = data.activeSessions || [];
-    const persistentSessions = data.persistentSessions || [];
+    var activeSessions = data.activeSessions || [];
+    var persistentSessions = data.persistentSessions || [];
 
     // Collect all users
-    let allUsers = [];
+    var allUsers = [];
     activeSessions.forEach(function(s) {
       (s.users || []).forEach(function(u) {
         allUsers.push({ name: u.name, role: u.role, sessionName: s.name, sessionId: s.id });
@@ -664,6 +856,9 @@
     document.getElementById('stat-users').textContent = allUsers.length;
     document.getElementById('stat-users-sub').textContent =
       'across ' + activeSessions.length + ' session' + (activeSessions.length !== 1 ? 's' : '');
+
+    document.getElementById('stat-dlp').textContent = data.dlpHits || 0;
+    document.getElementById('stat-dlp-sub').textContent = 'DLP detections';
 
     document.getElementById('stat-uptime').textContent = formatUptime(data.uptime || 0);
     document.getElementById('stat-uptime-sub').textContent = 'Node ' + (data.nodeVersion || '--');
@@ -686,16 +881,36 @@
       sessionsEmpty.style.display = 'none';
       sessionsTable.style.display = 'table';
       sessionsBody.innerHTML = activeSessions.map(function(s) {
+        var r = s.resources;
+        var cpuPct = r ? r.cpu_percent : null;
+        var memPct = r ? r.memory_percent : null;
         return '<tr>' +
           '<td><strong>' + escHtml(s.name) + '</strong></td>' +
           '<td><span class="mono">' + truncateId(s.id) + '</span></td>' +
           '<td>' + (s.userCount || 0) + '</td>' +
+          '<td>' + resourceCell(cpuPct, 'CPU') + '</td>' +
+          '<td>' + resourceCell(memPct, 'Mem') + '</td>' +
           '<td>' + statusBadge(s.status) + '</td>' +
           '<td>' + formatTime(s.createdAt) + '</td>' +
-          '<td><button class="btn btn-accent" onclick="downloadAudit(\'' + s.id + '\')">Audit Log</button></td>' +
+          '<td><div class="actions-cell">' +
+            '<button class="btn btn-accent" onclick="downloadAudit(\'' + s.id + '\')">Audit</button>' +
+            '<button class="btn btn-danger" onclick="killSession(\'' + s.id + '\', \'' + escHtml(s.name) + '\')">Kill</button>' +
+          '</div></td>' +
           '</tr>';
       }).join('');
     }
+
+    // Update audit session selector
+    var auditSelect = document.getElementById('audit-session-select');
+    var currentVal = auditSelect.value;
+    auditSelect.innerHTML = '<option value="">Select session...</option>';
+    activeSessions.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name + ' (' + truncateId(s.id) + ')';
+      auditSelect.appendChild(opt);
+    });
+    if (currentVal) auditSelect.value = currentVal;
 
     // Persistent Sessions table
     var persistentCountBadge = document.getElementById('persistent-count-badge');
@@ -733,7 +948,6 @@
       usersGrid.querySelectorAll('.user-chip').forEach(function(el) { el.remove(); });
     } else {
       usersEmpty.style.display = 'none';
-      // Clear old chips
       usersGrid.querySelectorAll('.user-chip').forEach(function(el) { el.remove(); });
       allUsers.forEach(function(u) {
         var chip = document.createElement('div');
@@ -750,28 +964,30 @@
     }
   }
 
-  function escHtml(str) {
-    var div = document.createElement('div');
-    div.textContent = str || '';
-    return div.innerHTML;
-  }
+  // ── Kill session ──
+  window.killSession = function(sessionId, sessionName) {
+    if (!confirm('Kill session "' + sessionName + '"? All connected users will be disconnected.')) return;
+    fetch('/api/admin/session/' + sessionId + '/kill', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    }).then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }).then(function() {
+      refresh();
+    }).catch(function(err) {
+      console.error('Kill failed:', err);
+    });
+  };
 
-  // Audit log download
+  // ── Audit log download ──
   window.downloadAudit = function(sessionId) {
-    var a = document.createElement('a');
-    a.href = '/api/admin/audit/' + sessionId + '?token=' + encodeURIComponent(TOKEN);
-    a.download = sessionId + '.ndjson';
-    // We'll add the token as a header via fetch instead for security
     fetch('/api/admin/audit/' + sessionId, {
       headers: { 'Authorization': 'Bearer ' + TOKEN }
     }).then(function(res) {
-      if (!res.ok) {
-        alert('Audit log not found for this session.');
-        return;
-      }
+      if (!res.ok) throw new Error('Audit log not found');
       return res.blob();
     }).then(function(blob) {
-      if (!blob) return;
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
@@ -782,11 +998,105 @@
       URL.revokeObjectURL(url);
     }).catch(function(err) {
       console.error('Download failed:', err);
-      alert('Failed to download audit log.');
     });
   };
 
-  // Refresh countdown
+  // ── Audit Log Viewer ──
+  var AUDIT_PAGE_SIZE = 50;
+  var auditOffset = 0;
+  var auditTotal = 0;
+
+  document.getElementById('audit-search-btn').addEventListener('click', function() {
+    auditOffset = 0;
+    searchAudit();
+  });
+
+  document.getElementById('audit-search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      auditOffset = 0;
+      searchAudit();
+    }
+  });
+
+  document.getElementById('audit-prev-btn').addEventListener('click', function() {
+    auditOffset = Math.max(0, auditOffset - AUDIT_PAGE_SIZE);
+    searchAudit();
+  });
+
+  document.getElementById('audit-next-btn').addEventListener('click', function() {
+    auditOffset += AUDIT_PAGE_SIZE;
+    searchAudit();
+  });
+
+  async function searchAudit() {
+    var sessionId = document.getElementById('audit-session-select').value;
+    if (!sessionId) return;
+
+    var q = document.getElementById('audit-search-input').value;
+    var type = document.getElementById('audit-type-filter').value;
+
+    var url = '/api/admin/audit/' + sessionId + '/search?offset=' + auditOffset + '&limit=' + AUDIT_PAGE_SIZE;
+    if (q) url += '&q=' + encodeURIComponent(q);
+    if (type) url += '&type=' + encodeURIComponent(type);
+
+    try {
+      var res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + TOKEN }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      renderAuditResults(data);
+    } catch (err) {
+      console.error('Audit search failed:', err);
+    }
+  }
+
+  function renderAuditResults(data) {
+    var events = data.events || [];
+    auditTotal = data.total || 0;
+
+    var auditEmpty = document.getElementById('audit-empty');
+    var auditTable = document.getElementById('audit-table');
+    var auditBody = document.getElementById('audit-body');
+    var auditPagination = document.getElementById('audit-pagination');
+
+    if (events.length === 0) {
+      auditEmpty.style.display = 'block';
+      auditEmpty.querySelector('.empty-icon').textContent = String.fromCodePoint(128270);
+      auditEmpty.childNodes[auditEmpty.childNodes.length - 1].textContent = auditTotal === 0 ? 'No matching events found' : 'No events';
+      auditTable.style.display = 'none';
+      auditPagination.style.display = 'none';
+      return;
+    }
+
+    auditEmpty.style.display = 'none';
+    auditTable.style.display = 'table';
+    auditPagination.style.display = 'flex';
+
+    var page = Math.floor(auditOffset / AUDIT_PAGE_SIZE) + 1;
+    var totalPages = Math.ceil(auditTotal / AUDIT_PAGE_SIZE);
+    document.getElementById('audit-page-info').textContent =
+      'Page ' + page + ' of ' + totalPages + ' (' + auditTotal + ' events)';
+
+    document.getElementById('audit-prev-btn').disabled = auditOffset === 0;
+    document.getElementById('audit-next-btn').disabled = auditOffset + AUDIT_PAGE_SIZE >= auditTotal;
+
+    auditBody.innerHTML = events.map(function(e) {
+      var dataStr = e.data ? JSON.stringify(e.data) : '';
+      var integrityIcon = e.hashValid
+        ? '<span class="integrity-ok" title="Hash chain valid">&#10003;</span>'
+        : '<span class="integrity-fail" title="Hash chain broken">&#10007;</span>';
+      return '<tr>' +
+        '<td class="mono">' + formatTime(e.ts) + '</td>' +
+        '<td>' + escHtml(e.userName || e.userId || '--') + '</td>' +
+        '<td><span class="mono">' + escHtml(e.type) + '</span></td>' +
+        '<td class="audit-data-cell" title="' + escHtml(dataStr) + '">' + escHtml(dataStr) + '</td>' +
+        '<td>' + integrityIcon + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  // ── Refresh countdown ──
   var countdown = 10;
   var refreshLabel = document.getElementById('refresh-label');
 
