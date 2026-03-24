@@ -354,6 +354,11 @@ body {
   background: #21262d;
 }
 
+.header-admin-link {
+  text-decoration: none;
+  font-size: 11px;
+}
+
 /* Connection dots */
 .dot-green, .dot-orange, .dot-red {
   width: 8px;
@@ -625,7 +630,37 @@ body {
 }
 
 #sidebar-header {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-bottom: 1px solid #21262d;
+  flex-shrink: 0;
+}
+
+.sidebar-export-buttons {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.sidebar-export-btn {
+  padding: 2px 8px;
+  font-size: 10px;
+  font-family: inherit;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #8b949e;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.sidebar-export-btn:hover {
+  background: #30363d;
+  border-color: #da7756;
+  color: #c9d1d9;
 }
 
 .sidebar-header-title {

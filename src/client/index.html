@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal Enterprise</title>
-  <link rel="stylesheet" href="css/xterm.css?v=349557ca">
-  <link rel="stylesheet" href="css/terminal.css?v=349557ca">
+  <link rel="stylesheet" href="css/xterm.css?v=e4f9d145">
+  <link rel="stylesheet" href="css/terminal.css?v=e4f9d145">
 </head>
 <body>
   <div id="app">
@@ -63,6 +63,7 @@
           <span id="session-name"><span class="accent">SharedTerminal</span> <span class="header-separator">&mdash;</span> <span id="session-display-name">Enterprise Session</span></span>
         </div>
         <div id="header-right">
+          <a id="admin-link" class="header-btn header-admin-link hidden" href="/admin" target="_blank" title="Admin Dashboard">&#9881; Admin</a>
           <span id="session-timer" class="header-meta">0:00</span>
           <span id="user-count" class="header-meta">0 online</span>
           <button id="sidebar-toggle-btn" class="header-btn" title="Toggle sidebar">&#9776;</button>
@@ -107,6 +108,10 @@
         <div id="sidebar">
           <div id="sidebar-header">
             <span class="sidebar-header-title">Session Panel</span>
+            <div id="sidebar-export" class="sidebar-export-buttons">
+              <button id="export-workspace-btn" class="sidebar-export-btn" title="Download workspace as .tar.gz">&#128229; Workspace</button>
+              <button id="export-history-btn" class="sidebar-export-btn" title="Download command history">&#128196; History</button>
+            </div>
           </div>
 
           <!-- Who's Online section -->
@@ -194,6 +199,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-IWX6UQ4M.js"></script>
+  <script src="js/main-UPQITMN4.js"></script>
 </body>
 </html>

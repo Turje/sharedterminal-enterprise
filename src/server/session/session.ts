@@ -23,6 +23,7 @@ export class SessionState implements Session {
   public readonly isPublic: boolean;
   public readonly isDemo: boolean;
   public readonly demoExpiresAt: Date | null;
+  public readonly dockerManager: DockerManager;
 
   constructor(
     public readonly id: string,
@@ -37,6 +38,7 @@ export class SessionState implements Session {
     isPublic = false,
     demoDurationMs = 0
   ) {
+    this.dockerManager = dockerManager;
     this.terminalManager = new TerminalManager(dockerManager, containerId);
     this.presenceManager = new PresenceManager();
     this.createdAt = new Date();

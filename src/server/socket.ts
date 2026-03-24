@@ -19,8 +19,36 @@ import { Terminal } from './terminal/terminal';
 import { DEFAULTS } from '../shared/constants';
 import { spawn } from 'child_process';
 import { createLogger } from './logger';
+import { SessionState } from './session/session';
 
 const log = createLogger('socket');
+
+function buildDemoMotd(session: SessionState): string {
+  const remaining = session.demoRemainingMs();
+  const mins = Math.ceil(remaining / 60000);
+  const accent = '\x1b[38;5;173m';
+  const bold = '\x1b[1m';
+  const dim = '\x1b[2m';
+  const reset = '\x1b[0m';
+  const line = `${dim}${'━'.repeat(51)}${reset}`;
+
+  return [
+    '\r\n',
+    line,
+    `  ${bold}${accent}SharedTerminal Enterprise Demo${reset}`,
+    line,
+    '',
+    `  ${bold}Multiplayer${reset}   Share this URL — teammates join instantly`,
+    `  ${bold}Security${reset}      Secrets (AWS keys, tokens) are auto-redacted`,
+    `  ${bold}Isolation${reset}     Hardened Docker sandbox (read-only rootfs)`,
+    `  ${bold}AI${reset}            Use the AI Summary panel in the sidebar`,
+    `  ${bold}Export${reset}        Download your workspace from the sidebar`,
+    '',
+    `  ${dim}Session expires in ${mins} min. Push your work with git!${reset}`,
+    line,
+    '\r\n',
+  ].join('\r\n');
+}
 
 type AppSocket = Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
@@ -214,6 +242,11 @@ export function createSocketServer(
         session.auditLogger?.log('terminal.created', { userId, userName, data: { tabId } });
 
         socket.emit('terminal:created', { tabId, index: 0 });
+
+        // Inject MOTD for demo sessions (first terminal only)
+        if (session.isDemo) {
+          socket.emit('terminal:output', { tabId, output: buildDemoMotd(session) });
+        }
       }
 
       // Set up demo countdown timers (once per session)

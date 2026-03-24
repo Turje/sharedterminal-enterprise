@@ -14,7 +14,9 @@ export type AuditEventType =
   | 'ai.response'
   | 'security.dlp_detected'
   | 'user.kicked'
-  | 'user.banned';
+  | 'user.banned'
+  | 'workspace.exported'
+  | 'history.exported';
 
 export interface AuditEvent {
   ts: string;

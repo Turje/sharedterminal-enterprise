@@ -1,5 +1,6 @@
 import Docker from 'dockerode';
 import { EventEmitter } from 'events';
+import { PassThrough } from 'stream';
 import { ContainerConfig, TerminalSize } from '../../shared/types';
 import { DockerError } from '../../shared/errors';
 import { buildContainerOptions, buildExecOptions } from './container-config';
@@ -107,6 +108,32 @@ export class DockerManager extends EventEmitter {
       return { stream, execId: exec.id };
     } catch (err) {
       throw new DockerError(`Failed to exec in container: ${(err as Error).message}`);
+    }
+  }
+
+  async execStream(
+    containerId: string,
+    cmd: string[]
+  ): Promise<PassThrough> {
+    try {
+      const container = this.docker.getContainer(containerId);
+      const exec = await container.exec({
+        Cmd: cmd,
+        AttachStdout: true,
+        AttachStderr: true,
+        Tty: false,
+      });
+      const stream = await exec.start({ hijack: true, stdin: false, Tty: false });
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      this.docker.modem.demuxStream(stream, stdout, stderr);
+      stream.on('end', () => {
+        stdout.end();
+        stderr.end();
+      });
+      return stdout;
+    } catch (err) {
+      throw new DockerError(`Failed to exec stream in container: ${(err as Error).message}`);
     }
   }
 

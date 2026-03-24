@@ -25,6 +25,7 @@ interface TabState {
 
 // ── State ──
 let socket: any = null;
+let authToken: string = '';
 let myRole = '';
 let sessionStartTime = 0;
 let timerInterval: number | null = null;
@@ -482,6 +483,14 @@ newTabBtn.addEventListener('click', () => { if (socket) socket.emit('terminal:cr
 // ── Follow stop ──
 followStopBtn.addEventListener('click', stopFollowing);
 
+// ── Export buttons ──
+document.getElementById('export-workspace-btn')?.addEventListener('click', () => {
+  if (authToken) window.open(`/api/session/export/workspace?token=${authToken}`, '_blank');
+});
+document.getElementById('export-history-btn')?.addEventListener('click', () => {
+  if (authToken) window.open(`/api/session/export/history?token=${authToken}`, '_blank');
+});
+
 // ── Summary button ──
 summaryAiBtn.addEventListener('click', requestSummary);
 
@@ -552,6 +561,15 @@ async function connect() {
 
 // ── Socket initialization ──
 function initSocket(token: string, name: string) {
+  authToken = token;
+
+  // Show admin link for owners
+  const adminLink = document.getElementById('admin-link') as HTMLAnchorElement;
+  if (adminLink && myRole === 'owner') {
+    adminLink.href = `/admin?token=${authToken}`;
+    adminLink.classList.remove('hidden');
+  }
+
   socket = io({
     auth: { token, name },
     transports: ['websocket', 'polling'],

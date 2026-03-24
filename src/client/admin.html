@@ -377,6 +377,46 @@
       color: var(--text-muted);
     }
 
+    /* Deploy CTA */
+    .deploy-cta {
+      text-align: center;
+      padding: 32px 24px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .deploy-cta h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .deploy-cta p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .deploy-cta-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .deploy-cta-btn:hover {
+      background: #e5896a;
+    }
+
     /* Responsive */
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -509,6 +549,13 @@
           No users connected
         </div>
       </div>
+    </div>
+
+    <!-- Deploy CTA -->
+    <div class="deploy-cta">
+      <h3>Deploy SharedTerminal On Your Infrastructure</h3>
+      <p>Self-hosted &middot; Your VPC &middot; Full audit control</p>
+      <a href="https://sharedterminal.com/pricing" target="_blank" class="deploy-cta-btn">Get Started &rarr;</a>
     </div>
 
   </div>

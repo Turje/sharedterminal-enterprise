@@ -1,4 +1,6 @@
 import { Router, Request, Response } from 'express';
+import fs from 'fs';
+import readline from 'readline';
 import { SessionManager } from '../session/session-manager';
 import { TokenStore } from '../auth/token';
 import { createExpressAuthMiddleware } from '../auth/middleware';
@@ -410,6 +412,75 @@ export function createApiRouter(
       demoCreateAttempts.set(ip, ipTimestamps);
 
       res.json({ sessionId: session.id, sessionName: teamName, token });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // Export workspace as tar.gz (auth required, any role)
+  router.get('/api/session/export/workspace', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { sessionId, userId } = req.tokenPayload!;
+      const session = sessionManager.getSession(sessionId);
+
+      if (session.status !== 'running') {
+        res.status(400).json({ error: 'Session is not running' });
+        return;
+      }
+
+      session.auditLogger?.log('workspace.exported', { userId, ip: req.ip });
+
+      const stdout = await session.dockerManager.execStream(
+        session.containerId,
+        ['tar', 'czf', '-', '-C', '/', 'workspace']
+      );
+
+      res.setHeader('Content-Type', 'application/gzip');
+      res.setHeader('Content-Disposition', `attachment; filename="workspace-${session.name}.tar.gz"`);
+      stdout.pipe(res);
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // Export command history as text (auth required, any role)
+  router.get('/api/session/export/history', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { sessionId, userId } = req.tokenPayload!;
+      const session = sessionManager.getSession(sessionId);
+
+      const filePath = session.auditLogger?.getFilePath();
+      if (!filePath || !fs.existsSync(filePath)) {
+        res.status(404).json({ error: 'No audit log available' });
+        return;
+      }
+
+      const lines: string[] = [];
+      const rl = readline.createInterface({
+        input: fs.createReadStream(filePath),
+        crlfDelay: Infinity,
+      });
+
+      for await (const line of rl) {
+        try {
+          const event = JSON.parse(line);
+          if (event.type === 'terminal.input') {
+            const ts = new Date(event.ts);
+            const date = ts.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
+            const user = event.userName || event.userId || 'unknown';
+            const cmd = event.data?.input || '';
+            lines.push(`[${date}] ${user}: ${cmd}`);
+          }
+        } catch {
+          // Skip malformed lines
+        }
+      }
+
+      session.auditLogger?.log('history.exported', { userId, ip: req.ip });
+
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Disposition', `attachment; filename="history-${session.name}.txt"`);
+      res.send(lines.join('\n'));
     } catch (err) {
       handleError(res, err);
     }
