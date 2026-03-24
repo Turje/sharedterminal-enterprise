@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=dce2909a">
-  <link rel="stylesheet" href="css/terminal.css?v=dce2909a">
+  <link rel="stylesheet" href="css/xterm.css?v=36fcbda6">
+  <link rel="stylesheet" href="css/terminal.css?v=36fcbda6">
 </head>
 <body>
   <div id="app">
@@ -13,7 +13,9 @@
     <div id="landing-screen" class="screen hidden">
       <div class="landing-container">
         <div class="landing-content">
-          <img src="img/logo.png" alt="SharedTerminal" class="landing-logo" />
+          <div class="landing-logo-text">
+            <span class="accent">Shared</span>Terminal
+          </div>
           <h1 class="landing-headline">Stop screensharing your terminal.</h1>
           <p class="landing-subhead">This is multiplayer for the command line.</p>
           <p class="landing-body">Jump into one live session, spawn parallel shells, and team up with AI to ship fixes together.</p>
@@ -54,7 +56,10 @@
       <div class="auth-container">
         <div class="auth-card">
           <div class="auth-logo">
-            <img src="img/logo.png" alt="SharedTerminal Enterprise" class="auth-logo-img" />
+            <svg viewBox="0 0 256 256" fill="none" class="auth-logo-icon">
+              <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+            </svg>
+            <h1>SharedTerminal <span>Enterprise</span></h1>
           </div>
           <div id="session-label" class="hidden"></div>
           <div id="auth-form">
@@ -93,7 +98,9 @@
 
       <div id="header">
         <div id="header-left">
-          <img src="img/logo.png" alt="SharedTerminal" class="header-logo-img" />
+          <svg viewBox="0 0 256 256" fill="none" class="header-logo-svg">
+            <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+          </svg>
           <span id="session-name"><span class="accent">SharedTerminal</span> <span class="header-separator">&mdash;</span> <span id="session-display-name">Enterprise Session</span></span>
         </div>
         <div id="header-right">

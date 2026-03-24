@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="logo.png" alt="SharedTerminal" width="600" />
-</p>
+<h1 align="center">SharedTerminal</h1>
 
 <h3 align="center">Stop screensharing your terminal.<br/>This is multiplayer for the command line.</h3>
 
