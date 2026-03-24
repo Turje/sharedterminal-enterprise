@@ -40,21 +40,21 @@ function buildDemoMotd(session: SessionState): string {
   return [
     '\r\n',
     line,
-    `  ${bold}${accent}SharedTerminal${reset} ${dim}— Incident Sandbox${reset} ${shield}`,
+    `  ${bold}${accent}SharedTerminal${reset} ${dim}— Cross-Stack Incident Sandbox${reset} ${shield}`,
     line,
     '',
-    `  ${bold}MISSION${reset}  The app in /workspace is leaking secrets and`,
-    `           crashing under load. Your team needs to find`,
-    `           and fix both issues.`,
+    `  ${bold}SCENARIO${reset}  A production stack is failing. The Node API`,
+    `            is leaking secrets and crashing. The Python`,
+    `            inference service is hitting a memory error.`,
     '',
-    `  ${cyan}►${reset} ${bold}npm start${reset}        Run the app (watch for redacted secrets)`,
-    `  ${cyan}►${reset} ${bold}cat .env${reset}         Test DLP — secrets are auto-masked`,
-    `  ${cyan}►${reset} ${bold}curl :3001/crash${reset}  Hit 5x to trigger the "Incident"`,
+    `  ${cyan}►${reset} ${bold}npm start${reset}           Run the API ${dim}(watch for redacted keys)${reset}`,
+    `  ${cyan}►${reset} ${bold}python3 model.py${reset}    Run inference ${dim}(hits OOM on batch 3)${reset}`,
+    `  ${cyan}►${reset} ${bold}cat .env${reset}            Test DLP ${dim}(secrets auto-masked)${reset}`,
+    `  ${cyan}►${reset} ${bold}curl :3001/crash${reset}    Hit 5x to trigger the crash`,
     '',
-    `  ${bold}Multiplayer${reset}  Share this URL — teammates join instantly`,
-    `  ${bold}Compliance${reset}   Tamper-evident Audit & DLP Active`,
-    `  ${bold}AI Tools${reset}     Log in to your AI workspace to use any AI tool`,
-    `               ${dim}Claude, Gemini, GPT, Copilot — just authenticate${reset}`,
+    `  ${bold}Collaborate${reset}  Share this URL — teammates join instantly`,
+    `  ${bold}Compliance${reset}   Tamper-evident audit log & DLP active`,
+    `  ${bold}AI Tools${reset}     Open the sidebar ${dim}\u2192${reset} for AI-assisted debugging`,
     '',
     `  ${dim}Session expires in ${mins} min \u00b7 Work is ephemeral${reset}`,
     line,
@@ -201,18 +201,47 @@ export function createSocketServer(
             const dlpResult = scanForSecrets(data);
             if (dlpResult.secretsFound.length > 0) {
               output = dlpResult.output;
-              // Warn the session owner
-              const ownerSockets = getOwnerSockets(sessionId);
-              for (const ownerSocket of ownerSockets) {
-                ownerSocket.emit('security:warning',
-                  `Secret detected in terminal output: ${dlpResult.secretsFound.join(', ')}`
-                );
-              }
+              // Notify all session users about DLP event
+              io.to(sessionId).emit('security:warning',
+                `Secret detected and redacted: ${dlpResult.secretsFound.join(', ')}`
+              );
+              io.to(sessionId).emit('demo:event', {
+                type: 'dlp_blocked',
+                payload: { patterns: dlpResult.secretsFound },
+              });
               session.auditLogger?.log('security.dlp_detected', {
                 userId,
                 userName,
                 data: { patterns: dlpResult.secretsFound, terminalId: terminal.id },
               });
+            }
+          }
+
+          // Demo: detect app events from terminal output
+          if (session.isDemo) {
+            const plain = data.replace(/\x1b\[[0-9;]*m/g, '');
+            // Node API events
+            if (plain.includes('Server listening on port')) {
+              io.to(sessionId).emit('demo:event', { type: 'service_started' });
+            }
+            if (plain.includes('"remaining":')) {
+              const match = plain.match(/"remaining"\s*:\s*(\d+)/);
+              if (match) {
+                io.to(sessionId).emit('demo:event', {
+                  type: 'crash_hit',
+                  payload: { remaining: parseInt(match[1], 10) },
+                });
+              }
+            }
+            if (plain.includes('[FATAL]') || plain.includes('STATE_OVERFLOW')) {
+              io.to(sessionId).emit('demo:event', { type: 'service_crashed' });
+            }
+            // Python ML events
+            if (plain.includes('TENSOR_OOM')) {
+              io.to(sessionId).emit('demo:event', { type: 'model_crashed' });
+            }
+            if (plain.includes('All') && plain.includes('batches completed')) {
+              io.to(sessionId).emit('demo:event', { type: 'model_fixed' });
             }
           }
 

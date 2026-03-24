@@ -45,6 +45,14 @@ let isFollowing = false;
 // AI state
 let currentAiMessageId: string | null = null;
 
+// Demo Command Center state
+let demoHudVisible = false;
+let demoCrashCount = 0;
+let demoDlpCount = 0;
+let demoServiceRunning = false;
+let demoHasCrashed = false;
+const demoMissions: Record<string, boolean> = { start: false, dlp: false, crash: false, model: false, fix: false };
+
 // Sidebar resize state
 let sidebarResizing = false;
 let sidebarWidth = 280;
@@ -215,6 +223,11 @@ document.addEventListener('mouseup', () => {
   }
 });
 
+// ── Landing screen ──
+const landingScreen = document.getElementById('landing-screen')!;
+const landingDemoBtn = document.getElementById('landing-demo-btn');
+const landingJoinBtn = document.getElementById('landing-join-btn');
+
 // ── URL session ID + project name ──
 const urlParams = new URLSearchParams(window.location.search);
 const urlSession = urlParams.get('session');
@@ -241,6 +254,7 @@ function setupPublicSession(sid: string, sName?: string) {
 
 if (urlTeam) {
   // Team demo mode: look up existing team session
+  authScreen.classList.remove('hidden');
   sessionInput.type = 'hidden';
 
   fetch(`/api/demo/team?name=${encodeURIComponent(urlTeam)}`)
@@ -342,6 +356,7 @@ if (urlTeam) {
       teamPinInput.focus();
     });
 } else if (urlSession) {
+  authScreen.classList.remove('hidden');
   sessionInput.value = urlSession;
   // If we have a project name, show it and hide the raw UUID
   if (urlName) {
@@ -367,7 +382,29 @@ if (urlTeam) {
     })
     .catch(() => {});
 } else {
-  // No params — check if demo mode is enabled for team flow
+  // No params — show landing page
+  landingScreen.classList.remove('hidden');
+
+  // "Try the Demo" — transition to demo/team-create flow
+  if (landingDemoBtn) {
+    landingDemoBtn.addEventListener('click', () => {
+      landingScreen.classList.add('hidden');
+      authScreen.classList.remove('hidden');
+      showDemoAuthFlow();
+    });
+  }
+
+  // "Join a Session" — show normal join form
+  if (landingJoinBtn) {
+    landingJoinBtn.addEventListener('click', () => {
+      landingScreen.classList.add('hidden');
+      authScreen.classList.remove('hidden');
+      sessionInput.focus();
+    });
+  }
+}
+
+function showDemoAuthFlow() {
   fetch('/api/demo/available')
     .then(r => r.ok ? r.json() : null)
     .then(data => {
@@ -410,7 +447,7 @@ if (urlTeam) {
             isPublicSession = false;
 
             myRole = 'owner';
-            document.title = `${teamName} — SharedTerminal Enterprise`;
+            document.title = `${teamName} — SharedTerminal`;
             sessionDisplayNameEl.textContent = teamName;
             securityBannerSession.textContent = teamName;
             authScreen.classList.add('hidden');
@@ -439,27 +476,12 @@ if (urlTeam) {
         teamUserInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDemo(); });
         teamNameInput.focus();
       } else {
-        // Demo mode not enabled — fall back to auto-discover
-        fetch('/api/session/demo')
-          .then(r => r.ok ? r.json() : null)
-          .then(demoData => {
-            if (demoData?.isPublic && demoData?.sessionId) {
-              setupPublicSession(demoData.sessionId, demoData.sessionName);
-            }
-          })
-          .catch(() => {});
+        // Demo mode not enabled — show regular join form
+        sessionInput.focus();
       }
     })
     .catch(() => {
-      // /api/demo/available failed — fall back to existing demo auto-discover
-      fetch('/api/session/demo')
-        .then(r => r.ok ? r.json() : null)
-        .then(demoData => {
-          if (demoData?.isPublic && demoData?.sessionId) {
-            setupPublicSession(demoData.sessionId, demoData.sessionName);
-          }
-        })
-        .catch(() => {});
+      sessionInput.focus();
     });
 }
 
@@ -867,6 +889,69 @@ function initSocket(token: string, name: string) {
       tab.term.write('\r\n\x1b[1;31m[Demo session has ended. Your sandbox has been destroyed.]\x1b[0m\r\n');
     }
     showDemoExpiredOverlay();
+  });
+
+  // ── Security warning (DLP toast) ──
+  socket.on('security:warning', (message: string) => {
+    showDlpToast(message);
+  });
+
+  // ── Demo Command Center events ──
+  socket.on('demo:event', (data: { type: string; payload?: Record<string, unknown> }) => {
+    // Show HUD on first demo event
+    if (!demoHudVisible) {
+      const hud = document.getElementById('demo-hud');
+      const missionSection = document.getElementById('sidebar-mission-section');
+      if (hud) hud.classList.remove('hidden');
+      if (missionSection) missionSection.classList.remove('hidden');
+      demoHudVisible = true;
+    }
+
+    switch (data.type) {
+      case 'service_started':
+        demoServiceRunning = true;
+        updateHudStatus('running');
+        if (demoHasCrashed) {
+          // Service restarted after crash = fix applied
+          completeMission('fix');
+        }
+        completeMission('start');
+        break;
+
+      case 'crash_hit': {
+        const remaining = (data.payload?.remaining as number) || 0;
+        demoCrashCount = 5 - remaining;
+        updateHudRequests(demoCrashCount, 5);
+        break;
+      }
+
+      case 'service_crashed':
+        demoServiceRunning = false;
+        demoHasCrashed = true;
+        demoCrashCount = 5;
+        updateHudStatus('crashed');
+        updateHudRequests(5, 5);
+        completeMission('crash');
+        showCrashAutoPrompt();
+        break;
+
+      case 'dlp_blocked':
+        demoDlpCount++;
+        updateHudDlp(demoDlpCount);
+        completeMission('dlp');
+        break;
+
+      case 'model_crashed':
+        updateHudModel('crashed');
+        completeMission('model');
+        showModelCrashToast();
+        break;
+
+      case 'model_fixed':
+        updateHudModel('running');
+        completeMission('fix');
+        break;
+    }
   });
 
   // ── Chat input ──
@@ -1304,4 +1389,138 @@ function showDemoExpiredOverlay() {
     </div>
   `;
   document.body.appendChild(overlay);
+}
+
+// ── Demo: HUD helpers ──
+function updateHudStatus(state: 'idle' | 'running' | 'crashed') {
+  const el = document.getElementById('hud-status');
+  if (!el) return;
+  el.className = 'hud-value';
+  switch (state) {
+    case 'running':
+      el.textContent = 'RUNNING';
+      el.classList.add('hud-running');
+      break;
+    case 'crashed':
+      el.textContent = 'CRASHED';
+      el.classList.add('hud-crashed');
+      break;
+    default:
+      el.textContent = 'IDLE';
+      el.classList.add('hud-idle');
+  }
+}
+
+function updateHudModel(state: 'idle' | 'running' | 'crashed') {
+  const el = document.getElementById('hud-model');
+  if (!el) return;
+  el.className = 'hud-value';
+  switch (state) {
+    case 'running':
+      el.textContent = 'OK';
+      el.classList.add('hud-running');
+      break;
+    case 'crashed':
+      el.textContent = 'OOM';
+      el.classList.add('hud-crashed');
+      break;
+    default:
+      el.textContent = 'IDLE';
+      el.classList.add('hud-idle');
+  }
+}
+
+function updateHudRequests(count: number, total: number) {
+  const el = document.getElementById('hud-requests');
+  if (el) el.textContent = `${count}/${total}`;
+}
+
+function updateHudDlp(count: number) {
+  const el = document.getElementById('hud-dlp');
+  if (!el) return;
+  el.textContent = `${count} blocked`;
+  el.className = 'hud-value hud-dlp-active';
+}
+
+// ── Demo: DLP Alert Toast ──
+function showDlpToast(message: string) {
+  const container = document.getElementById('toast-container')!;
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-dlp';
+  toast.innerHTML = `
+    <div><span class="toast-dlp-icon">\u{1f6e1}\ufe0f</span><span class="toast-dlp-title">Secret Blocked</span></div>
+    <div class="toast-dlp-detail">${escapeHtml(message)}</div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 5000);
+}
+
+// ── Demo: Crash Auto-Prompt ──
+function showCrashAutoPrompt() {
+  const container = document.getElementById('toast-container')!;
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-crash';
+  toast.innerHTML = `
+    <div><span class="toast-dlp-icon">\u{1f6a8}</span><strong style="color:#f85149">Service Crashed</strong></div>
+    <div class="toast-dlp-detail">The microservice hit a fatal error. AI can analyze the incident.</div>
+    <button class="toast-crash-btn" id="crash-analyze-btn">Analyze Crash</button>
+  `;
+  container.appendChild(toast);
+
+  const btn = toast.querySelector('#crash-analyze-btn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      toast.remove();
+      // Open AI panel if collapsed
+      const claudeBody = document.getElementById('claude-panel-content');
+      const claudeChevron = document.querySelector('#sidebar-ai-section .sidebar-section-chevron') as HTMLElement;
+      if (claudeBody && claudeBody.classList.contains('collapsed')) {
+        claudeBody.classList.remove('collapsed');
+        if (claudeChevron) { claudeChevron.innerHTML = '\u25bc'; claudeChevron.classList.remove('collapsed-chevron'); }
+      }
+      // Auto-send crash analysis prompt
+      const terminalBuffer = getTerminalBuffer(100);
+      appendAiUserMessage('The service just crashed. Analyze the error and suggest a fix.');
+      socket.emit('ai:ask', { message: 'The microservice just crashed with a fatal error. Analyze the terminal output and suggest a fix for the crash in server.js.', apiKey: '', terminalBuffer });
+    });
+  }
+
+  setTimeout(() => { if (toast.parentNode) { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); } }, 15000);
+}
+
+// ── Demo: Model OOM Toast ──
+function showModelCrashToast() {
+  const container = document.getElementById('toast-container')!;
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-crash';
+  toast.innerHTML = `
+    <div><span class="toast-dlp-icon">\u{1f9e0}</span><strong style="color:#f85149">ML Model OOM</strong></div>
+    <div class="toast-dlp-detail">Inference pipeline crashed — TENSOR_BUFFER_MULTIPLIER too high. Fix model.py and re-run.</div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); } }, 8000);
+}
+
+// ── Demo: Mission Tracker ──
+function completeMission(key: string) {
+  if (demoMissions[key]) return;
+  demoMissions[key] = true;
+
+  const item = document.querySelector(`.mission-item[data-mission="${key}"]`);
+  if (item) {
+    item.classList.add('completed');
+    const check = item.querySelector('.mission-check');
+    if (check) check.innerHTML = '\u2611';
+  }
+
+  // Update progress badge
+  const total = Object.keys(demoMissions).length;
+  const completed = Object.values(demoMissions).filter(Boolean).length;
+  const badge = document.getElementById('mission-progress-badge');
+  if (badge) badge.textContent = `${completed}/${total}`;
+
+  // Show completion toast on all done
+  if (completed === total) {
+    showToast('Mission Complete! All objectives achieved.');
+  }
 }

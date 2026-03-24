@@ -137,6 +137,7 @@ export interface ServerToClientEvents {
   'user:banned': (reason: string) => void;
   'demo:warning': (data: { remainingMs: number; message: string }) => void;
   'demo:expired': () => void;
+  'demo:event': (data: { type: string; payload?: Record<string, unknown> }) => void;
 }
 
 export interface InterServerEvents {}

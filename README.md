@@ -1,181 +1,127 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" alt="SharedTerminal" width="64" height="64">
+  <img src="logo.png" alt="SharedTerminal" width="600" />
 </p>
 
-<h1 align="center">SharedTerminal Enterprise</h1>
+<h3 align="center">Stop screensharing your terminal.<br/>This is multiplayer for the command line.</h3>
 
 <p align="center">
-  Self-hosted collaborative terminal sharing for engineering teams.<br>
-  Docker-sandboxed. Audit-logged. Session-recorded. SSO-ready.
-</p>
-
-<p align="center">
-  <a href="https://turje.github.io/sharedterminal-enterprise/">Website</a> &nbsp;|&nbsp;
-  <a href="#quick-start">Quick Start</a> &nbsp;|&nbsp;
-  <a href="#enterprise-deployment">Deploy</a> &nbsp;|&nbsp;
-  <a href="mailto:saarturjeman@gmail.com?subject=SharedTerminal%20Enterprise%20-%20Demo%20Request">Request Demo</a>
+  Jump into a live session, spawn parallel shells, and ship fixes together.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="License: AGPL-3.0">
-  <img src="https://img.shields.io/badge/Node-20%2B-green.svg" alt="Node 20+">
-  <img src="https://img.shields.io/badge/Docker-Required-blue.svg" alt="Docker Required">
-  <img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript">
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#features">Features</a> &bull;
+  <a href="#architecture">Architecture</a> &bull;
+  <a href="#self-hosting">Self-Hosting</a>
 </p>
 
 ---
 
-## Overview
+## What is SharedTerminal?
 
-SharedTerminal Enterprise lets engineering teams instantly share a terminal environment for incident response, pair debugging, and collaborative development. Each user gets their own independent shell inside an isolated Docker container with the project mounted as a shared volume. Every keystroke is audit-logged, every session is recorded, and secrets are automatically redacted — all running entirely inside your firewall.
-
----
-
-## Key Features
-
-### Security
-
-- **Docker Isolation** — Read-only rootfs, dropped capabilities, isolated network, resource limits
-- **DLP / Secret Scanning** — Real-time redaction of AWS keys, GitHub tokens, private keys, passwords
-- **Audit Logging** — NDJSON format, every command with user attribution, Splunk/Datadog-ready
-- **Session Recording** — asciicast v2 format, browser-based playback at `/player`
-
-### Authentication
-
-- **SSO / OIDC** — Okta, Microsoft Entra, Google Workspace, Auth0, Keycloak
-- **Domain Restriction** — Lock access to specific email domains
-- **Brute-Force Protection** — Rate limiting with automatic lockout
-
-### Operations
-
-- **Self-Hosted** — Deploy with docker-compose inside your VPC
-- **Admin Dashboard** — Active sessions, connected users, audit log download at `/admin`
-- **Persistent Sessions** — Named Docker volumes survive disconnects
-- **Container Cleanup** — Automatic orphan cleanup on ungraceful shutdown
-
----
-
-## Architecture
-
-<p align="center">
-  <img src="docs/assets/architecture.svg" alt="SharedTerminal Architecture" width="800">
-</p>
-
-All components run inside your network. Zero external dependencies in self-hosted mode.
-
----
+SharedTerminal is an enterprise-grade collaborative terminal environment. Share a secure, sandboxed terminal with your team for live debugging, incident response, and pair programming — all inside isolated Docker containers with real-time audit logging and secret detection.
 
 ## Quick Start
 
 ```bash
-# 1. Clone and build
+# Install
+npm install -g sharedterminal-enterprise
+
+# Share your current directory
+sharedterm .
+
+# Your team joins via the URL — no setup required
+```
+
+## Features
+
+### Real-Time Collaboration
+- **Multi-user terminals** — Everyone types, everyone sees. No screen-sharing lag.
+- **Follow mode** — Watch a teammate's terminal in a split pane.
+- **Team chat** — Built-in sidebar chat without leaving the terminal.
+- **Activity feed** — See who's running what, live.
+
+### Enterprise Security
+- **DLP (Data Loss Prevention)** — Secrets are detected and redacted in real-time before they hit any screen. Stripe keys, AWS credentials, database URLs — all auto-masked.
+- **Tamper-evident audit log** — Every keystroke, every command, SHA-256 hash-chained. Cryptographically verifiable.
+- **Session recording** — Full terminal replay with asciinema-compatible exports.
+- **SSO/OIDC** — Integrate with your identity provider.
+
+### Isolated Sandboxes
+- **Docker containers** — Each session runs in its own container. No host access.
+- **Resource limits** — Memory caps, PID limits, read-only filesystem option.
+- **Ephemeral by default** — Containers are destroyed when sessions end. Persistent mode available.
+
+### AI-Assisted Debugging
+- **Context-aware AI** — The sidebar AI sees the last 100 lines of your terminal. Ask it about errors, get fixes.
+- **Incident post-mortem** — One-click post-mortem report generated from the audit log.
+- **Cross-stack analysis** — Works with Node, Python, Go, Rust — whatever's in your container.
+
+### Admin Control Tower
+- **Kill switch** — Terminate any session from the admin dashboard.
+- **Container resource gauges** — CPU and memory usage per session, live.
+- **DLP stats** — See how many secrets have been blocked across all sessions.
+- **Audit log search** — Full-text search across session audit logs with hash integrity verification.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│  Browser (xterm.js + Socket.IO)             │
+├─────────────────────────────────────────────┤
+│  Express Server                             │
+│  ├── Auth (JWT tokens, SSO/OIDC)            │
+│  ├── DLP Scanner (real-time redaction)       │
+│  ├── Audit Logger (SHA-256 hash chain)       │
+│  └── Session Manager                        │
+├─────────────────────────────────────────────┤
+│  Docker Containers (isolated per session)    │
+│  ├── Node.js 20 + Python 3                  │
+│  ├── git, vim, nano, tmux, htop             │
+│  └── /workspace (your project files)         │
+└─────────────────────────────────────────────┘
+```
+
+## Self-Hosting
+
+### Docker Compose (Recommended)
+
+```yaml
+version: '3.8'
+services:
+  sharedterminal:
+    image: sharedterminal-enterprise
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - ADMIN_TOKEN=your-secret-token
+```
+
+```bash
+docker compose up -d
+```
+
+### From Source
+
+```bash
 git clone https://github.com/Turje/sharedterminal-enterprise.git
 cd sharedterminal-enterprise
-npm install && npm run build
-
-# 2. Build the sandbox image
-docker build -t sharedterminal:latest docker/
-
-# 3. Start a session
-node dist/cli/index.js --path /your/project
-```
-
-Open the printed URL in a browser to join. Share the PIN with teammates.
-
----
-
-## Enterprise Deployment
-
-For production use, deploy with docker-compose:
-
-```bash
-cd deploy
-cp .env.example .env
-# Edit .env with your SERVER_URL, SSO config, etc.
-docker-compose up -d
-```
-
-See `deploy/.env.example` for the full list of configuration options including
-SSO provider setup, resource limits, and feature flags.
-
----
-
-## CLI Reference
-
-| Flag | Description |
-|------|-------------|
-| `--path <dir>` | Project directory to share |
-| `--password <pin>` | Session PIN (auto-generated if omitted) |
-| `--name <name>` | Session name |
-| `--git` | Mount SSH keys and gitconfig for git push |
-| `--read-only` | Share as read-only |
-| `--persistent` | Persist session state across disconnects |
-| `--server-url <url>` | Self-hosted mode (disables tunnel) |
-
----
-
-## Security Model
-
-| Layer | Implementation |
-|-------|----------------|
-| Container Isolation | Read-only rootfs, all capabilities dropped, no-new-privileges |
-| Network | Isolated Docker network, no inter-container communication |
-| Resources | Memory limit (512MB), PID limit (256), 50% CPU cap |
-| Authentication | Token-based + SSO/OIDC, brute-force protection |
-| Secrets | Real-time DLP scanning, automatic redaction |
-| Audit | Every action logged in NDJSON, 50MB rotation |
-| Recording | Full I/O capture in asciicast v2 |
-
----
-
-## API Endpoints
-
-| Endpoint | Auth | Description |
-|----------|------|-------------|
-| `POST /api/session/create` | No | Create a new session |
-| `POST /api/session/join` | No | Join with PIN |
-| `GET /api/session/status` | Token | Session info |
-| `POST /api/session/stop` | Owner | Stop session |
-| `POST /api/session/kick` | Owner | Kick a user |
-| `GET /api/admin/sessions` | Owner | List all sessions |
-| `GET /api/admin/audit/:id` | Owner | Download audit log |
-| `GET /api/admin/recordings/:id` | Owner | List recordings |
-| `GET /admin` | — | Admin dashboard |
-| `GET /player` | — | Session recording player |
-
----
-
-## Configuration
-
-Key environment variables (see `deploy/.env.example` for full reference):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SERVER_URL` | — | Your deployment URL (required for self-hosted) |
-| `PORT` | `3000` | Server listen port |
-| `DOCKER_IMAGE` | `sharedterminal:latest` | Sandbox container image |
-| `DLP_ENABLED` | `true` | Enable real-time secret redaction |
-| `RECORDING_ENABLED` | `true` | Enable session recording |
-| `SSO_ENABLED` | `false` | Require SSO authentication |
-| `SSO_ISSUER_URL` | — | OIDC issuer URL for your IdP |
-| `SSO_CLIENT_ID` | — | OAuth2 client ID |
-
----
-
-## Development
-
-```bash
 npm install
 npm run build
-npm test
+npm start
 ```
 
----
+## Demo
+
+The built-in demo includes a cross-stack incident sandbox:
+- **Node.js API** — Leaking Stripe keys + crash bug after 5 requests
+- **Python ML model** — Sentiment inference that OOMs on batch 3
+- **DLP** — `.env` full of fake credentials, all auto-redacted
+
+Run `npm start` and `python3 model.py` in the sandbox, then watch the HUD light up.
 
 ## License
 
-AGPL-3.0 — free for internal use. [Commercial licenses](COMMERCIAL-LICENSE.md) available for SaaS and proprietary distribution.
-
----
-
-Built for teams that take security seriously.
+AGPL-3.0-or-later

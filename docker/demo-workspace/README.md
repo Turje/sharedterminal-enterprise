@@ -1,26 +1,32 @@
-# Incident Sandbox
+# Cross-Stack Incident Sandbox
 
-A buggy microservice for collaborative debugging practice.
+A production stack with two failing services for collaborative debugging.
 
 ## Quick Start
 
 ```bash
-npm start          # Start the server (watch for redacted secrets in logs)
-cat .env           # Test DLP — secrets are automatically masked
-curl :3001/health  # Health check
-curl :3001/crash   # Hit this 5 times to trigger the bug
+# Node API (leaking secrets + crash bug)
+npm start             # Watch for redacted secrets in logs
+curl :3001/crash      # Hit 5x to trigger the crash
+
+# Python ML (memory error)
+python3 model.py      # Inference crashes on batch 3 (OOM)
+
+# DLP Security
+cat .env              # Secrets are auto-masked by DLP
 ```
 
-## The Bug
+## The Bugs
 
-The `/crash` endpoint has a counter that throws an unhandled exception after
-5 requests. Your mission: find the root cause and fix it before the service
-goes down in production.
+1. **Node API** — The `/crash` endpoint throws after 5 requests. Find and fix the
+   counter logic in `server.js`.
+
+2. **ML Inference** — `model.py` crashes with TENSOR_OOM on the 3rd batch. The
+   `TENSOR_BUFFER_MULTIPLIER` is set to 512 but should be 64.
 
 ## What to Notice
 
-- **DLP in action**: When the server starts, it logs a Stripe key — watch it
-  get redacted in real-time by SharedTerminal's secret scanner.
-- **`.env` file**: Contains fake AWS keys, database URLs, and API secrets.
-  Run `cat .env` to see them all get masked.
-- **Collaboration**: Share the session URL with a teammate to debug together.
+- **DLP**: Stripe keys in server logs get redacted in real-time.
+- **`.env`**: Contains fake AWS keys, DB URLs, API secrets — all auto-masked.
+- **Multi-role**: Have your SRE fix the API while a DS fixes the model.
+- **AI**: Open the sidebar for AI-assisted crash analysis.

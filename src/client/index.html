@@ -3,23 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SharedTerminal Enterprise</title>
-  <link rel="stylesheet" href="css/xterm.css?v=e4f9d145">
-  <link rel="stylesheet" href="css/terminal.css?v=e4f9d145">
+  <title>SharedTerminal — Multiplayer for the command line</title>
+  <link rel="stylesheet" href="css/xterm.css?v=dce2909a">
+  <link rel="stylesheet" href="css/terminal.css?v=dce2909a">
 </head>
 <body>
   <div id="app">
+    <!-- Landing screen -->
+    <div id="landing-screen" class="screen hidden">
+      <div class="landing-container">
+        <div class="landing-content">
+          <img src="img/logo.png" alt="SharedTerminal" class="landing-logo" />
+          <h1 class="landing-headline">Stop screensharing your terminal.</h1>
+          <p class="landing-subhead">This is multiplayer for the command line.</p>
+          <p class="landing-body">Jump into a live session, spawn parallel shells, and ship fixes together.</p>
+          <div class="landing-cta">
+            <button id="landing-demo-btn" class="landing-btn-primary">Try the Demo</button>
+            <button id="landing-join-btn" class="landing-btn-secondary">Join a Session</button>
+          </div>
+          <div class="landing-features">
+            <div class="landing-feature">
+              <span class="landing-feature-icon">&#x1f6e1;&#xfe0f;</span>
+              <div>
+                <strong>Real-time DLP</strong>
+                <span>Secrets are detected and redacted before they hit any screen</span>
+              </div>
+            </div>
+            <div class="landing-feature">
+              <span class="landing-feature-icon">&#x1f4dc;</span>
+              <div>
+                <strong>Tamper-evident audit</strong>
+                <span>Every command SHA-256 hash-chained. Cryptographically verifiable.</span>
+              </div>
+            </div>
+            <div class="landing-feature">
+              <span class="landing-feature-icon">&#x1f465;</span>
+              <div>
+                <strong>Multi-user terminals</strong>
+                <span>Share a link. Your team is typing in seconds. No install.</span>
+              </div>
+            </div>
+          </div>
+          <p class="landing-footer">Built for SREs, ML Engineers, and Security Teams.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Auth screen -->
-    <div id="auth-screen" class="screen">
+    <div id="auth-screen" class="screen hidden">
       <div class="auth-container">
         <div class="auth-card">
           <div class="auth-logo">
-            <svg viewBox="0 0 256 256" fill="none" class="auth-logo-icon">
-              <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
-            </svg>
-            <h1>SharedTerminal <span>Enterprise</span></h1>
+            <img src="img/logo.png" alt="SharedTerminal Enterprise" class="auth-logo-img" />
           </div>
-          <p class="auth-subtitle">Secure collaborative terminal environment</p>
           <div id="session-label" class="hidden"></div>
           <div id="auth-form">
             <input type="text" id="session-input" placeholder="Session ID" autocomplete="off" spellcheck="false" />
@@ -57,9 +93,7 @@
 
       <div id="header">
         <div id="header-left">
-          <svg viewBox="0 0 256 256" fill="none">
-            <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
-          </svg>
+          <img src="img/logo.png" alt="SharedTerminal" class="header-logo-img" />
           <span id="session-name"><span class="accent">SharedTerminal</span> <span class="header-separator">&mdash;</span> <span id="session-display-name">Enterprise Session</span></span>
         </div>
         <div id="header-right">
@@ -90,6 +124,25 @@
         <div id="terminal-main">
           <div id="terminal-row">
             <div id="terminal-area">
+              <!-- Demo: Live Service Health HUD -->
+              <div id="demo-hud" class="hidden">
+                <div class="hud-item">
+                  <span class="hud-label">API</span>
+                  <span id="hud-status" class="hud-value hud-idle">IDLE</span>
+                </div>
+                <div class="hud-item">
+                  <span class="hud-label">MODEL</span>
+                  <span id="hud-model" class="hud-value hud-idle">IDLE</span>
+                </div>
+                <div class="hud-item">
+                  <span class="hud-label">CRASHES</span>
+                  <span id="hud-requests" class="hud-value">0/5</span>
+                </div>
+                <div class="hud-item">
+                  <span class="hud-label">DLP</span>
+                  <span id="hud-dlp" class="hud-value">0 blocked</span>
+                </div>
+              </div>
               <div id="terminal-container"></div>
             </div>
 
@@ -145,6 +198,41 @@
               <div id="chat-messages"></div>
               <div id="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" maxlength="500" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Demo: Mission Progress Tracker -->
+          <div class="sidebar-section hidden" id="sidebar-mission-section">
+            <div class="sidebar-section-header">
+              <span class="sidebar-section-title">Mission Progress</span>
+              <span id="mission-progress-badge" class="sidebar-section-badge">0/5</span>
+            </div>
+            <div class="mission-checklist">
+              <div class="mission-item" data-mission="start">
+                <span class="mission-check">&#9744;</span>
+                <span class="mission-text">Run the API</span>
+                <span class="mission-hint">npm start</span>
+              </div>
+              <div class="mission-item" data-mission="dlp">
+                <span class="mission-check">&#9744;</span>
+                <span class="mission-text">Test DLP Security</span>
+                <span class="mission-hint">cat .env</span>
+              </div>
+              <div class="mission-item" data-mission="crash">
+                <span class="mission-check">&#9744;</span>
+                <span class="mission-text">Crash the API</span>
+                <span class="mission-hint">curl /crash x5</span>
+              </div>
+              <div class="mission-item" data-mission="model">
+                <span class="mission-check">&#9744;</span>
+                <span class="mission-text">Run ML Inference</span>
+                <span class="mission-hint">python3 model.py</span>
+              </div>
+              <div class="mission-item" data-mission="fix">
+                <span class="mission-check">&#9744;</span>
+                <span class="mission-text">Fix &amp; Restart</span>
+                <span class="mission-hint">Edit &amp; re-run</span>
               </div>
             </div>
           </div>
@@ -211,6 +299,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-SZATZFPG.js"></script>
+  <script src="js/main-3V3J2KRT.js"></script>
 </body>
 </html>
