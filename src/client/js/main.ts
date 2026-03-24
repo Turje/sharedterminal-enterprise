@@ -238,10 +238,8 @@ function setupPublicSession(sid: string, sName?: string) {
 }
 
 if (urlTeam) {
-  // Team demo mode: fetch or create team session
-  const authForm = document.getElementById('auth-form')!;
+  // Team demo mode: look up existing team session
   sessionInput.type = 'hidden';
-  passwordInput.style.display = 'none';
 
   fetch(`/api/demo/team?name=${encodeURIComponent(urlTeam)}`)
     .then((r) => {
@@ -249,13 +247,97 @@ if (urlTeam) {
       return r.json();
     })
     .then((data: any) => {
-      setupPublicSession(data.sessionId, data.sessionName);
-    })
-    .catch((err: any) => {
-      showError(err.message || 'Failed to load team demo');
-      // Show auth form inputs again so user isn't stuck
-      sessionInput.type = 'text';
+      // Team session found — show session name + PIN + name fields
+      sessionInput.value = data.sessionId;
+      const sessionLabel = document.getElementById('session-label')!;
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'label-dim';
+      labelSpan.textContent = 'Team:';
+      sessionLabel.appendChild(labelSpan);
+      sessionLabel.appendChild(document.createTextNode(' ' + data.sessionName));
+      sessionLabel.classList.remove('hidden');
+      passwordInput.placeholder = 'Session PIN';
       passwordInput.style.display = '';
+      nameInput.focus();
+    })
+    .catch(() => {
+      // No session for this team — show the create form instead
+      const authForm = document.getElementById('auth-form')!;
+      authForm.classList.add('hidden');
+      const teamCreate = document.getElementById('team-create')!;
+      teamCreate.classList.remove('hidden');
+
+      const teamNameInput = document.getElementById('team-name-input') as HTMLInputElement;
+      const teamPinInput = document.getElementById('team-pin-input') as HTMLInputElement;
+      const teamUserInput = document.getElementById('team-user-input') as HTMLInputElement;
+      const startDemoBtn = document.getElementById('start-demo-btn')!;
+
+      teamNameInput.value = urlTeam;
+      teamNameInput.readOnly = true;
+      teamNameInput.style.opacity = '0.7';
+
+      const createTeamSession = async () => {
+        const pin = teamPinInput.value.trim();
+        const userName = teamUserInput.value.trim() || 'host';
+        if (!pin || pin.length < 4) { showError('PIN must be at least 4 characters'); return; }
+
+        (startDemoBtn as HTMLButtonElement).disabled = true;
+        startDemoBtn.textContent = 'Creating...';
+
+        try {
+          const res = await fetch('/api/demo/team', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: urlTeam, password: pin, ownerName: userName }),
+          });
+          const result = await res.json();
+          if (!res.ok) { showError(result.error || 'Failed to create session'); (startDemoBtn as HTMLButtonElement).disabled = false; startDemoBtn.textContent = 'Start Private Demo'; return; }
+
+          // Auto-connect as owner
+          sessionInput.value = result.sessionId;
+          teamCreate.classList.add('hidden');
+          const authFormEl = document.getElementById('auth-form')!;
+          authFormEl.classList.remove('hidden');
+          sessionInput.type = 'hidden';
+          passwordInput.style.display = 'none';
+          isPublicSession = false;
+
+          const sessionLabel = document.getElementById('session-label')!;
+          sessionLabel.innerHTML = '';
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'label-dim';
+          labelSpan.textContent = 'Team:';
+          sessionLabel.appendChild(labelSpan);
+          sessionLabel.appendChild(document.createTextNode(' ' + urlTeam));
+          sessionLabel.classList.remove('hidden');
+
+          // Directly connect using the owner token
+          myRole = 'owner';
+          document.title = `${urlTeam} \u2014 SharedTerminal Enterprise`;
+          sessionDisplayNameEl.textContent = urlTeam;
+          securityBannerSession.textContent = urlTeam;
+          authScreen.classList.add('hidden');
+          terminalScreen.classList.remove('hidden');
+          sessionStartTime = Date.now();
+          timerInterval = window.setInterval(updateTimer, 1000);
+          statusRole.textContent = 'owner';
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().then((p) => { notificationsPermission = p === 'granted'; });
+          } else if ('Notification' in window) {
+            notificationsPermission = Notification.permission === 'granted';
+          }
+          initSocket(result.token, userName);
+        } catch {
+          showError('Connection failed. Is the server running?');
+          (startDemoBtn as HTMLButtonElement).disabled = false;
+          startDemoBtn.textContent = 'Start Private Demo';
+        }
+      };
+
+      startDemoBtn.addEventListener('click', createTeamSession);
+      teamPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') createTeamSession(); });
+      teamUserInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') createTeamSession(); });
+      teamPinInput.focus();
     });
 } else if (urlSession) {
   sessionInput.value = urlSession;

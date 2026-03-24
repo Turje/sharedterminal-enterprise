@@ -304,8 +304,8 @@ export function createApiRouter(
     res.json({ enabled: !!config.demoProjectPath });
   });
 
-  // Find or create a team demo session (no auth)
-  router.get('/api/demo/team', async (req: Request, res: Response) => {
+  // Look up an existing team demo session (no auth)
+  router.get('/api/demo/team', (req: Request, res: Response) => {
     try {
       if (!config.demoProjectPath) {
         res.status(404).json({ error: 'Demo mode is not enabled' });
@@ -313,10 +313,47 @@ export function createApiRouter(
       }
 
       const rawName = (req.query.name as string || '').trim();
-      // Sanitize: lowercase, alphanumeric + hyphens, max 30 chars
       const teamName = rawName.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30);
       if (!teamName) {
         res.status(400).json({ error: 'Team name is required' });
+        return;
+      }
+
+      const existingId = teamSessions.get(teamName);
+      if (existingId) {
+        try {
+          const session = sessionManager.getSession(existingId);
+          if (session.status === 'running') {
+            res.json({ sessionId: existingId, sessionName: teamName });
+            return;
+          }
+        } catch {
+          teamSessions.delete(teamName);
+        }
+      }
+
+      res.status(404).json({ error: 'No session found for this team. Ask your team lead for the PIN.' });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
+  // Create a new team demo session with a PIN (no auth)
+  router.post('/api/demo/team', async (req: Request, res: Response) => {
+    try {
+      if (!config.demoProjectPath) {
+        res.status(404).json({ error: 'Demo mode is not enabled' });
+        return;
+      }
+
+      const { name: rawName, password, ownerName } = req.body as { name?: string; password?: string; ownerName?: string };
+      const teamName = (rawName || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30);
+      if (!teamName) {
+        res.status(400).json({ error: 'Team name is required' });
+        return;
+      }
+      if (!password || password.length < 4) {
+        res.status(400).json({ error: 'A PIN of at least 4 characters is required' });
         return;
       }
 
@@ -326,16 +363,15 @@ export function createApiRouter(
         try {
           const session = sessionManager.getSession(existingId);
           if (session.status === 'running') {
-            res.json({ sessionId: existingId, sessionName: teamName, isPublic: true });
+            res.status(409).json({ error: 'A session for this team already exists. Join with the PIN instead.' });
             return;
           }
         } catch {
-          // Session no longer exists, clean up
           teamSessions.delete(teamName);
         }
       }
 
-      // Rate limit: max DEMO_CREATE_LIMIT creates per IP per window
+      // Rate limit
       const ip = req.ip || 'unknown';
       const now = Date.now();
       const ipTimestamps = (demoCreateAttempts.get(ip) || []).filter(
@@ -352,21 +388,19 @@ export function createApiRouter(
         try {
           const s = sessionManager.getSession(sessionId);
           if (s.status === 'running') activeDemoCount++;
-        } catch {
-          // will be cleaned up by periodic sweep
-        }
+        } catch {}
       }
       if (activeDemoCount >= config.maxDemoRooms) {
-        res.status(429).json({ error: 'Maximum demo rooms reached. Try again later.' });
+        res.status(429).json({ error: 'All demo rooms are currently in use. Please try again later.' });
         return;
       }
 
-      // Create new session
-      const { session } = await sessionManager.createSession({
+      // Create session with password (not public)
+      const { session, token } = await sessionManager.createSession({
         projectPath: config.demoProjectPath,
-        ownerName: 'host',
-        password: 'demo',
-        isPublic: true,
+        ownerName: ownerName || 'host',
+        password,
+        isPublic: false,
         name: teamName,
         demoDurationMs: config.demoSessionDurationMs,
       });
@@ -375,7 +409,7 @@ export function createApiRouter(
       ipTimestamps.push(now);
       demoCreateAttempts.set(ip, ipTimestamps);
 
-      res.json({ sessionId: session.id, sessionName: teamName, isPublic: true });
+      res.json({ sessionId: session.id, sessionName: teamName, token });
     } catch (err) {
       handleError(res, err);
     }

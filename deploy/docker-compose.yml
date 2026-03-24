@@ -40,6 +40,8 @@ services:
       retries: 3
       start_period: 10s
     restart: unless-stopped
+    group_add:
+      - "${DOCKER_GID:-988}"
 
 volumes:
   sharedterminal-data:
