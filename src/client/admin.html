@@ -727,6 +727,33 @@
   </div>
 </div>
 
+<!-- Admin Feedback Modal -->
+<div id="feedback-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:12px; padding:28px 32px; max-width:440px; width:90%;">
+    <h3 style="color:var(--text-primary); margin-bottom:4px; font-size:16px;">Quick Feedback</h3>
+    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">Help us build what you need.</p>
+    <label style="color:var(--text-secondary); font-size:12px; display:block; margin-bottom:4px;">Your role</label>
+    <select id="fb-role" style="width:100%; padding:8px 10px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:6px; color:var(--text-primary); font-size:13px; margin-bottom:12px;">
+      <option value="">Select...</option>
+      <option value="CTO">CTO</option>
+      <option value="VP Engineering">VP Engineering</option>
+      <option value="SRE Lead">SRE Lead</option>
+      <option value="Security">Security</option>
+      <option value="Engineering Manager">Engineering Manager</option>
+      <option value="Developer">Developer</option>
+      <option value="Other">Other</option>
+    </select>
+    <label style="color:var(--text-secondary); font-size:12px; display:block; margin-bottom:4px;">What's the one thing stopping you from deploying this today?</label>
+    <textarea id="fb-text" rows="3" style="width:100%; padding:8px 10px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:6px; color:var(--text-primary); font-size:13px; resize:vertical; margin-bottom:12px;" placeholder="e.g. Need SSO with Okta, need SOC2 docs..."></textarea>
+    <label style="color:var(--text-secondary); font-size:12px; display:block; margin-bottom:4px;">Email for a follow-up demo (optional)</label>
+    <input id="fb-email" type="email" style="width:100%; padding:8px 10px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:6px; color:var(--text-primary); font-size:13px; margin-bottom:16px;" placeholder="you@company.com" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button id="fb-skip" class="btn" style="padding:8px 16px;">Skip</button>
+      <button id="fb-submit" class="btn btn-accent" style="padding:8px 16px;">Send Feedback</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   'use strict';
@@ -965,6 +992,37 @@
   }
 
   // ── Kill session ──
+  // ── Feedback modal ──
+  var feedbackModal = document.getElementById('feedback-modal');
+
+  function showFeedbackModal() {
+    feedbackModal.style.display = 'flex';
+  }
+
+  document.getElementById('fb-skip').addEventListener('click', function() {
+    feedbackModal.style.display = 'none';
+  });
+
+  document.getElementById('fb-submit').addEventListener('click', function() {
+    var role = document.getElementById('fb-role').value;
+    var text = document.getElementById('fb-text').value.trim();
+    var email = document.getElementById('fb-email').value.trim();
+    if (!text && !role) { feedbackModal.style.display = 'none'; return; }
+    fetch('/api/admin/feedback', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: role, feedback: text, email: email })
+    }).then(function() {
+      feedbackModal.style.display = 'none';
+      document.getElementById('fb-role').value = '';
+      document.getElementById('fb-text').value = '';
+      document.getElementById('fb-email').value = '';
+    }).catch(function() {
+      feedbackModal.style.display = 'none';
+    });
+  });
+
+  // ── Kill session ──
   window.killSession = function(sessionId, sessionName) {
     if (!confirm('Kill session "' + sessionName + '"? All connected users will be disconnected.')) return;
     fetch('/api/admin/session/' + sessionId + '/kill', {
@@ -975,6 +1033,7 @@
       return res.json();
     }).then(function() {
       refresh();
+      showFeedbackModal();
     }).catch(function(err) {
       console.error('Kill failed:', err);
     });

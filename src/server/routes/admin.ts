@@ -286,6 +286,26 @@ export function createAdminRouter(
     }
   });
 
+  // ── Admin Feedback ──
+  router.post('/api/admin/feedback', authMiddleware, (req: Request, res: Response) => {
+    try {
+      if (!ownerOnly(req, res)) return;
+      const { role, feedback, email } = req.body || {};
+      const entry = {
+        ts: new Date().toISOString(),
+        role: String(role || '').slice(0, 100),
+        feedback: String(feedback || '').slice(0, 2000),
+        email: String(email || '').slice(0, 200),
+        ip: req.ip,
+      };
+      const feedbackPath = path.join(config.dataDir, 'admin-feedback.ndjson');
+      fs.appendFileSync(feedbackPath, JSON.stringify(entry) + '\n');
+      res.json({ status: 'saved' });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
   return router;
 }
 
