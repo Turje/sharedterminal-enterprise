@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/xterm.css?v=79cf21c7">
-  <link rel="stylesheet" href="css/terminal.css?v=79cf21c7">
+  <link rel="stylesheet" href="css/xterm.css?v=a4feb07d">
+  <link rel="stylesheet" href="css/terminal.css?v=a4feb07d">
 </head>
 <body>
   <div id="app">
@@ -160,15 +160,39 @@
       <div id="demo-motd" class="hidden">
         <button id="demo-motd-dismiss" class="demo-motd-dismiss" title="Dismiss">&times;</button>
         <div class="demo-motd-content">
-          <div class="demo-motd-header">SharedTerminal <span class="demo-motd-dim">&mdash; Cross-Stack Incident Sandbox</span> &#x1f6e1;</div>
+          <div class="demo-motd-header">SharedTerminal <span class="demo-motd-dim">&mdash; Cross-Stack Incident Sandbox</span></div>
           <div class="demo-motd-scenario">
-            <strong>SCENARIO</strong> &nbsp;A production stack is failing. The Node API is leaking secrets and crashing. The Python inference service is hitting a memory error.
+            <strong>SCENARIO</strong> &nbsp;A production stack is failing. The Node API is leaking secrets and crashing. The Python inference service is hitting a memory error. Your team has 15 minutes to triage, fix, and restart both services.
+          </div>
+
+          <div class="demo-motd-section-label">INCIDENT COMMANDS</div>
+          <div class="demo-motd-cmds">
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>npm start</strong> <span class="demo-motd-dim">Run the Node API (port 3001)</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>python3 model.py</strong> <span class="demo-motd-dim">Run ML inference service</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>cat .env</strong> <span class="demo-motd-dim">Test real-time DLP redaction</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>curl :3001/crash</strong> <span class="demo-motd-dim">Trigger API crash (5x = cascading failure)</span></span>
+          </div>
+
+          <div class="demo-motd-section-label">AI INTEGRATION</div>
+          <div class="demo-motd-scenario">
+            An AI assistant is available in the sidebar panel. It connects to your terminal session in real time and can analyze errors, suggest fixes, and generate post-mortems. You can also bring your own AI CLI.
           </div>
           <div class="demo-motd-cmds">
-            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>npm start</strong> <span class="demo-motd-dim">Run the API</span></span>
-            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>python3 model.py</strong> <span class="demo-motd-dim">Run inference</span></span>
-            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>cat .env</strong> <span class="demo-motd-dim">Test DLP</span></span>
-            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>curl :3001/crash</strong> <span class="demo-motd-dim">Trigger crash</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>Sidebar &rarr; AI Assistant</strong> <span class="demo-motd-dim">Open the built-in AI panel</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>Generate Session Summary</strong> <span class="demo-motd-dim">AI reads your terminal history &amp; outputs a summary</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>Generate Post-Mortem</strong> <span class="demo-motd-dim">Structured incident report from session activity</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>Ask a question</strong> <span class="demo-motd-dim">Type anything &mdash; the AI sees your live terminal context</span></span>
+          </div>
+
+          <div class="demo-motd-section-label">BRING YOUR OWN AI</div>
+          <div class="demo-motd-cmds">
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>claude</strong> <span class="demo-motd-dim">Launch Claude Code (install via sidebar)</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>aider</strong> <span class="demo-motd-dim">Launch Aider AI pair programmer</span></span>
+            <span class="demo-motd-cmd"><span class="demo-motd-arrow">&#9658;</span> <strong>gh copilot</strong> <span class="demo-motd-dim">Launch GitHub Copilot CLI</span></span>
+          </div>
+
+          <div class="demo-motd-footer">
+            All AI interactions are audited. Secrets are redacted before reaching any AI model.
           </div>
         </div>
       </div>

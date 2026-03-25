@@ -1840,7 +1840,25 @@ body {
 
 .demo-motd-cmd { font-size: 11px; }
 
-.demo-motd-arrow { color: var(--blue); font-size: 9px; }
+.demo-motd-arrow { color: var(--accent); font-size: 9px; }
+
+.demo-motd-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin: 10px 0 6px;
+  font-family: var(--font-mono);
+}
+
+.demo-motd-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-primary);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
 
 /* ── AI Setup prompt ── */
 #ai-setup {
