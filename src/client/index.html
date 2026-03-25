@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/xterm.css?v=01743bd6">
-  <link rel="stylesheet" href="css/terminal.css?v=01743bd6">
+  <link rel="stylesheet" href="css/xterm.css?v=fa45d4f6">
+  <link rel="stylesheet" href="css/terminal.css?v=fa45d4f6">
 </head>
 <body>
   <div id="app">
@@ -165,52 +165,6 @@
       <div id="terminal-tabs">
         <div id="tab-list"></div>
         <button id="new-tab-btn" title="New terminal (Ctrl+T)">+</button>
-      </div>
-
-      <!-- Pinned demo MOTD (immune to terminal clear) -->
-      <div id="demo-motd" class="hidden">
-        <button id="demo-motd-dismiss" class="demo-motd-dismiss" title="Dismiss">&times;</button>
-        <div class="demo-motd-content">
-          <!-- Header -->
-          <div class="demo-motd-header">
-            <span class="demo-motd-title">SharedTerminal</span>
-            <span class="demo-motd-subtitle">Cross-Stack Incident Sandbox</span>
-          </div>
-
-          <!-- Scenario brief -->
-          <div class="demo-motd-scenario">
-            A production stack is failing. The Node API is leaking secrets and crashing. The Python inference service is hitting a memory error. Triage, fix, and restart both services.
-          </div>
-
-          <!-- Two-column layout: Commands + AI -->
-          <div class="demo-motd-grid">
-            <!-- Left column: Incident Commands -->
-            <div class="demo-motd-card">
-              <div class="demo-motd-card-label">INCIDENT COMMANDS</div>
-              <table class="demo-motd-table">
-                <tr><td class="demo-motd-cmd-col">npm start</td><td class="demo-motd-desc-col">Run the Node API (port 3001)</td></tr>
-                <tr><td class="demo-motd-cmd-col">python3 model.py</td><td class="demo-motd-desc-col">Run ML inference service</td></tr>
-                <tr><td class="demo-motd-cmd-col">cat .env</td><td class="demo-motd-desc-col">Test real-time DLP redaction</td></tr>
-                <tr><td class="demo-motd-cmd-col">curl :3001/crash</td><td class="demo-motd-desc-col">Trigger crash (5x = cascade)</td></tr>
-              </table>
-            </div>
-
-            <!-- Right column: AI Integration -->
-            <div class="demo-motd-card">
-              <div class="demo-motd-card-label">AI INTEGRATION</div>
-              <table class="demo-motd-table">
-                <tr><td class="demo-motd-cmd-col">Sidebar &rarr; AI</td><td class="demo-motd-desc-col">Open the built-in AI panel</td></tr>
-                <tr><td class="demo-motd-cmd-col">Session Summary</td><td class="demo-motd-desc-col">AI reads history &amp; summarizes</td></tr>
-                <tr><td class="demo-motd-cmd-col">Post-Mortem</td><td class="demo-motd-desc-col">Structured incident report</td></tr>
-                <tr><td class="demo-motd-cmd-col">Ask anything</td><td class="demo-motd-desc-col">AI sees your live terminal context</td></tr>
-              </table>
-              <div class="demo-motd-card-hint">Or run your own: <strong>claude</strong> &middot; <strong>aider</strong> &middot; <strong>gh copilot</strong></div>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="demo-motd-footer">All sessions are audited &middot; Secrets are redacted before reaching any AI model</div>
-        </div>
       </div>
 
       <div id="workspace">
@@ -402,6 +356,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-AD7CWX7Q.js"></script>
+  <script src="js/main-3EZDA55N.js"></script>
 </body>
 </html>

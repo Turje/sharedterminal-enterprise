@@ -800,16 +800,6 @@ function initSocket(token: string, name: string) {
     adminLink.classList.remove('hidden');
   }
 
-  // Show pinned demo MOTD for demo sessions
-  const demoMotd = document.getElementById('demo-motd');
-  const urlParams = new URLSearchParams(window.location.search);
-  if (demoMotd && (urlParams.has('team') || !urlParams.has('session'))) {
-    demoMotd.classList.remove('hidden');
-    document.getElementById('demo-motd-dismiss')?.addEventListener('click', () => {
-      demoMotd.classList.add('hidden');
-    });
-  }
-
   socket = io({
     auth: { token, name },
     transports: ['websocket', 'polling'],
