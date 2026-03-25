@@ -342,6 +342,9 @@ if (savedToken && savedRole && savedName) {
       passwordInput.placeholder = 'Session password';
       passwordInput.style.display = '';
       nameInput.focus();
+
+      // Show admin re-join option
+      showAdminRejoin(data.sessionId);
     })
     .catch(() => {
       // No session for this team — show the create form instead
@@ -456,6 +459,9 @@ if (savedToken && savedRole && savedName) {
       }
     })
     .catch(() => {});
+
+  // Show admin re-join option
+  showAdminRejoin(urlSession);
 } else {
   // No params — show landing page with hero animation
   landingScreen.classList.remove('hidden');
@@ -1498,6 +1504,67 @@ function timeAgo(date: Date): string {
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
   return `${Math.floor(minutes / 60)}h ago`;
+}
+
+function showAdminRejoin(sessionId: string) {
+  const adminRejoin = document.getElementById('admin-rejoin');
+  const adminPinInput = document.getElementById('admin-rejoin-pin') as HTMLInputElement;
+  const adminNameInput = document.getElementById('admin-rejoin-name') as HTMLInputElement;
+  const adminRejoinBtn = document.getElementById('admin-rejoin-btn') as HTMLButtonElement;
+  if (!adminRejoin || !adminPinInput || !adminNameInput || !adminRejoinBtn) return;
+
+  adminRejoin.classList.remove('hidden');
+
+  const doAdminRejoin = async () => {
+    const pin = adminPinInput.value.trim();
+    const name = adminNameInput.value.trim() || 'admin';
+    if (!pin || pin.length !== 6) { showError('Admin PIN must be 6 digits'); return; }
+
+    adminRejoinBtn.disabled = true;
+    adminRejoinBtn.textContent = 'Verifying...';
+
+    try {
+      const res = await fetch('/api/session/admin-rejoin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, adminPin: pin, name }),
+      });
+      const result = await res.json();
+      if (!res.ok) { showError(result.error || 'Failed to verify PIN'); adminRejoinBtn.disabled = false; adminRejoinBtn.textContent = 'Re-enter as Admin'; return; }
+
+      // Connect as owner
+      myRole = 'owner';
+      const sessionName = result.sessionName || '';
+      if (sessionName) {
+        document.title = `${sessionName} \u2014 SharedTerminal`;
+        sessionDisplayNameEl.textContent = sessionName;
+        securityBannerSession.textContent = sessionName;
+      }
+      authScreen.classList.add('hidden');
+      terminalScreen.classList.remove('hidden');
+      sessionStartTime = Date.now();
+      timerInterval = window.setInterval(updateTimer, 1000);
+      statusRole.textContent = 'owner';
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then((p) => { notificationsPermission = p === 'granted'; });
+      } else if ('Notification' in window) {
+        notificationsPermission = Notification.permission === 'granted';
+      }
+      sessionStorage.setItem('st_token', result.token);
+      sessionStorage.setItem('st_role', 'owner');
+      sessionStorage.setItem('st_name', name);
+      sessionStorage.setItem('st_session_name', sessionName);
+      initSocket(result.token, name);
+    } catch {
+      showError('Connection failed');
+      adminRejoinBtn.disabled = false;
+      adminRejoinBtn.textContent = 'Re-enter as Admin';
+    }
+  };
+
+  adminRejoinBtn.addEventListener('click', doAdminRejoin);
+  adminPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doAdminRejoin(); });
+  adminNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doAdminRejoin(); });
 }
 
 function showError(msg: string) {

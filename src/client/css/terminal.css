@@ -453,6 +453,71 @@ body {
   text-align: center;
 }
 
+/* ── Admin re-join ── */
+#admin-rejoin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+#admin-rejoin input {
+  padding: 10px 14px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#admin-rejoin input::placeholder {
+  color: var(--text-muted);
+}
+
+#admin-rejoin input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+#admin-rejoin-pin {
+  font-family: var(--font-mono);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+#admin-rejoin-btn {
+  padding: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+#admin-rejoin-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+#admin-rejoin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#sso-divider-admin {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
 .error {
   color: var(--red);
   font-size: 12px;

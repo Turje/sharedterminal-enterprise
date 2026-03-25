@@ -238,6 +238,69 @@ export function createApiRouter(
     }
   });
 
+  // Admin re-join via PIN (no auth token required)
+  router.post('/api/session/admin-rejoin', (req: Request, res: Response) => {
+    try {
+      const { sessionId, adminPin, name } = req.body as { sessionId?: string; adminPin?: string; name?: string };
+      if (!sessionId || !adminPin || !name) {
+        res.status(400).json({ error: 'sessionId, adminPin, and name are required' });
+        return;
+      }
+
+      // Brute-force protection
+      const ip = req.ip || 'unknown';
+      const attempt = loginAttempts.get(ip);
+      if (attempt && Date.now() < attempt.lockedUntil) {
+        const waitSec = Math.ceil((attempt.lockedUntil - Date.now()) / 1000);
+        res.status(429).json({ error: `Too many attempts. Try again in ${waitSec}s` });
+        return;
+      }
+
+      let session;
+      try {
+        session = sessionManager.getSession(sessionId);
+      } catch {
+        res.status(404).json({ error: 'Session not found' });
+        return;
+      }
+
+      if (!session.adminPin) {
+        res.status(403).json({ error: 'This session has no admin PIN configured' });
+        return;
+      }
+
+      if (adminPin !== session.adminPin) {
+        // Track failed attempts
+        const current = loginAttempts.get(ip) || { count: 0, lockedUntil: 0 };
+        current.count++;
+        if (current.count >= MAX_LOGIN_ATTEMPTS) {
+          current.lockedUntil = Date.now() + LOCKOUT_MS;
+          current.count = 0;
+        }
+        loginAttempts.set(ip, current);
+
+        session.auditLogger?.log('auth.admin_pin_failure', { ip, userName: name });
+        res.status(401).json({ error: 'Invalid admin PIN' });
+        return;
+      }
+
+      // PIN correct — issue owner token
+      loginAttempts.delete(ip);
+      const { token: userToken, userId } = sessionManager.generateJoinToken(sessionId, name, 'owner');
+
+      session.auditLogger?.log('auth.admin_rejoin', { userId, userName: name, ip });
+
+      res.json({
+        sessionId,
+        sessionName: session.name,
+        token: userToken,
+        role: 'owner',
+      });
+    } catch (err) {
+      handleError(res, err);
+    }
+  });
+
   // Stop session (requires auth + owner role)
   router.post('/api/session/stop', authMiddleware, async (req: Request, res: Response) => {
     try {

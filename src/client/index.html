@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/xterm.css?v=a4feb07d">
-  <link rel="stylesheet" href="css/terminal.css?v=a4feb07d">
+  <link rel="stylesheet" href="css/xterm.css?v=0f23dad3">
+  <link rel="stylesheet" href="css/terminal.css?v=0f23dad3">
 </head>
 <body>
   <div id="app">
@@ -107,6 +107,17 @@
             <input type="password" id="admin-pin-input" placeholder="Admin PIN (6 digits)" maxlength="6" autocomplete="off" />
             <button id="start-demo-btn">Start Private Demo</button>
             <p class="demo-hint">You'll get an isolated sandbox. Share the link + password with your team.<br><span class="demo-hint-dim">Admin PIN protects the dashboard from other session members.</span></p>
+          </div>
+          <!-- Admin re-join via PIN -->
+          <div id="admin-rejoin" class="hidden">
+            <div id="sso-divider-admin">
+              <span class="divider-line"></span>
+              <span class="divider-text">admin</span>
+              <span class="divider-line"></span>
+            </div>
+            <input type="password" id="admin-rejoin-pin" placeholder="Admin PIN (6 digits)" maxlength="6" autocomplete="off" />
+            <input type="text" id="admin-rejoin-name" placeholder="Your name" autocomplete="off" />
+            <button id="admin-rejoin-btn">Re-enter as Admin</button>
           </div>
           <div id="auth-error" class="error hidden"></div>
           <p class="auth-footer">Secure sandbox environment. All sessions are audited and recorded.</p>
@@ -386,6 +397,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-VRHYRMIU.js"></script>
+  <script src="js/main-AD7CWX7Q.js"></script>
 </body>
 </html>

@@ -10,6 +10,8 @@ export type AuditEventType =
   | 'auth.success'
   | 'auth.failure'
   | 'auth.lockout'
+  | 'auth.admin_pin_failure'
+  | 'auth.admin_rejoin'
   | 'ai.request'
   | 'ai.response'
   | 'security.dlp_detected'
