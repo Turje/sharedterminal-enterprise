@@ -4,31 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal Enterprise — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-primary: #0d1117;
-      --bg-secondary: #161b22;
-      --bg-tertiary: #1c2129;
-      --border: #30363d;
-      --border-subtle: #21262d;
-      --text-primary: #e6edf3;
-      --text-secondary: #8b949e;
-      --text-muted: #6e7681;
-      --accent: #da7756;
-      --accent-dim: rgba(218, 119, 86, 0.15);
-      --green: #3fb950;
-      --green-dim: rgba(63, 185, 80, 0.15);
-      --yellow: #d29922;
-      --yellow-dim: rgba(210, 153, 34, 0.15);
-      --red: #f85149;
-      --red-dim: rgba(248, 81, 73, 0.15);
+      --bg-primary: #0A0A0B;
+      --bg-secondary: #121214;
+      --bg-tertiary: #1a1a1d;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --text-primary: #EDEDED;
+      --text-secondary: #888888;
+      --text-muted: #666666;
+      --accent: #00F5FF;
+      --accent-dim: rgba(0, 245, 255, 0.12);
+      --green: #34D058;
+      --green-dim: rgba(52, 208, 88, 0.15);
+      --yellow: #C69026;
+      --yellow-dim: rgba(198, 144, 38, 0.15);
+      --red: #E5534B;
+      --red-dim: rgba(229, 83, 75, 0.15);
       --blue: #58a6ff;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.5;
@@ -362,7 +365,7 @@
 
     .btn-accent:hover {
       background: var(--accent);
-      color: #fff;
+      color: var(--bg-primary);
     }
 
     .btn-danger {
@@ -377,13 +380,13 @@
     }
 
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
+      background: var(--text-primary);
+      color: var(--bg-primary);
       border-color: transparent;
     }
 
     .btn-primary:hover {
-      background: #e5896a;
+      background: #d4d4d4;
     }
 
     .actions-cell {
@@ -453,10 +456,10 @@
     .deploy-cta-btn {
       display: inline-block;
       padding: 10px 24px;
-      background: var(--accent);
+      background: var(--text-primary);
       border: none;
       border-radius: 6px;
-      color: #fff;
+      color: var(--bg-primary);
       font-size: 14px;
       font-weight: 600;
       text-decoration: none;
@@ -464,7 +467,7 @@
     }
 
     .deploy-cta-btn:hover {
-      background: #e5896a;
+      background: #d4d4d4;
     }
 
     /* Audit log viewer */
@@ -542,7 +545,7 @@
 <!-- Auth gate (shown if no token) -->
 <div id="auth-gate" class="auth-gate" style="display:none;">
   <svg width="48" height="48" viewBox="0 0 256 256" fill="none">
-    <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+    <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#00F5FF"/>
   </svg>
   <h2>Admin Access Required</h2>
   <p>Append <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:4px;">?token=YOUR_TOKEN</code> to the URL to authenticate.</p>
@@ -550,7 +553,7 @@
 
 <!-- Admin PIN gate (shown when PIN is required) -->
 <div id="pin-gate" class="auth-gate" style="display:none;">
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#da7756" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
   </svg>
@@ -561,7 +564,7 @@
       style="background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);padding:10px 16px;border-radius:8px;font-size:20px;letter-spacing:8px;text-align:center;width:180px;font-family:monospace;"
       autocomplete="off" />
     <button id="admin-pin-submit"
-      style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
+      style="background:var(--text-primary);color:var(--bg-primary);border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
       Verify
     </button>
   </div>
@@ -574,7 +577,7 @@
   <div class="topbar">
     <div class="topbar-left">
       <svg class="topbar-logo" viewBox="0 0 256 256" fill="none">
-        <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+        <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#00F5FF"/>
       </svg>
       <span class="topbar-title"><span>SharedTerminal</span> Enterprise</span>
       <span class="topbar-sep">/</span>
@@ -861,7 +864,7 @@
 
   // Color palette for user avatars
   var AVATAR_COLORS = [
-    '#da7756', '#58a6ff', '#3fb950', '#d29922',
+    '#00F5FF', '#58a6ff', '#34D058', '#C69026',
     '#bc8cff', '#f778ba', '#79c0ff', '#7ee787'
   ];
 

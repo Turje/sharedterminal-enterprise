@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SharedTerminal — Multiplayer for the command line</title>
-  <link rel="stylesheet" href="css/xterm.css?v=31ada7b6">
-  <link rel="stylesheet" href="css/terminal.css?v=31ada7b6">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/xterm.css?v=79cf21c7">
+  <link rel="stylesheet" href="css/terminal.css?v=79cf21c7">
 </head>
 <body>
   <div id="app">
@@ -16,30 +19,45 @@
           <div class="landing-logo-text">
             <span class="accent">Shared</span>Terminal
           </div>
-          <h1 class="landing-headline">Stop screensharing your terminal.</h1>
-          <p class="landing-subhead">This is multiplayer for the command line.</p>
+
+          <!-- Hero terminal window -->
+          <div class="hero-terminal">
+            <div class="hero-terminal-bar">
+              <span class="hero-terminal-dot"></span>
+              <span class="hero-terminal-dot"></span>
+              <span class="hero-terminal-dot"></span>
+              <span class="hero-terminal-title">sharedterminal</span>
+            </div>
+            <div class="hero-terminal-body">
+              <div><span class="hero-prompt">$ </span><span id="hero-typed" class="hero-typed"></span><span id="hero-cursor" class="hero-cursor"></span></div>
+              <div id="hero-response" class="hero-response">&#10003; Session ready. 3 users connected.</div>
+            </div>
+          </div>
+
+          <h1 class="landing-headline">Multiplayer for the command line.</h1>
+          <p class="landing-subhead">Real-time collaborative terminals</p>
           <p class="landing-body">Jump into one live session, spawn parallel shells, and team up with AI to ship fixes together.</p>
           <div class="landing-cta">
-            <button id="landing-demo-btn" class="landing-btn-primary">Try the Demo</button>
+            <button id="landing-demo-btn" class="landing-btn-primary">Start Session</button>
             <button id="landing-join-btn" class="landing-btn-secondary">Join a Session</button>
           </div>
           <div class="landing-features">
             <div class="landing-feature">
-              <span class="landing-feature-icon">&#x1f6e1;&#xfe0f;</span>
+              <span class="landing-feature-dot"></span>
               <div>
                 <strong>Real-time DLP</strong>
                 <span>Secrets are detected and redacted before they hit any screen</span>
               </div>
             </div>
             <div class="landing-feature">
-              <span class="landing-feature-icon">&#x1f4dc;</span>
+              <span class="landing-feature-dot"></span>
               <div>
                 <strong>Tamper-evident audit</strong>
                 <span>Every command SHA-256 hash-chained. Cryptographically verifiable.</span>
               </div>
             </div>
             <div class="landing-feature">
-              <span class="landing-feature-icon">&#x1f465;</span>
+              <span class="landing-feature-dot"></span>
               <div>
                 <strong>Multi-user terminals</strong>
                 <span>Share a link. Your team is typing in seconds. No install.</span>
@@ -57,7 +75,7 @@
         <div class="auth-card">
           <div class="auth-logo">
             <svg viewBox="0 0 256 256" fill="none" class="auth-logo-icon">
-              <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+              <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#00F5FF"/>
             </svg>
             <h1>SharedTerminal <span>Enterprise</span></h1>
           </div>
@@ -110,7 +128,7 @@
       <div id="header">
         <div id="header-left">
           <svg viewBox="0 0 256 256" fill="none" class="header-logo-svg">
-            <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#da7756"/>
+            <path d="M169.9 107.5c-5.2-3.5-11-5.8-16.5-9-2.4-1.4-4.8-3-6.5-5.3-3.6-4.8-2.3-10.7 2.8-13.8 3.4-2 7.4-2.1 11.1-1.1 7.7 2.2 13 7.2 17.2 13.5 1 1.5 1.8 3.1 2.9 5-2.7-1.2-5-2.5-7.4-3.2-5.2-1.6-10.1-.7-13.5 3.6-3.4 4.2-3.1 9.3.9 13 2.8 2.6 6.2 4.1 9.6 5.6 5.5 2.3 11 4.5 15.6 8.4 8.8 7.4 10.7 19.5 4.7 29.3-4.2 6.8-10.6 10.6-18.4 12-11.2 2-21-1.4-29.2-9.1-1.5-1.4-2.8-3-4.2-4.6l1.1-.8c3.1 2 6.1 4.3 9.4 5.8 7.3 3.3 14.7 3.7 21.6-.9 5.4-3.5 7.7-9.1 6.2-15.4-1-4.3-3.8-7.3-7.3-9.6zM90.5 107.5c5.2-3.5 11-5.8 16.5-9 2.4-1.4 4.8-3 6.5-5.3 3.6-4.8 2.3-10.7-2.8-13.8-3.4-2-7.4-2.1-11.1-1.1-7.7 2.2-13 7.2-17.2 13.5-1 1.5-1.8 3.1-2.9 5 2.7-1.2 5-2.5 7.4-3.2 5.2-1.6 10.1-.7 13.5 3.6 3.4 4.2 3.1 9.3-.9 13-2.8 2.6-6.2 4.1-9.6 5.6-5.5 2.3-11 4.5-15.6 8.4-8.8 7.4-10.7 19.5-4.7 29.3 4.2 6.8 10.6 10.6 18.4 12 11.2 2 21-1.4 29.2-9.1 1.5-1.4 2.8-3 4.2-4.6l-1.1-.8c-3.1 2-6.1 4.3-9.4 5.8-7.3 3.3-14.7 3.7-21.6-.9-5.4-3.5-7.7-9.1-6.2-15.4 1-4.3 3.8-7.3 7.3-9.6z" fill="#00F5FF"/>
           </svg>
           <span id="session-name"><span class="accent">SharedTerminal</span> <span class="header-separator">&mdash;</span> <span id="session-display-name">Enterprise Session</span></span>
         </div>
@@ -312,12 +330,12 @@
 
   <!-- Lead capture modal -->
   <div id="lead-modal" class="hidden" style="position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);">
-    <div style="background:#161b22;border:1px solid #30363d;border-radius:10px;padding:28px 32px;max-width:400px;width:90%;text-align:center;">
-      <div style="font-size:14px;font-weight:600;color:#e6edf3;margin-bottom:6px;" id="lead-modal-title">Enter your email to download</div>
-      <div style="font-size:13px;color:#8b949e;margin-bottom:18px;" id="lead-modal-subtitle">We'll send you updates on the self-hosted release.</div>
-      <input type="email" id="lead-email-input" placeholder="you@company.com" autocomplete="email" style="width:100%;padding:10px 12px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:14px;margin-bottom:12px;outline:none;" />
-      <button id="lead-submit-btn" style="width:100%;padding:10px;background:#da7756;border:none;border-radius:6px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Download</button>
-      <div id="lead-error" style="color:#f85149;font-size:12px;margin-top:8px;display:none;"></div>
+    <div style="background:#121214;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:28px 32px;max-width:400px;width:90%;text-align:center;">
+      <div style="font-size:14px;font-weight:600;color:#EDEDED;margin-bottom:6px;" id="lead-modal-title">Enter your email to download</div>
+      <div style="font-size:13px;color:#888888;margin-bottom:18px;" id="lead-modal-subtitle">We'll send you updates on the self-hosted release.</div>
+      <input type="email" id="lead-email-input" placeholder="you@company.com" autocomplete="email" style="width:100%;padding:10px 12px;background:#0A0A0B;border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#EDEDED;font-size:14px;margin-bottom:12px;outline:none;" />
+      <button id="lead-submit-btn" style="width:100%;padding:10px;background:#EDEDED;border:none;border-radius:6px;color:#0A0A0B;font-size:14px;font-weight:600;cursor:pointer;">Download</button>
+      <div id="lead-error" style="color:#E5534B;font-size:12px;margin-top:8px;display:none;"></div>
     </div>
   </div>
 
@@ -344,6 +362,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/main-PYNEMLST.js"></script>
+  <script src="js/main-VRHYRMIU.js"></script>
 </body>
 </html>

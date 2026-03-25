@@ -237,6 +237,41 @@ const landingScreen = document.getElementById('landing-screen')!;
 const landingDemoBtn = document.getElementById('landing-demo-btn');
 const landingJoinBtn = document.getElementById('landing-join-btn');
 
+function startHeroAnimation() {
+  const typedEl = document.getElementById('hero-typed');
+  const cursorEl = document.getElementById('hero-cursor');
+  const responseEl = document.getElementById('hero-response');
+  if (!typedEl || !cursorEl || !responseEl) return;
+
+  const text = 'sharedterminal login --guest';
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      typedEl.textContent += text[i];
+      i++;
+    } else {
+      clearInterval(interval);
+      cursorEl.style.display = 'none';
+      setTimeout(() => responseEl.classList.add('visible'), 300);
+    }
+  }, 60);
+}
+
+if (landingDemoBtn) {
+  landingDemoBtn.addEventListener('click', () => {
+    landingScreen.classList.add('hidden');
+    authScreen.classList.remove('hidden');
+    showDemoAuthFlow();
+  });
+}
+
+if (landingJoinBtn) {
+  landingJoinBtn.addEventListener('click', () => {
+    landingScreen.classList.add('hidden');
+    authScreen.classList.remove('hidden');
+  });
+}
+
 // ── URL session ID + project name ──
 const urlParams = new URLSearchParams(window.location.search);
 const urlSession = urlParams.get('session');
@@ -422,9 +457,9 @@ if (savedToken && savedRole && savedName) {
     })
     .catch(() => {});
 } else {
-  // No params — go straight to auth screen with demo flow
-  authScreen.classList.remove('hidden');
-  showDemoAuthFlow();
+  // No params — show landing page with hero animation
+  landingScreen.classList.remove('hidden');
+  startHeroAnimation();
 }
 
 function showDemoAuthFlow() {
@@ -983,9 +1018,9 @@ function initSocket(token: string, name: string) {
         const s = Math.floor((left % 60_000) / 1000);
         sessionTimerEl.textContent = `${m}:${String(s).padStart(2, '0')}`;
         if (left <= 60_000) {
-          sessionTimerEl.style.color = '#f85149';
+          sessionTimerEl.style.color = '#E5534B';
         } else if (left <= 5 * 60_000) {
-          sessionTimerEl.style.color = '#da7756';
+          sessionTimerEl.style.color = '#00F5FF';
         }
       }, 1000);
     }
@@ -1138,15 +1173,15 @@ function initSocket(token: string, name: string) {
 // ── Tab management ──
 function createTab(tabId: string, index: number) {
   const termTheme = {
-    background: '#0d1117', foreground: '#c9d1d9', cursor: '#da7756', cursorAccent: '#0d1117',
-    selectionBackground: '#da775640',
-    black: '#0d1117', red: '#f85149', green: '#3fb950', yellow: '#da7756', blue: '#58a6ff',
-    magenta: '#bc8cff', cyan: '#39d353', white: '#c9d1d9',
-    brightBlack: '#484f58', brightRed: '#ff7b72', brightGreen: '#56d364', brightYellow: '#e3b341',
+    background: '#0A0A0B', foreground: '#EDEDED', cursor: '#00F5FF', cursorAccent: '#0A0A0B',
+    selectionBackground: 'rgba(0, 245, 255, 0.19)',
+    black: '#0A0A0B', red: '#E5534B', green: '#34D058', yellow: '#C69026', blue: '#58a6ff',
+    magenta: '#bc8cff', cyan: '#00F5FF', white: '#EDEDED',
+    brightBlack: '#555555', brightRed: '#ff7b72', brightGreen: '#56d364', brightYellow: '#e3b341',
     brightBlue: '#79c0ff', brightMagenta: '#d2a8ff', brightCyan: '#56d364', brightWhite: '#f0f6fc',
   };
 
-  const term = new Terminal({ cursorBlink: true, fontSize: 14, fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace", theme: termTheme });
+  const term = new Terminal({ cursorBlink: true, fontSize: 14, fontFamily: "'Geist Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace", theme: termTheme });
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
   term.loadAddon(new WebLinksAddon());
@@ -1252,8 +1287,8 @@ function startFollowing(userId: string, userName: string) {
 
   followTerm = new Terminal({
     cursorBlink: false, fontSize: 14,
-    fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace",
-    theme: { background: '#0d1117', foreground: '#c9d1d9', cursor: '#da7756' },
+    fontFamily: "'Geist Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace",
+    theme: { background: '#0A0A0B', foreground: '#EDEDED', cursor: '#00F5FF' },
     disableStdin: true,
   });
   followFitAddon = new FitAddon();
@@ -1320,7 +1355,7 @@ function getInitials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-const AVATAR_COLORS = ['#da7756', '#3fb950', '#58a6ff', '#bc8cff', '#39d353', '#f85149', '#e3b341', '#79c0ff'];
+const AVATAR_COLORS = ['#00F5FF', '#34D058', '#58a6ff', '#bc8cff', '#39d353', '#E5534B', '#C69026', '#79c0ff'];
 function hashColor(name: string): string {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
