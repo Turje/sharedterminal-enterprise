@@ -1883,46 +1883,100 @@ body {
 .demo-motd-dismiss:hover { color: var(--red); }
 
 .demo-motd-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.demo-motd-title {
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 6px;
   font-size: 13px;
+}
+
+.demo-motd-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
 .demo-motd-dim { color: var(--text-dim); font-weight: 400; }
 
 .demo-motd-scenario {
-  color: var(--text-secondary);
-  margin-bottom: 8px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
   font-size: 11px;
+  line-height: 1.5;
 }
 
-.demo-motd-cmds {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
+.demo-motd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.demo-motd-cmd { font-size: 11px; }
+@media (max-width: 600px) {
+  .demo-motd-grid { grid-template-columns: 1fr; }
+}
 
-.demo-motd-arrow { color: var(--accent); font-size: 9px; }
+.demo-motd-card {
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--bg-canvas);
+}
 
-.demo-motd-section-label {
-  font-size: 10px;
+.demo-motd-card-label {
+  font-size: 9px;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.08em;
-  margin: 10px 0 6px;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
   font-family: var(--font-mono);
+}
+
+.demo-motd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.demo-motd-table tr + tr td { padding-top: 3px; }
+
+.demo-motd-cmd-col {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 12px;
+  width: 1%;
+}
+
+.demo-motd-desc-col {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.demo-motd-card-hint {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid var(--border-primary);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.demo-motd-card-hint strong {
+  color: var(--text-secondary);
 }
 
 .demo-motd-footer {
   margin-top: 10px;
-  padding-top: 8px;
+  padding-top: 6px;
   border-top: 1px solid var(--border-primary);
   font-size: 10px;
   color: var(--text-muted);
   letter-spacing: 0.02em;
+  text-align: center;
 }
 
 /* ── AI Setup prompt ── */
