@@ -36,6 +36,8 @@ export interface ServerConfig {
   demoProjectPath: string;
   maxDemoRooms: number;
   demoSessionDurationMs: number;
+  // GPU passthrough for self-hosters with NVIDIA GPUs
+  gpuEnabled: boolean;
 }
 
 export function loadConfig(): ServerConfig {
@@ -90,5 +92,6 @@ export function loadConfig(): ServerConfig {
     demoProjectPath: process.env.DEMO_PROJECT_PATH || '',
     maxDemoRooms: parseInt(process.env.MAX_DEMO_ROOMS || '5', 10),
     demoSessionDurationMs: parseInt(process.env.DEMO_SESSION_DURATION_MS || String(10 * 60 * 1000), 10),
+    gpuEnabled: process.env.GPU_ENABLED === 'true',
   };
 }

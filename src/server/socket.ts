@@ -40,7 +40,7 @@ function buildDemoMotd(session: import('./session/session').SessionState): strin
   return [
     '',
     line,
-    `  ${bold}${accent}SharedTerminal${reset} ${dim}— Cross-Stack Incident Sandbox${reset} ${shield}`,
+    `  ${bold}${accent}SharedTerminal${reset} ${dim}— ${session.name}${reset} ${shield}`,
     line,
     '',
     `  ${bold}SCENARIO${reset}  A production stack is failing. The Node API`,
@@ -52,14 +52,43 @@ function buildDemoMotd(session: import('./session/session').SessionState): strin
     `  ${cyan}►${reset} ${bold}cat .env${reset}            Test DLP ${dim}(secrets auto-masked)${reset}`,
     `  ${cyan}►${reset} ${bold}curl :3001/crash${reset}    Hit 5x to trigger the crash`,
     '',
-    `  ${bold}Collaborate${reset}  Share this URL — teammates join instantly`,
-    `  ${bold}Compliance${reset}   Tamper-evident audit log & DLP active`,
-    `  ${bold}AI Tools${reset}     Install any AI CLI — the sidebar connects automatically`,
-    '',
-    `  ${dim}\u{1F4A1} npm install -g @anthropic-ai/claude-code && claude${reset}`,
-    `  ${dim}   Then use the AI Assistant in the sidebar for summaries & debugging${reset}`,
+    `  ${bold}Collaborate${reset}    Share this URL — teammates join instantly`,
+    `  ${bold}ML Models${reset}      ${dim}pip install torch transformers scikit-learn${reset}`,
+    `  ${bold}GPU Access${reset}     ${dim}Connect your own GPU — set GPU_ENABLED=true on host${reset}`,
+    `  ${bold}AI Assistants${reset}  ${dim}Install any AI CLI (Claude, Aider, Copilot)${reset}`,
+    `  ${bold}Compliance${reset}     Tamper-evident audit log & DLP active`,
     '',
     `  ${dim}Session expires in ${mins} min \u00b7 Work is ephemeral${reset}`,
+    line,
+    '\r\n',
+  ].join('\r\n');
+}
+
+function buildMotd(session: import('./session/session').SessionState): string {
+  const bold = '\x1b[1m';
+  const dim = '\x1b[2m';
+  const reset = '\x1b[0m';
+  const accent = '\x1b[36m';
+  const line = `  ${dim}${'─'.repeat(56)}${reset}`;
+
+  const cyan = '\x1b[36m';
+
+  return [
+    '',
+    line,
+    `  ${bold}${accent}SharedTerminal${reset} ${dim}— ${session.name}${reset}`,
+    line,
+    '',
+    `  ${bold}Collaborate${reset}    Share this URL — teammates join instantly`,
+    `  ${bold}ML Models${reset}      ${dim}pip install torch transformers scikit-learn${reset}`,
+    `  ${bold}GPU Access${reset}     ${dim}Connect your own GPU — set GPU_ENABLED=true on host${reset}`,
+    `  ${bold}AI Assistants${reset}  ${dim}Install any AI CLI (Claude, Aider, Copilot)${reset}`,
+    `  ${bold}Compliance${reset}     Tamper-evident audit log & DLP active`,
+    '',
+    `  ${cyan}►${reset} ${bold}python3 -c "import torch; print(torch.cuda.is_available())"${reset}`,
+    `  ${cyan}►${reset} ${bold}pip install transformers && python3 -c "from transformers import pipeline"${reset}`,
+    `  ${cyan}►${reset} ${bold}npm install -g @anthropic-ai/claude-code && claude${reset}`,
+    '',
     line,
     '\r\n',
   ].join('\r\n');
@@ -285,9 +314,11 @@ export function createSocketServer(
 
         socket.emit('terminal:created', { tabId, index: 0 });
 
-        // Inject MOTD for demo sessions (first terminal only)
+        // Inject MOTD (first terminal only)
         if (session.isDemo) {
           socket.emit('terminal:output', { tabId, output: buildDemoMotd(session) });
+        } else {
+          socket.emit('terminal:output', { tabId, output: buildMotd(session) });
         }
       }
 

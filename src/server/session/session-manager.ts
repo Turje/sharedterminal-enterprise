@@ -82,6 +82,7 @@ export class SessionManager {
         readOnly: sessionConfig.readOnly,
         persistent,
         sessionId,
+        gpuEnabled: this.config.gpuEnabled,
       },
       sessionId
     );

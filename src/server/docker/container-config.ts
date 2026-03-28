@@ -75,6 +75,19 @@ export function buildContainerOptions(config: ContainerConfig, sessionId: string
         { Name: 'nproc', Soft: 256, Hard: 256 },
       ],
       Dns: ['8.8.8.8', '8.8.4.4'],
+      ...(config.gpuEnabled
+        ? {
+            DeviceRequests: [
+              {
+                Driver: '',
+                Count: -1, // all available GPUs
+                DeviceIDs: [],
+                Capabilities: [['gpu']],
+                Options: {},
+              },
+            ],
+          }
+        : {}),
     },
     WorkingDir: '/workspace',
     User: '1000:1000',

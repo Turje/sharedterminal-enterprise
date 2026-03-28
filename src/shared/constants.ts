@@ -21,6 +21,7 @@ export const DEFAULTS = {
   RECORDING_ENABLED: true,
   TUNNEL_ENABLED: true,
   DOCKER_NETWORK_NAME: 'sharedterm-isolated',
+  GPU_ENABLED: false,
 } as const;
 
 export const EVENTS = {

@@ -74,6 +74,7 @@ export interface ContainerConfig {
   readOnly?: boolean;
   persistent?: boolean;
   sessionId?: string;
+  gpuEnabled?: boolean;
 }
 
 export interface ActivityUpdate {
